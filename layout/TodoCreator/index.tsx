@@ -2,7 +2,7 @@ import StyledButton from "@/components/StyledButton"
 import StyledTextInput from "@/components/StyledTextInput"
 import { Todo } from "@/types/todo"
 import { useEffect, useState } from "react"
-import { StyleSheet, View } from "react-native"
+import { Keyboard, StyleSheet, View } from "react-native"
 
 
 type TodoCreatorProps = {
@@ -18,8 +18,9 @@ const TodoCreator: React.FC<TodoCreatorProps> = ({ onAddTodo }) => {
             setInputError(true)
             return
         }
-        onAddTodo(text)
-        setText("")
+        Keyboard.dismiss();
+        onAddTodo(text);
+        setText("");
     }
 
     useEffect(() => {
@@ -36,7 +37,7 @@ const TodoCreator: React.FC<TodoCreatorProps> = ({ onAddTodo }) => {
                 onChangeText={setText}
                 isError={inputError} />
             <StyledButton
-                icon="add-circle-sharp"
+                icon="add-circle-outline"
                 size="large"
                 variant="add"
                 onPress={onPressAdd}
@@ -50,9 +51,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginVertical: 10,
-        paddingHorizontal: 15,
-        gap: 20,
+        marginVertical: 15,
+        paddingHorizontal: 30,
+        gap: 10,
     }
 })
 

@@ -8,7 +8,8 @@ type StyledButtonProps = TouchableOpacityProps & {
     label?: string
     icon?: React.ComponentProps<typeof Ionicons>['name']
     size?: "small" | "large"
-    variant?: "delete" | "edit" | "add" | "modal_cancel" | "modal_save"
+    variant?: "delete" | "edit" | "add" |
+    "modal_cancel" | "modal_save" | "modal_delete"
 }
 
 const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant, disabled, ...props }) => {
@@ -18,7 +19,7 @@ const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant,
         return "small"
     })()
 
-    const iconSize = size === "large" ? 27 : 22
+    const iconSize = size === "large" ? 31 : 17
 
     const iconColor = (() => {
         if (variant === "delete") return COLORS.PRIMARY_DELETE_BUTTON_TEXT
@@ -34,13 +35,22 @@ const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant,
         size === "large" ? styles.large : null,
         variant === "modal_cancel" ? styles.modal_cancel : null,
         variant === "modal_save" ? styles.modal_save : null,
+        variant === "modal_delete" ? styles.modal_delete : null,
         variant === "delete" ? styles.delete : null,
         variant === "edit" ? styles.edit : null,
         variant === "add" ? styles.add : null]}
             {...props}
             disabled={disabled}>
-            {label && <StyledText variant={textVariant}>{label}</StyledText>}
-            {icon && <Ionicons name={icon} size={iconSize} color={iconColor} />}
+            {label && <StyledText
+                variant={textVariant}
+                style={{ color: "#ffffffff" }}>
+                {label}
+            </StyledText>}
+            {icon && <Ionicons
+                name={icon}
+                size={iconSize}
+                color={iconColor}>
+            </Ionicons>}
         </TouchableOpacity>
     )
 }
@@ -51,10 +61,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        paddingVertical: 10,
-        paddingHorizontal: 20,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
         borderRadius: 5,
-        borderWidth: 0.5
+        borderWidth: 0.5,
     },
     disabled: {
         opacity: 0.5
@@ -69,11 +79,18 @@ const styles = StyleSheet.create({
     },
     modal_cancel: {
         backgroundColor: COLORS.PRIMARY_DELETE_BUTTON_ICON,
-        borderRadius: 15
+        borderRadius: 15,
+        minWidth: 100
     },
     modal_save: {
         backgroundColor: COLORS.PRIMARY_EDIT_BUTTON_ICON,
-        borderRadius: 15
+        borderRadius: 15,
+        minWidth: 100
+    },
+    modal_delete: {
+        backgroundColor: COLORS.PRIMARY_DELETE_BUTTON_ICON,
+        borderRadius: 15,
+        minWidth: 100
     },
     delete: {
         backgroundColor: COLORS.PRIMARY_DELETE_BUTTON_ICON,

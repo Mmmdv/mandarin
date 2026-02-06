@@ -2,7 +2,7 @@ import { COLORS } from "@/constants/ui";
 import { StyleSheet, Text, TextProps } from "react-native";
 
 type StyledTextProps = TextProps & {
-  variant?: "primary" | "title" | "subtitle" | "heading" | "small"
+  variant?: "primary" | "title" | "subtitle" | "heading" | "small" | "modal_question"
 };
 
 const StyledText: React.FC<StyledTextProps> = ({ style, variant, ...props }) => {
@@ -12,6 +12,7 @@ const StyledText: React.FC<StyledTextProps> = ({ style, variant, ...props }) => 
     variant === "subtitle" ? styles.subtitle : null,
     variant === "heading" ? styles.heading : null,
     variant === "small" ? styles.small : null,
+    variant === "modal_question" ? styles.modal_question : null,
     style
   ]} {...props}></Text>;
 };
@@ -38,6 +39,11 @@ const styles = StyleSheet.create({
   small: {
     fontSize: 14,
     lineHeight: 18,
+  },
+  modal_question: {
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: "500",
   }
 });
 

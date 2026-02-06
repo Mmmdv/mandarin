@@ -12,8 +12,9 @@ const StyledCheckBox: React.FC<StyledCheckBoxProps> = ({ checked, onCheck }) => 
     return (
         <TouchableOpacity onPress={onCheck}>
             <Ionicons
-                name={checked ? "checkmark-circle" : "ellipse-outline"}
-                size={30}
+                name={checked ? "checkmark-circle-sharp" : "ellipse-outline"}
+                size={25}
+                textColor="white"
                 color={checked ? COLORS.CHECKBOX_SUCCESS : COLORS.CHECKBOX_INACTIVE} />
         </TouchableOpacity>
     )
