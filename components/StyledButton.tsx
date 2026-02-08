@@ -1,17 +1,22 @@
 import { COLORS } from "@/constants/ui"
 import { Ionicons } from "@expo/vector-icons"
 import React from "react"
-import { StyleSheet, TouchableOpacity, TouchableOpacityProps } from "react-native"
+import { StyleSheet, ViewStyle } from "react-native"
+import { TouchableOpacity } from "react-native-gesture-handler"
 import StyledText from "./StyledText"
 
-type StyledButtonProps = TouchableOpacityProps & {
+type StyledButtonProps = {
     label?: string
     icon?: React.ComponentProps<typeof Ionicons>['name']
     size?: "small" | "large"
     variant?: "blue_icon" | "blue_button"
+    disabled?: boolean
+    onPress?: () => void
+    style?: ViewStyle
+    activeOpacity?: number
 }
 
-const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant, disabled, ...props }) => {
+const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant, disabled, onPress, style, activeOpacity }) => {
 
     const textVariant = (() => {
         if (size === "large") return "heading"
@@ -25,14 +30,20 @@ const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant,
     })()
 
     return (
-        <TouchableOpacity style={[styles.base,
-        disabled ? styles.disabled : null,
-        size === "small" ? styles.small : null,
-        size === "large" ? styles.large : null,
-        variant === "blue_icon" ? styles.blue_icon : null,
-        variant === "blue_button" ? styles.blue_button : null]}
-            {...props}
-            disabled={disabled}>
+        <TouchableOpacity
+            style={[
+                styles.base,
+                disabled ? styles.disabled : null,
+                size === "small" ? styles.small : null,
+                size === "large" ? styles.large : null,
+                variant === "blue_icon" ? styles.blue_icon : null,
+                variant === "blue_button" ? styles.blue_button : null,
+                style
+            ]}
+            onPress={onPress}
+            disabled={disabled}
+            activeOpacity={activeOpacity ?? 0.7}
+        >
             {label && <StyledText
                 variant={textVariant}
                 style={{ color: "#ffffffff" }}>
