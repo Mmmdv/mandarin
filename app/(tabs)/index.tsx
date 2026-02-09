@@ -10,10 +10,13 @@ export default function Index() {
   const {
     todos,
     completedTodos,
+    archivedTodos,
     onAddTodo,
     onDeleteTodo,
     onEditTodo,
     onCheckTodo,
+    onArchiveTodo,
+    onClearArchive,
   } = useTodo();
 
   return (
@@ -21,7 +24,15 @@ export default function Index() {
       <StatusBar barStyle={"light-content"}></StatusBar>
       <Header totalTodos={todos.length} completedTodos={completedTodos.length}></Header>
       <TodoCreator onAddTodo={onAddTodo} />
-      <TodoList todos={todos} onDeleteTodo={onDeleteTodo} onCheckTodo={onCheckTodo} onEditTodo={onEditTodo}></TodoList>
+      <TodoList
+        todos={todos}
+        onDeleteTodo={onDeleteTodo}
+        onCheckTodo={onCheckTodo}
+        onEditTodo={onEditTodo}
+        onArchiveTodo={onArchiveTodo}
+        onClearArchive={onClearArchive}
+        archivedTodos={archivedTodos}
+      />
     </View>
   );
 }

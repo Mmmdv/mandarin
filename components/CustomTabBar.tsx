@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.SECONDARY_BACKGROUND,
         borderRadius: 35,
         borderWidth: 0.4,
-        borderColor: "#3a3f47",
+        borderColor: COLORS.PRIMARY_BORDER_DARK,
         height: 60,
         width: SCREEN_WIDTH * 0.65,
         justifyContent: "space-around",

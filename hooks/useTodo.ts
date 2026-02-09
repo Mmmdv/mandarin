@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "@/store";
-import { addTodo, checkTodo, deleteTodo, editTodo, selectTodos } from "@/store/slices/todoSlice";
+import { addTodo, archiveTodo, checkTodo, clearArchive, deleteTodo, editTodo, selectTodos } from "@/store/slices/todoSlice";
 import { Todo } from "@/types/todo";
 
 // Random ID generator 
@@ -34,15 +34,28 @@ const useTodo = () => {
         dispatch(checkTodo(id))
     }
 
-    const completedTodos = todos.filter((todo) => todo.isCompleted);
+    const onArchiveTodo = (id: Todo["id"]) => {
+        dispatch(archiveTodo(id))
+    }
+
+
+    const onClearArchive = () => {
+        dispatch(clearArchive())
+    }
+
+    const completedTodos = todos.filter((todo) => todo.isCompleted && !todo.isArchived);
+    const archivedTodos = todos.filter((todo) => todo.isArchived);
 
     return {
         onAddTodo,
         onDeleteTodo,
         onEditTodo,
         onCheckTodo,
+        onArchiveTodo,
+        onClearArchive,
         todos,
-        completedTodos
+        completedTodos,
+        archivedTodos
     };
 }
 

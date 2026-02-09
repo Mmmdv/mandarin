@@ -51,10 +51,27 @@ export const todoSlice = createSlice({
                     completedAt: !todo.isCompleted ? new Date().toISOString() : undefined
                 } : todo)
         },
+        archiveTodo: (
+            state: TodoState,
+            action: PayloadAction<string>,
+        ) => {
+            const id = action.payload;
+            state.todos = state.todos.map((todo) =>
+                todo.id === id ? {
+                    ...todo,
+                    isArchived: true,
+                    archivedAt: new Date().toISOString()
+                } : todo)
+        },
+        clearArchive: (
+            state: TodoState,
+        ) => {
+            state.todos = state.todos.filter((todo) => !todo.isArchived)
+        },
     },
 });
 
-export const { addTodo, deleteTodo, editTodo, checkTodo } = todoSlice.actions
+export const { addTodo, deleteTodo, editTodo, checkTodo, archiveTodo, clearArchive } = todoSlice.actions
 
 export const selectTodos = (state: { todo: TodoState }): TodoState['todos'] =>
     state.todo.todos

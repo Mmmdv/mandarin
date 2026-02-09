@@ -4,6 +4,7 @@ import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
 import { useState } from "react"
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
+import ClearArchiveModal from "../Modals/ClearArchiveModal.tsx"
 import TodoItem from "../TodoItem"
 
 type SortBy = "date" | "text"
@@ -14,6 +15,9 @@ type TodoListProps = {
     onDeleteTodo: (id: Todo["id"]) => void
     onCheckTodo: (id: Todo["id"]) => void
     onEditTodo: (id: Todo["id"], title: Todo["title"]) => void
+    onArchiveTodo: (id: Todo["id"]) => void
+    onClearArchive: () => void
+    archivedTodos: Todo[]
 }
 
 // Sort controls component
@@ -49,19 +53,23 @@ const SortControls = ({
     </View>
 )
 
-const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo }) => {
+const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo, onArchiveTodo, onClearArchive, archivedTodos }) => {
     // Separate sort states for each section
     const [todoSortBy, setTodoSortBy] = useState<SortBy>("date")
     const [todoSortOrder, setTodoSortOrder] = useState<SortOrder>("desc")
     const [doneSortBy, setDoneSortBy] = useState<SortBy>("date")
     const [doneSortOrder, setDoneSortOrder] = useState<SortOrder>("desc")
+    const [archiveSortBy, setArchiveSortBy] = useState<SortBy>("date")
+    const [archiveSortOrder, setArchiveSortOrder] = useState<SortOrder>("desc")
 
     const [todoExpanded, setTodoExpanded] = useState(true)
     const [doneExpanded, setDoneExpanded] = useState(true)
+    const [archiveExpanded, setArchiveExpanded] = useState(false)
+    const [isClearArchiveModalOpen, setIsClearArchiveModalOpen] = useState(false)
 
-    // Filter todos into pending and completed
-    const pendingTodos = todos.filter(todo => !todo.isCompleted)
-    const completedTodos = todos.filter(todo => todo.isCompleted)
+    // Filter todos into pending and completed (non-archived)
+    const pendingTodos = todos.filter(todo => !todo.isCompleted && !todo.isArchived)
+    const completedTodos = todos.filter(todo => todo.isCompleted && !todo.isArchived)
 
     // Sort function for pending todos (by createdAt)
     const sortPendingTodos = (todoList: Todo[], sortBy: SortBy, sortOrder: SortOrder) => {
@@ -104,6 +112,26 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const sortedPendingTodos = sortPendingTodos(pendingTodos, todoSortBy, todoSortOrder)
     const sortedCompletedTodos = sortCompletedTodos(completedTodos, doneSortBy, doneSortOrder)
 
+    // Sort archived todos (by archivedAt)
+    const sortArchivedTodos = (todoList: Todo[], sortBy: SortBy, sortOrder: SortOrder) => {
+        return [...todoList].sort((a, b) => {
+            if (sortBy === "date") {
+                const dateA = new Date(a.archivedAt || a.createdAt).getTime()
+                const dateB = new Date(b.archivedAt || b.createdAt).getTime()
+                return sortOrder === "asc" ? dateA - dateB : dateB - dateA
+            } else {
+                const textA = a.title.toLowerCase()
+                const textB = b.title.toLowerCase()
+                if (sortOrder === "asc") {
+                    return textA.localeCompare(textB)
+                } else {
+                    return textB.localeCompare(textA)
+                }
+            }
+        })
+    }
+    const sortedArchivedTodos = sortArchivedTodos(archivedTodos, archiveSortBy, archiveSortOrder)
+
     if (todos.length === 0) {
         return (
             <View style={styles.emptyContainer}>
@@ -132,12 +160,14 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         </StyledText>
                     </View>
                     <View style={styles.sectionControls}>
-                        <SortControls
-                            sortBy={todoSortBy}
-                            sortOrder={todoSortOrder}
-                            onToggleSortBy={() => setTodoSortBy(prev => prev === "date" ? "text" : "date")}
-                            onToggleSortOrder={() => setTodoSortOrder(prev => prev === "asc" ? "desc" : "asc")}
-                        />
+                        {todoExpanded && (
+                            <SortControls
+                                sortBy={todoSortBy}
+                                sortOrder={todoSortOrder}
+                                onToggleSortBy={() => setTodoSortBy(prev => prev === "date" ? "text" : "date")}
+                                onToggleSortOrder={() => setTodoSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                            />
+                        )}
                         <Ionicons
                             name={todoExpanded ? "chevron-up" : "chevron-down"}
                             size={20}
@@ -181,12 +211,14 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         </StyledText>
                     </View>
                     <View style={styles.sectionControls}>
-                        <SortControls
-                            sortBy={doneSortBy}
-                            sortOrder={doneSortOrder}
-                            onToggleSortBy={() => setDoneSortBy(prev => prev === "date" ? "text" : "date")}
-                            onToggleSortOrder={() => setDoneSortOrder(prev => prev === "asc" ? "desc" : "asc")}
-                        />
+                        {doneExpanded && (
+                            <SortControls
+                                sortBy={doneSortBy}
+                                sortOrder={doneSortOrder}
+                                onToggleSortBy={() => setDoneSortBy(prev => prev === "date" ? "text" : "date")}
+                                onToggleSortOrder={() => setDoneSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                            />
+                        )}
                         <Ionicons
                             name={doneExpanded ? "chevron-up" : "chevron-down"}
                             size={20}
@@ -206,9 +238,78 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         deleteTodo={onDeleteTodo}
                         checkTodo={onCheckTodo}
                         editTodo={onEditTodo}
+                        archiveTodo={onArchiveTodo}
                     />
                 ))}
             </View>
+
+            {/* Divider */}
+            <View style={styles.sectionDivider} />
+
+            {/* Archive Section */}
+            <View style={styles.sectionContainer}>
+                <TouchableOpacity
+                    style={styles.sectionHeader}
+                    onPress={() => setArchiveExpanded(!archiveExpanded)}
+                    activeOpacity={0.7}
+                >
+                    <View style={styles.sectionTitleContainer}>
+                        <Ionicons
+                            name="archive"
+                            size={24}
+                            color="#888"
+                        />
+                        <StyledText style={styles.sectionTitle}>
+                            Archive ({archivedTodos.length})
+                        </StyledText>
+                    </View>
+                    <View style={styles.sectionControls}>
+                        {archivedTodos.length > 0 && (
+                            <TouchableOpacity
+                                onPress={() => setIsClearArchiveModalOpen(true)}
+                                style={{ marginRight: 10 }}
+                            >
+                                <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
+                            </TouchableOpacity>
+                        )}
+                        {archiveExpanded && (
+                            <SortControls
+                                sortBy={archiveSortBy}
+                                sortOrder={archiveSortOrder}
+                                onToggleSortBy={() => setArchiveSortBy(archiveSortBy === "date" ? "text" : "date")}
+                                onToggleSortOrder={() => setArchiveSortOrder(archiveSortOrder === "asc" ? "desc" : "asc")}
+                            />
+                        )}
+                        <Ionicons
+                            name={archiveExpanded ? "chevron-up" : "chevron-down"}
+                            size={20}
+                            color={COLORS.PRIMARY_TEXT}
+                        />
+                    </View>
+                </TouchableOpacity>
+                {archiveExpanded && sortedArchivedTodos.map(item => (
+                    <TodoItem
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        isCompleted={item.isCompleted}
+                        isArchived={item.isArchived}
+                        createdAt={item.createdAt}
+                        completedAt={item.completedAt}
+                        updatedAt={item.updatedAt}
+                        archivedAt={item.archivedAt}
+                        deleteTodo={onDeleteTodo}
+                        checkTodo={onCheckTodo}
+                        editTodo={onEditTodo}
+                    />
+                ))}
+            </View>
+
+            <ClearArchiveModal
+                isOpen={isClearArchiveModalOpen}
+                onClose={() => setIsClearArchiveModalOpen(false)}
+                onClear={onClearArchive}
+            />
         </ScrollView>
     )
 }

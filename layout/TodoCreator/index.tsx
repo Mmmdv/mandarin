@@ -49,7 +49,7 @@ const TodoCreator: React.FC<TodoCreatorProps> = ({ onAddTodo }) => {
                 activeOpacity={0.7}
                 disabled={inputError}
             >
-                <Ionicons name="arrow-up-circle" size={40} color={inputError ? "#3a3f47" : "#5BC0EB"} />
+                <Ionicons name="arrow-up-circle" size={40} color={inputError ? "#3a3f47" : COLORS.PRIMARY_TEXT} />
             </TouchableOpacity>
         </View>
     )

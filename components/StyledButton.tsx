@@ -10,7 +10,7 @@ type StyledButtonProps = {
     label?: string
     icon?: React.ComponentProps<typeof Ionicons>['name']
     size?: "small" | "large"
-    variant?: "blue_icon" | "blue_button"
+    variant?: "blue_icon" | "blue_button" | "delete_button"
     disabled?: boolean
     onPress?: () => void
     style?: ViewStyle
@@ -47,6 +47,7 @@ const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant,
                 size === "large" ? styles.large : null,
                 variant === "blue_icon" ? styles.blue_icon : null,
                 variant === "blue_button" ? styles.blue_button : null,
+                variant === "delete_button" ? styles.delete_button : null,
                 style
             ]}
             onPress={handlePress}
@@ -95,6 +96,11 @@ const styles = StyleSheet.create({
     },
     blue_button: {
         backgroundColor: COLORS.PRIMARY_ACTIVE_BUTTON,
+        borderRadius: 15,
+        minWidth: 100
+    },
+    delete_button: {
+        backgroundColor: "#FF6B6B",
         borderRadius: 15,
         minWidth: 100
     }
