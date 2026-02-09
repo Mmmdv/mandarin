@@ -17,7 +17,7 @@ type TodoItemProps = Todo & {
 
 const STAR_COLORS = ["#FFD700", "#FF6B6B", "#4ECDC4", "#A855F7", "#F97316"]
 
-const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, createdAt, completedAt, checkTodo, deleteTodo, editTodo }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, createdAt, completedAt, updatedAt, checkTodo, deleteTodo, editTodo }) => {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString)
@@ -103,8 +103,13 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, createdAt, 
     const onCheckTodo = () => {
         if (!isCompleted) {
             playCelebration()
+            // Delay check so animation plays before item moves to Done section
+            setTimeout(() => {
+                checkTodo(id)
+            }, 800)
+        } else {
+            checkTodo(id)
         }
-        checkTodo(id)
     }
 
     return (
@@ -155,6 +160,11 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, createdAt, 
                             ✅ {formatDate(completedAt)}
                         </StyledText>
                     )}
+                    {updatedAt && (
+                        <StyledText style={[styles.dateText, { color: '#5BC0EB' }]}>
+                            ✏️ {formatDate(updatedAt)}
+                        </StyledText>
+                    )}
                 </View>
             </View>
             <View style={styles.controlsContainer}>
@@ -201,6 +211,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         paddingHorizontal: 10,
         paddingVertical: 12,
+        overflow: "visible",
     },
     controlsContainer: {
         flexDirection: "row",
@@ -215,14 +226,17 @@ const styles = StyleSheet.create({
         flex: 1,
         flexShrink: 1,
         marginRight: 10,
+        overflow: "visible",
     },
     checkboxWrapper: {
         position: "relative",
+        overflow: "visible",
     },
     star: {
         position: "absolute",
         top: 0,
         left: 0,
+        zIndex: 1000,
     },
     textContainer: {
         flex: 1,

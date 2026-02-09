@@ -37,7 +37,7 @@ export const todoSlice = createSlice({
         ) => {
             const { id, title } = action.payload;
             state.todos = state.todos.map((todo) =>
-                todo.id === id ? { ...todo, title } : todo)
+                todo.id === id ? { ...todo, title, updatedAt: new Date().toISOString() } : todo)
         },
         checkTodo: (
             state: TodoState,

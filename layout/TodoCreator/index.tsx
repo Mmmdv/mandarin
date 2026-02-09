@@ -1,10 +1,8 @@
-import StyledButton from "@/components/StyledButton"
-import StyledTextInput from "@/components/StyledTextInput"
 import { COLORS } from "@/constants/ui"
 import { Todo } from "@/types/todo"
+import { Ionicons } from "@expo/vector-icons"
 import { useEffect, useState } from "react"
-import { Keyboard, StyleSheet, View } from "react-native"
-
+import { Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from "react-native"
 
 type TodoCreatorProps = {
     onAddTodo: (title: Todo["title"]) => void
@@ -14,6 +12,7 @@ const TodoCreator: React.FC<TodoCreatorProps> = ({ onAddTodo }) => {
 
     const [text, setText] = useState("")
     const [inputError, setInputError] = useState(false)
+
     const onPressAdd = () => {
         if (!text) {
             setInputError(true)
@@ -32,18 +31,26 @@ const TodoCreator: React.FC<TodoCreatorProps> = ({ onAddTodo }) => {
 
     return (
         <View style={styles.container}>
-            <StyledTextInput
-                placeholder="Add a new task.."
-                backgroundColor={COLORS.PRIMARY_BACKGROUND_WHITE}
-                value={text}
-                onChangeText={setText}
-                isError={inputError} />
-            <StyledButton
-                icon="add-circle-outline"
-                size="large"
-                variant="blue_icon"
+            <View style={[styles.inputContainer, inputError && styles.inputError]}>
+                <Ionicons name="add-outline" size={20} color="#666" style={styles.inputIcon} />
+                <TextInput
+                    style={styles.textInput}
+                    placeholder="Add a new task..."
+                    placeholderTextColor="#666"
+                    value={text}
+                    onChangeText={setText}
+                    onSubmitEditing={onPressAdd}
+                    returnKeyType="done"
+                />
+            </View>
+            <TouchableOpacity
+                style={[styles.addButton, inputError && styles.addButtonDisabled]}
                 onPress={onPressAdd}
-                disabled={inputError} />
+                activeOpacity={0.7}
+                disabled={inputError}
+            >
+                <Ionicons name="arrow-up-circle" size={40} color={inputError ? "#3a3f47" : "#5BC0EB"} />
+            </TouchableOpacity>
         </View>
     )
 }
@@ -52,13 +59,40 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
-        marginVertical: 15,
-        paddingHorizontal: 30,
-        paddingBottom: 15,
+        paddingVertical: 15,
+        paddingHorizontal: 15,
         gap: 10,
         borderBottomWidth: 0.5,
         borderBottomColor: "#3a3f47",
+    },
+    inputContainer: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: COLORS.SECONDARY_BACKGROUND,
+        borderRadius: 15,
+        borderWidth: 0.5,
+        borderColor: "#3a3f47",
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        gap: 8,
+    },
+    inputError: {
+        borderColor: COLORS.ERROR_INPUT_TEXT,
+    },
+    inputIcon: {
+        marginLeft: 2,
+    },
+    textInput: {
+        flex: 1,
+        color: COLORS.PRIMARY_TEXT,
+        fontSize: 14,
+    },
+    addButton: {
+        padding: 0,
+    },
+    addButtonDisabled: {
+        opacity: 0.5,
     },
 })
 

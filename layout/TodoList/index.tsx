@@ -63,8 +63,8 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const pendingTodos = todos.filter(todo => !todo.isCompleted)
     const completedTodos = todos.filter(todo => todo.isCompleted)
 
-    // Sort function
-    const sortTodos = (todoList: Todo[], sortBy: SortBy, sortOrder: SortOrder) => {
+    // Sort function for pending todos (by createdAt)
+    const sortPendingTodos = (todoList: Todo[], sortBy: SortBy, sortOrder: SortOrder) => {
         return [...todoList].sort((a, b) => {
             if (sortBy === "date") {
                 const dateA = new Date(a.createdAt).getTime()
@@ -82,8 +82,27 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
         })
     }
 
-    const sortedPendingTodos = sortTodos(pendingTodos, todoSortBy, todoSortOrder)
-    const sortedCompletedTodos = sortTodos(completedTodos, doneSortBy, doneSortOrder)
+    // Sort function for completed todos (by completedAt)
+    const sortCompletedTodos = (todoList: Todo[], sortBy: SortBy, sortOrder: SortOrder) => {
+        return [...todoList].sort((a, b) => {
+            if (sortBy === "date") {
+                const dateA = new Date(a.completedAt || a.createdAt).getTime()
+                const dateB = new Date(b.completedAt || b.createdAt).getTime()
+                return sortOrder === "asc" ? dateA - dateB : dateB - dateA
+            } else {
+                const textA = a.title.toLowerCase()
+                const textB = b.title.toLowerCase()
+                if (sortOrder === "asc") {
+                    return textA.localeCompare(textB)
+                } else {
+                    return textB.localeCompare(textA)
+                }
+            }
+        })
+    }
+
+    const sortedPendingTodos = sortPendingTodos(pendingTodos, todoSortBy, todoSortOrder)
+    const sortedCompletedTodos = sortCompletedTodos(completedTodos, doneSortBy, doneSortOrder)
 
     if (todos.length === 0) {
         return (
@@ -134,12 +153,16 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         isCompleted={item.isCompleted}
                         createdAt={item.createdAt}
                         completedAt={item.completedAt}
+                        updatedAt={item.updatedAt}
                         deleteTodo={onDeleteTodo}
                         checkTodo={onCheckTodo}
                         editTodo={onEditTodo}
                     />
                 ))}
             </View>
+
+            {/* Divider */}
+            <View style={styles.sectionDivider} />
 
             {/* Done Section */}
             <View style={styles.sectionContainer}>
@@ -149,7 +172,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 >
                     <View style={styles.sectionTitleContainer}>
                         <Ionicons
-                            name="checkmark-circle"
+                            name="checkmark-done-circle"
                             size={24}
                             color="#4ECDC4"
                         />
@@ -179,6 +202,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         isCompleted={item.isCompleted}
                         createdAt={item.createdAt}
                         completedAt={item.completedAt}
+                        updatedAt={item.updatedAt}
                         deleteTodo={onDeleteTodo}
                         checkTodo={onCheckTodo}
                         editTodo={onEditTodo}
@@ -251,6 +275,12 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 8,
+    },
+    sectionDivider: {
+        height: 0.5,
+        backgroundColor: "#3a3f47",
+        marginHorizontal: 15,
+        marginVertical: 10,
     },
 })
 

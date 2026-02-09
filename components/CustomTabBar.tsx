@@ -46,7 +46,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             Animated.parallel([
                 Animated.sequence([
                     Animated.spring(scaleAnims[index], {
-                        toValue: 1.25,
+                        toValue: 1.20,
                         friction: 3,
                         tension: 300,
                         useNativeDriver: true,
