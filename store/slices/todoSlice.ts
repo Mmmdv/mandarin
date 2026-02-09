@@ -45,7 +45,11 @@ export const todoSlice = createSlice({
         ) => {
             const id = action.payload;
             state.todos = state.todos.map((todo) =>
-                todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo)
+                todo.id === id ? {
+                    ...todo,
+                    isCompleted: !todo.isCompleted,
+                    completedAt: !todo.isCompleted ? new Date().toISOString() : undefined
+                } : todo)
         },
     },
 });

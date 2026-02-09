@@ -49,7 +49,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 25,
         borderRadius: 25,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        borderWidth: 0.5,
+        borderColor: "#3a3f47",
     },
     buttonsContainer: {
         flexDirection: "row",

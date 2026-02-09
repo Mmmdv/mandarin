@@ -31,6 +31,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20, //ashagidan mesafe
     paddingHorizontal: 15, // soldan mesafe
     backgroundColor: COLORS.SECONDARY_BACKGROUND,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#3a3f47",
   },
   headerMainContent: {
     marginBottom: 10,

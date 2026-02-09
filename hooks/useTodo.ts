@@ -18,6 +18,7 @@ const useTodo = () => {
             id: generateId(),
             title,
             isCompleted: false,
+            createdAt: new Date().toISOString(),
         }))
     }
 

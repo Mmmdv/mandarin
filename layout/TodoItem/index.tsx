@@ -17,7 +17,14 @@ type TodoItemProps = Todo & {
 
 const STAR_COLORS = ["#FFD700", "#FF6B6B", "#4ECDC4", "#A855F7", "#F97316"]
 
-const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, checkTodo, deleteTodo, editTodo }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, createdAt, completedAt, checkTodo, deleteTodo, editTodo }) => {
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString)
+        const dateStr = date.toLocaleDateString('az-AZ', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        const timeStr = date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+        return `${dateStr} ${timeStr}`
+    }
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -55,34 +62,34 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, checkTodo, 
         // Start animations for each star with different delays
         const animations = starAnimations.map((anim, index) => {
             const angle = (index / 5) * 2 * Math.PI
-            const distance = 60 + Math.random() * 40
+            const distance = 80 + Math.random() * 60
 
             return Animated.parallel([
                 Animated.sequence([
                     Animated.timing(anim.scale, {
-                        toValue: 1.5,
-                        duration: 200,
+                        toValue: 2.0,
+                        duration: 300,
                         useNativeDriver: true,
                     }),
                     Animated.timing(anim.scale, {
-                        toValue: 0.5,
-                        duration: 400,
+                        toValue: 0.8,
+                        duration: 700,
                         useNativeDriver: true,
                     }),
                 ]),
                 Animated.timing(anim.translateX, {
                     toValue: Math.cos(angle) * distance,
-                    duration: 600,
+                    duration: 1000,
                     useNativeDriver: true,
                 }),
                 Animated.timing(anim.translateY, {
-                    toValue: Math.sin(angle) * distance - 30,
-                    duration: 600,
+                    toValue: Math.sin(angle) * distance - 40,
+                    duration: 1000,
                     useNativeDriver: true,
                 }),
                 Animated.timing(anim.opacity, {
                     toValue: 0,
-                    duration: 600,
+                    duration: 1000,
                     useNativeDriver: true,
                 }),
             ])
@@ -122,14 +129,33 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, checkTodo, 
                                 }
                             ]}
                         >
-                            <Ionicons name="star" size={16} color={STAR_COLORS[index]} />
+                            <Ionicons name="star" size={20} color={STAR_COLORS[index]} />
                         </Animated.View>
                     ))}
                 </View>
-                <StyledText
-                    style={[{ textDecorationLine: isCompleted ? "line-through" : "none" }]}>
-                    {title}
-                </StyledText>
+                <View style={styles.textContainer}>
+                    <StyledText
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={[{
+                            textDecorationLine: isCompleted ? "line-through" : "none",
+                            fontSize: 14,
+                            flexShrink: 1,
+                            opacity: isCompleted ? 0.6 : 1,
+                        }]}>
+                        {title}
+                    </StyledText>
+                    {createdAt && (
+                        <StyledText style={styles.dateText}>
+                            🕐 {formatDate(createdAt)}
+                        </StyledText>
+                    )}
+                    {isCompleted && completedAt && (
+                        <StyledText style={[styles.dateText, { color: '#4ECDC4' }]}>
+                            ✅ {formatDate(completedAt)}
+                        </StyledText>
+                    )}
+                </View>
             </View>
             <View style={styles.controlsContainer}>
 
@@ -186,6 +212,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 15,
+        flex: 1,
+        flexShrink: 1,
+        marginRight: 10,
     },
     checkboxWrapper: {
         position: "relative",
@@ -194,6 +223,15 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 0,
         left: 0,
+    },
+    textContainer: {
+        flex: 1,
+        flexShrink: 1,
+    },
+    dateText: {
+        fontSize: 11,
+        color: "#aaa",
+        marginTop: 2,
     }
 })
 export default TodoItem
