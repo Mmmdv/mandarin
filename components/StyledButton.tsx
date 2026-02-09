@@ -1,5 +1,6 @@
 import { COLORS } from "@/constants/ui"
 import { Ionicons } from "@expo/vector-icons"
+import * as Haptics from "expo-haptics"
 import React from "react"
 import { StyleSheet, ViewStyle } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
@@ -14,9 +15,10 @@ type StyledButtonProps = {
     onPress?: () => void
     style?: ViewStyle
     activeOpacity?: number
+    vibrate?: boolean
 }
 
-const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant, disabled, onPress, style, activeOpacity }) => {
+const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant, disabled, onPress, style, activeOpacity, vibrate }) => {
 
     const textVariant = (() => {
         if (size === "large") return "heading"
@@ -29,6 +31,13 @@ const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant,
         return COLORS.PRIMARY_ACTIVE_BUTTON_TEXT
     })()
 
+    const handlePress = () => {
+        if (vibrate) {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        }
+        onPress?.();
+    }
+
     return (
         <TouchableOpacity
             style={[
@@ -40,7 +49,7 @@ const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant,
                 variant === "blue_button" ? styles.blue_button : null,
                 style
             ]}
-            onPress={onPress}
+            onPress={handlePress}
             disabled={disabled}
             activeOpacity={activeOpacity ?? 0.7}
         >

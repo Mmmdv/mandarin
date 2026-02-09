@@ -1,5 +1,6 @@
 import { COLORS } from "@/constants/ui"
 import { Ionicons } from "@expo/vector-icons"
+import * as Haptics from "expo-haptics"
 import React from "react"
 import { TouchableOpacity } from "react-native"
 
@@ -9,8 +10,13 @@ type StyledCheckBoxProps = {
 }
 
 const StyledCheckBox: React.FC<StyledCheckBoxProps> = ({ checked, onCheck }) => {
+    const handlePress = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onCheck();
+    }
+
     return (
-        <TouchableOpacity onPress={onCheck}>
+        <TouchableOpacity onPress={handlePress}>
             <Ionicons
                 name={checked ? "checkmark-circle-sharp" : "ellipse-outline"}
                 size={25}
