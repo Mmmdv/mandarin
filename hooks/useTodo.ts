@@ -11,12 +11,13 @@ const useTodo = () => {
     const todos = useAppSelector(selectTodos);
     const dispatch = useAppDispatch();
 
-    const onAddTodo = (title: Todo["title"]) => {
+    const onAddTodo = (title: Todo["title"], reminder?: string) => {
         dispatch(addTodo({
             id: generateId(),
             title,
             isCompleted: false,
             createdAt: new Date().toISOString(),
+            reminder
         }))
     }
 

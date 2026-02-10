@@ -2,6 +2,7 @@ import StyledButton from "@/components/StyledButton";
 import StyledModal from "@/components/StyledModal";
 import StyledText from "@/components/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
+import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 
@@ -15,6 +16,7 @@ const DeleteTodoModal: React.FC<DeleteTodoModalProps> = ({
     isOpen,
     onClose,
     onDelete }) => {
+    const { t } = useTheme();
 
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
@@ -23,22 +25,22 @@ const DeleteTodoModal: React.FC<DeleteTodoModalProps> = ({
                     <Ionicons name="trash-outline" size={28} color="#FF6B6B" />
                 </View>
 
-                <StyledText style={modalStyles.headerText}>Delete task</StyledText>
+                <StyledText style={modalStyles.headerText}>{t("delete_confirm_title")}</StyledText>
 
                 <View style={modalStyles.divider} />
 
                 <StyledText style={modalStyles.messageText}>
-                    Are you sure you want to delete this task?
+                    {t("delete_confirm_message")}
                 </StyledText>
 
                 <View style={modalStyles.buttonsContainer}>
                     <StyledButton
-                        label="Cancel"
+                        label={t("cancel")}
                         onPress={onClose}
                         variant="blue_button"
                     />
                     <StyledButton
-                        label="Delete"
+                        label={t("delete")}
                         onPress={onDelete}
                         variant="blue_button"
                     />

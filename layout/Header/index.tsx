@@ -1,44 +1,89 @@
 import StyledText from "@/components/StyledText";
-import { COLORS } from "@/constants/ui";
-import { getFullFormatDate } from "@/helpers/date";
-import { StyleSheet, View } from "react-native";
+import { useTheme } from "@/hooks/useTheme";
+import SettingsModal from "@/layout/Modals/SettingsModal.tsx";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Image, Share, StyleSheet, TouchableOpacity, View } from "react-native";
 
-type HeaderProps = {
-  totalTodos: number
-  completedTodos: number
+const Header: React.FC = () => {
+  const { colors, t } = useTheme();
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
-}
-
-const Header: React.FC<HeaderProps> = ({ totalTodos, completedTodos }) => {
-
-  const formattedDateNow = getFullFormatDate(new Date())
+  const onShare = async () => {
+    try {
+      await Share.share({
+        message: t("share_message"),
+      });
+    } catch (error) {
+      // silently ignore
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerMainContent}>
-        <StyledText variant="title">To do APP</StyledText>
-        <StyledText variant="subtitle">{formattedDateNow}</StyledText>
+    <View style={[styles.container, { backgroundColor: colors.SECONDARY_BACKGROUND, borderBottomColor: colors.PRIMARY_BORDER_DARK }]}>
+      <View style={styles.leftSection}>
+        <View style={styles.iconWrapper}>
+          <Image source={require("@/assets/images/nar_4_1_1.png")} style={styles.logoImage} />
+        </View>
+        <StyledText style={styles.appName}>Nar</StyledText>
       </View>
-      <StyledText>Completed {completedTodos} / {totalTodos}</StyledText>
+      <View style={styles.rightSection}>
+        <TouchableOpacity onPress={() => setSettingsVisible(true)} activeOpacity={0.7} style={styles.iconButton}>
+          <Ionicons name="settings-outline" size={22} color={colors.PRIMARY_TEXT} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onShare} activeOpacity={0.7} style={styles.iconButton}>
+          <Ionicons name="share-outline" size={22} color={colors.PRIMARY_TEXT} />
+        </TouchableOpacity>
+      </View>
+
+      <SettingsModal
+        visible={settingsVisible}
+        onClose={() => setSettingsVisible(false)}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    //flex: 0,
-    paddingTop: 50, //yuxaridan mesafe
-    paddingBottom: 20, //ashagidan mesafe
-    paddingHorizontal: 15, // soldan mesafe
-    backgroundColor: COLORS.SECONDARY_BACKGROUND,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 55,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
     borderBottomWidth: 0.5,
-    borderBottomColor: "#3a3f47",
   },
-  headerMainContent: {
-    marginBottom: 10,
+  leftSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  rightSection: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  iconWrapper: {
+    width: 40,
+    height: 40,
     justifyContent: "center",
     alignItems: "center",
-    gap: 10, // setirler arasi mesafe
+  },
+  logoImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
+  },
+  appName: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#a11708ff",
+    letterSpacing: 1,
+  },
+  iconButton: {
+    padding: 8,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.05)",
   },
 });
 

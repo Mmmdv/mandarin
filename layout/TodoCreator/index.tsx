@@ -1,4 +1,5 @@
 import { COLORS } from "@/constants/ui"
+import { useTheme } from "@/hooks/useTheme"
 import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
 import { useEffect, useState } from "react"
@@ -9,6 +10,8 @@ type TodoCreatorProps = {
 }
 
 const TodoCreator: React.FC<TodoCreatorProps> = ({ onAddTodo }) => {
+
+    const { colors, t } = useTheme()
 
     const [isFocused, setIsFocused] = useState(false)
     const [text, setText] = useState("")
@@ -40,7 +43,7 @@ const TodoCreator: React.FC<TodoCreatorProps> = ({ onAddTodo }) => {
                 <Ionicons name="add-outline" size={20} color={isFocused ? "#ffffff" : "#666"} style={styles.inputIcon} />
                 <TextInput
                     style={styles.textInput}
-                    placeholder="Add a new task..."
+                    placeholder={t("todo_placeholder")} //"Add a new task..."
                     placeholderTextColor="#666"
                     value={text}
                     onChangeText={setText}

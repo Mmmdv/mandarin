@@ -7,4 +7,5 @@ export interface Todo {
   completedAt?: string;
   updatedAt?: string;
   archivedAt?: string;
+  reminder?: string;
 }

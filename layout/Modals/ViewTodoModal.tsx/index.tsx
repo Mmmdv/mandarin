@@ -4,6 +4,7 @@ import StyledText from "@/components/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { COLORS } from "@/constants/ui";
 import { formatDate } from "@/helpers/date";
+import { useTheme } from "@/hooks/useTheme";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, View } from "react-native";
@@ -25,6 +26,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
     updatedAt,
     completedAt,
 }) => {
+    const { t } = useTheme();
 
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
@@ -33,24 +35,24 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
                     <Ionicons name="checkmark-done-circle" size={28} color="#4ECDC4" />
                 </View>
 
-                <StyledText style={[modalStyles.headerText, localStyles.headerText]}>Task details</StyledText>
+                <StyledText style={[modalStyles.headerText, localStyles.headerText]}>{t("task_details")}</StyledText>
 
                 <View style={modalStyles.divider} />
 
                 <View style={localStyles.detailsContainer}>
                     <View style={localStyles.detailRow}>
-                        <StyledText style={localStyles.label}>Title</StyledText>
+                        <StyledText style={localStyles.label}>{t("title")}</StyledText>
                         <StyledText style={localStyles.value}>{title}</StyledText>
                     </View>
 
                     <View style={localStyles.detailRow}>
-                        <StyledText style={localStyles.label}>🕐 Created</StyledText>
+                        <StyledText style={localStyles.label}>🕐 {t("created")}</StyledText>
                         <StyledText style={localStyles.value}>{formatDate(createdAt)}</StyledText>
                     </View>
 
                     {updatedAt && (
                         <View style={localStyles.detailRow}>
-                            <StyledText style={localStyles.label}>✏️ Edited</StyledText>
+                            <StyledText style={localStyles.label}>✏️ {t("edited")}</StyledText>
                             <StyledText style={[localStyles.value, { color: '#5BC0EB' }]}>
                                 {formatDate(updatedAt)}
                             </StyledText>
@@ -59,7 +61,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
 
                     {completedAt && (
                         <View style={localStyles.detailRow}>
-                            <StyledText style={localStyles.label}>✅ Completed</StyledText>
+                            <StyledText style={localStyles.label}>✅ {t("completed")}</StyledText>
                             <StyledText style={[localStyles.value, { color: '#4ECDC4' }]}>
                                 {formatDate(completedAt)}
                             </StyledText>
@@ -69,7 +71,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
 
                 <View style={[modalStyles.buttonsContainer, { justifyContent: "center" }]}>
                     <StyledButton
-                        label="Close"
+                        label={t("close")}
                         onPress={onClose}
                         variant="blue_button"
                     />
@@ -104,17 +106,16 @@ const localStyles = StyleSheet.create({
         gap: 6,
     },
     label: {
-        fontSize: 13,
-        color: "#888",
+        fontSize: 14,
+        color: "#aca9a9ff",
         fontWeight: "500",
-        textTransform: "uppercase",
-        letterSpacing: 0.5,
+        letterSpacing: 0.2,
     },
     value: {
-        fontSize: 16,
+        fontSize: 12,
         color: COLORS.PRIMARY_TEXT,
         fontWeight: "500",
-        lineHeight: 22,
+        lineHeight: 20,
     },
 })
 

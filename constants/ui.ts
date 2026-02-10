@@ -1,4 +1,4 @@
-export const COLORS = {
+export const DarkTheme = {
   PRIMARY_BACKGROUND: "#000000ff",
   PRIMARY_BACKGROUND_WHITE: "#f7f1f1ff",
   PRIMARY_TEXT: "#e8e9ebff",
@@ -16,3 +16,25 @@ export const COLORS = {
   PLACEHOLDER: "#cacdd39a",
   ERROR_INPUT_TEXT: "#f55212ff",
 };
+
+export const LightTheme = {
+  PRIMARY_BACKGROUND: "#FFFFFF",
+  PRIMARY_BACKGROUND_WHITE: "#000000",
+  PRIMARY_TEXT: "#1A1A1A",
+  PRIMARY_TEXT_BLACK: "#FFFFFF",
+  PRIMARY_TEXT_WHITE: "#000000",
+  PRIMARY_BORDER: "#E0E0E0",
+  PRIMARY_BORDER_DARK: "#D1D1D1",
+  PRIMARY_ACTIVE_BUTTON: "#007AFF", // Blue for active actions
+  PRIMARY_INACTIVE_BUTTON: "#F0F0F0",
+  PRIMARY_ACTIVE_BUTTON_TEXT: "#FFFFFF",
+  SECONDARY_BACKGROUND: "#F8F9FA",
+  CHECKBOX_SUCCESS: "#4ECDC4",
+  CHECKBOX_SUCCESS_ACTIVE: "#3AAFA9",
+  CHECKBOX_INACTIVE: "#CCCCCC",
+  PLACEHOLDER: "#999999",
+  ERROR_INPUT_TEXT: "#FF3B30",
+};
+
+// Default to DarkTheme for backward compatibility if needed, but components should use useTheme
+export const COLORS = DarkTheme;

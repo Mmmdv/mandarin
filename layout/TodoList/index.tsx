@@ -1,7 +1,7 @@
 import StyledText from "@/components/StyledText"
 import { toggleAnimation } from "@/constants/animations"
-import { COLORS } from "@/constants/ui"
 import { sortTodos } from "@/helpers/sort"
+import { useTheme } from "@/hooks/useTheme"
 import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
 import { useEffect, useRef, useState } from "react"
@@ -21,9 +21,11 @@ type TodoListProps = {
     onArchiveAll?: () => void
     onClearArchive: () => void
     archivedTodos: Todo[]
+    onAddRequest?: () => void
 }
 
-const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo, onArchiveTodo, onClearArchive, archivedTodos, onArchiveAll }) => {
+const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo, onArchiveTodo, onClearArchive, archivedTodos, onArchiveAll, onAddRequest }) => {
+    const { colors, t } = useTheme()
     const [todoSortBy, setTodoSortBy] = useState<SortBy>("date")
     const [todoSortOrder, setTodoSortOrder] = useState<SortOrder>("desc")
     const [doneSortBy, setDoneSortBy] = useState<SortBy>("date")
@@ -65,8 +67,8 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     if (todos.length === 0) {
         return (
             <View style={styles.emptyContainer}>
-                <StyledText style={styles.emptyText}>No tasks yet</StyledText>
-                <StyledText style={styles.emptySubtext}>Add a new task to get started</StyledText>
+                <StyledText style={[styles.emptyText, { color: colors.PRIMARY_TEXT }]}>{t("empty_list")}</StyledText>
+                <StyledText style={[styles.emptySubtext, { color: colors.PLACEHOLDER }]}>{t("todo_placeholder")}</StyledText>
             </View>
         )
     }
@@ -82,11 +84,19 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 >
                     <View style={styles.sectionTitleContainer}>
                         <Ionicons name="list-circle" size={24} color="#5BC0EB" />
-                        <StyledText style={styles.sectionTitle}>
-                            To Do ({sortedPendingTodos.length})
+                        <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>
+                            {t("todo")} ({sortedPendingTodos.length})
                         </StyledText>
                     </View>
                     <View style={styles.sectionControls}>
+                        <TouchableOpacity
+                            onPress={onAddRequest}
+                            style={{ marginRight: 10 }}
+                            activeOpacity={0.7}
+                        >
+                            <Ionicons name="add-circle" size={28} color={colors.CHECKBOX_SUCCESS} />
+                        </TouchableOpacity>
+
                         {todoExpanded && sortedPendingTodos.length > 0 && (
                             <SortControls
                                 sortBy={todoSortBy}
@@ -96,9 +106,9 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             />
                         )}
                         <Ionicons
-                            name={todoExpanded && sortedPendingTodos.length > 0 ? "chevron-up" : "chevron-down"}
+                            name={todoExpanded ? "chevron-down" : "chevron-forward"}
                             size={20}
-                            color={COLORS.PRIMARY_TEXT}
+                            color={colors.PRIMARY_TEXT}
                         />
                     </View>
                 </TouchableOpacity>
@@ -118,7 +128,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 ))}
             </View>
 
-            <View style={styles.sectionDivider} />
+            <View style={[styles.sectionDivider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
 
             {/* Done Section */}
             <View style={styles.sectionContainer}>
@@ -128,19 +138,27 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     disabled={sortedCompletedTodos.length === 0}
                 >
                     <View style={styles.sectionTitleContainer}>
-                        <Ionicons name="checkmark-done-circle" size={24} color="#4ECDC4" />
-                        <StyledText style={styles.sectionTitle}>Done ({sortedCompletedTodos.length})</StyledText>
+                        <Ionicons name="checkmark-done-circle" size={24} color={colors.CHECKBOX_SUCCESS} />
+                        <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>{t("done")} ({sortedCompletedTodos.length})</StyledText>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        {doneExpanded && sortedCompletedTodos.length > 0 && (
+                            <SortControls
+                                sortBy={doneSortBy}
+                                sortOrder={doneSortOrder}
+                                onToggleSortBy={() => setDoneSortBy(prev => prev === "date" ? "text" : "date")}
+                                onToggleSortOrder={() => setDoneSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                            />
+                        )}
                         {sortedCompletedTodos.length > 0 && onArchiveAll && (
                             <TouchableOpacity onPress={() => setIsArchiveAllModalOpen(true)} style={{ padding: 4 }}>
-                                <Ionicons name="archive-outline" size={20} color={COLORS.PRIMARY_TEXT} />
+                                <Ionicons name="archive-outline" size={20} color={colors.PRIMARY_TEXT} />
                             </TouchableOpacity>
                         )}
                         <Ionicons
                             name={doneExpanded ? "chevron-down" : "chevron-forward"}
                             size={20}
-                            color={COLORS.PRIMARY_TEXT}
+                            color={colors.PRIMARY_TEXT}
                         />
                     </View>
                 </TouchableOpacity>
@@ -156,7 +174,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     />
                 ))}
 
-                <View style={styles.sectionDivider} />
+                <View style={[styles.sectionDivider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
 
                 {/* Archive Section */}
                 <View style={styles.sectionContainer}>
@@ -168,8 +186,8 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     >
                         <View style={styles.sectionTitleContainer}>
                             <Ionicons name="archive" size={24} color="#888" />
-                            <StyledText style={styles.sectionTitle}>
-                                Archive ({archivedTodos.length})
+                            <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>
+                                {t("archive")} ({archivedTodos.length})
                             </StyledText>
                         </View>
                         <View style={styles.sectionControls}>
@@ -190,9 +208,9 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                 />
                             )}
                             <Ionicons
-                                name={archiveExpanded && sortedArchivedTodos.length > 0 ? "chevron-up" : "chevron-down"}
+                                name={archiveExpanded ? "chevron-down" : "chevron-forward"}
                                 size={20}
-                                color={COLORS.PRIMARY_TEXT}
+                                color={colors.PRIMARY_TEXT}
                             />
                         </View>
                     </TouchableOpacity>
@@ -229,7 +247,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 onClose={() => setIsClearArchiveModalOpen(false)}
                 onClear={onClearArchive}
             />
-        </ScrollView>
+        </ScrollView >
     )
 }
 

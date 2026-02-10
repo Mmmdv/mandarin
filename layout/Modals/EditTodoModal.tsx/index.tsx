@@ -3,6 +3,7 @@ import StyledModal from "@/components/StyledModal";
 import StyledText from "@/components/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { COLORS } from "@/constants/ui";
+import { useTheme } from "@/hooks/useTheme";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ type EditTodoModalProps = {
 
 const EditTodoModal: React.FC<EditTodoModalProps> = ({
     isOpen, onClose, onUpdate, title }) => {
+    const { t } = useTheme();
 
     const [isFocused, setIsFocused] = useState(false)
     const [updatedTitle, setUpdateTitle] = useState(title)
@@ -50,7 +52,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     <Ionicons name="create-outline" size={28} color="#5BC0EB" />
                 </View>
 
-                <StyledText style={modalStyles.headerText}>Edit task</StyledText>
+                <StyledText style={modalStyles.headerText}>{t("edit")}</StyledText>
 
                 <View style={modalStyles.divider} />
 
@@ -61,7 +63,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                 ]}>
                     <TextInput
                         style={localStyles.textInput}
-                        placeholder="Update your task..."
+                        placeholder={t("todo_placeholder")}
                         placeholderTextColor="#666"
                         value={updatedTitle}
                         onChangeText={setUpdateTitle}
@@ -73,12 +75,12 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
 
                 <View style={modalStyles.buttonsContainer}>
                     <StyledButton
-                        label="Cancel"
+                        label={t("cancel")}
                         onPress={onClose}
                         variant="blue_button"
                     />
                     <StyledButton
-                        label="Save"
+                        label={t("save")}
                         onPress={onPressSave}
                         variant="blue_button"
                     />

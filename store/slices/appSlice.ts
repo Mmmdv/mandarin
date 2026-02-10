@@ -6,16 +6,24 @@ export enum Lang {
     AZ = "az"
 }
 
+export enum Theme {
+    DARK = "dark",
+    LIGHT = "light"
+}
+
 export interface AppState {
     lang: Lang
+    theme: Theme
 }
 
 const initialState: AppState = {
-    lang: Lang.EN
+    lang: Lang.AZ,
+    theme: Theme.DARK
 }
 
 export interface UpdateAppSettingsPayload {
-    lang: Lang
+    lang?: Lang
+    theme?: Theme
 }
 
 export const appSlice = createSlice({
@@ -26,8 +34,9 @@ export const appSlice = createSlice({
             state: AppState,
             action: PayloadAction<UpdateAppSettingsPayload>
         ) => {
-            const { lang } = action.payload;
-            state.lang = lang
+            const { lang, theme } = action.payload;
+            if (lang) state.lang = lang
+            if (theme) state.theme = theme
         },
     },
 })

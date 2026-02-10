@@ -60,7 +60,7 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children }) 
                     <Pressable
                         style={[
                             styles.modalBackgroundContainer,
-                            { paddingBottom: isKeyboardVisible ? 20 : "50%" }
+                            { paddingBottom: isKeyboardVisible ? 20 : 0 }
                         ]}
                         onPress={() => {
                             Keyboard.dismiss()

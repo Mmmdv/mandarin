@@ -1,12 +1,13 @@
 import { COLORS } from "@/constants/ui";
 import useTodo from "@/hooks/useTodo";
 import Header from "@/layout/Header";
-import TodoCreator from "@/layout/TodoCreator";
+import AddTodoModal from "@/layout/Modals/AddTodoModal";
 import TodoList from "@/layout/TodoList";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Platform, StatusBar, StyleSheet, UIManager, View } from "react-native";
 
 export default function Index() {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -29,11 +30,14 @@ export default function Index() {
     onClearArchive,
   } = useTodo();
 
+  const handleAddTodo = (title: string, reminder?: string) => {
+    onAddTodo(title, reminder);
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle={"light-content"}></StatusBar>
-      <Header totalTodos={todos.length} completedTodos={completedTodos.length}></Header>
-      <TodoCreator onAddTodo={onAddTodo} />
+      <Header />
       <TodoList
         todos={todos}
         onDeleteTodo={onDeleteTodo}
@@ -43,6 +47,13 @@ export default function Index() {
         onArchiveAll={onArchiveAll}
         onClearArchive={onClearArchive}
         archivedTodos={archivedTodos}
+        onAddRequest={() => setIsAddModalOpen(true)}
+      />
+
+      <AddTodoModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={handleAddTodo}
       />
     </View>
   );
@@ -52,6 +63,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.PRIMARY_BACKGROUND,
-    paddingBottom: 100,
+    paddingBottom: 110,
   },
 });
