@@ -1,6 +1,5 @@
 import ComingSoon from "@/components/ComingSoon";
 import { useTheme } from "@/hooks/useTheme";
-import Header from "@/layout/Header";
 import { View } from "react-native";
 
 export default function Events() {
@@ -8,7 +7,6 @@ export default function Events() {
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.PRIMARY_BACKGROUND }}>
-            <Header />
             <ComingSoon />
         </View>
     );

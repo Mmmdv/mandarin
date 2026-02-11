@@ -1,11 +1,15 @@
 import StyledText from "@/components/StyledText";
 import { useTheme } from "@/hooks/useTheme";
+import ResetAppModal from "@/layout/Modals/ResetAppModal";
 import { useAppDispatch } from "@/store";
 import { Lang, Theme, updateAppSetting } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
+import * as Notifications from "expo-notifications";
+import * as Updates from "expo-updates";
 import React from "react";
-import { Image, Linking, Modal, Platform, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Linking, Modal, Platform, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
 
 interface SettingsModalProps {
     visible: boolean;
@@ -16,6 +20,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
     const { colors, t, lang, theme, notificationsEnabled } = useTheme();
     const dispatch = useAppDispatch();
 
+    const [isLoadingNotifications, setIsLoadingNotifications] = React.useState(false);
+
+    // Sync switch with actual OS permissions when modal opens
+    React.useEffect(() => {
+        if (visible) {
+            checkPermissions();
+        }
+    }, [visible]);
+
+    const checkPermissions = async () => {
+        const { status } = await Notifications.getPermissionsAsync();
+        // If OS permission is not granted, update store to false
+        if (status !== 'granted' && notificationsEnabled) {
+            dispatch(updateAppSetting({ notificationsEnabled: false }));
+        }
+    };
+
     const handleLanguageChange = (newLang: Lang) => {
         dispatch(updateAppSetting({ lang: newLang }));
     };
@@ -24,8 +45,29 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
         dispatch(updateAppSetting({ theme: newTheme }));
     };
 
-    const handleNotificationToggle = (value: boolean) => {
-        dispatch(updateAppSetting({ notificationsEnabled: value }));
+    const handleNotificationToggle = async (value: boolean) => {
+        if (value) {
+            // User trying to enable
+            setIsLoadingNotifications(true);
+            const { status } = await Notifications.getPermissionsAsync();
+
+            if (status === 'granted') {
+                dispatch(updateAppSetting({ notificationsEnabled: true }));
+            } else {
+                const { status: newStatus } = await Notifications.requestPermissionsAsync();
+                if (newStatus === 'granted') {
+                    dispatch(updateAppSetting({ notificationsEnabled: true }));
+                } else {
+                    // Permission denied
+                    dispatch(updateAppSetting({ notificationsEnabled: false }));
+                    Linking.openSettings(); // Optional: guide user to settings
+                }
+            }
+            setIsLoadingNotifications(false);
+        } else {
+            // User disabling - just update store
+            dispatch(updateAppSetting({ notificationsEnabled: false }));
+        }
     };
 
     const handleRateUs = () => {
@@ -33,6 +75,40 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
             ? 'https://apps.apple.com/app/id6443574936' // Placeholder ID
             : 'https://play.google.com/store/apps/details?id=com.mmmdv.todolistapp'; // Based on package name or placeholder
         Linking.openURL(storeUrl).catch(err => console.error("An error occurred", err));
+    };
+
+    const [isResetModalOpen, setIsResetModalOpen] = React.useState(false);
+
+    const handleResetStorage = () => {
+        setIsResetModalOpen(true);
+    };
+
+    const onConfirmReset = async () => {
+        try {
+            const keys = await AsyncStorage.getAllKeys();
+            if (keys.length > 0) {
+                await AsyncStorage.clear();
+            }
+
+            try {
+                if (Updates && Updates.reloadAsync) {
+                    await Updates.reloadAsync();
+                } else {
+                    throw new Error("Updates module not available");
+                }
+            } catch (reloadError) {
+                console.log("Reload failed:", reloadError);
+                Alert.alert(
+                    t("success") || "Uğurlu",
+                    "Tətbiq sıfırlandı. Zəhmət olmasa tətbiqi yenidən başladın."
+                );
+            }
+        } catch (error) {
+            console.error("Failed to reset storage:", error);
+            Alert.alert(t("error") || "Xəta", "Məlumatları silmək mümkün olmadı.");
+        } finally {
+            setIsResetModalOpen(false);
+        }
     };
 
     const appVersion = Constants.expoConfig?.version ?? '1.0.0';
@@ -179,8 +255,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
                             <View style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0 }]}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                                     <Image
-                                        source={require("@/assets/images/nar_4_1_1.png")}
-                                        style={{ width: 40, height: 40, borderRadius: 8 }}
+                                        source={require("@/assets/images/nar_48x48.png")}
+                                        style={{ width: 35, height: 35, borderRadius: 8 }}
                                     />
                                     <View>
                                         <StyledText style={{ fontSize: 16, fontWeight: '600', color: colors.PRIMARY_TEXT }}>{t("version")}</StyledText>
@@ -198,11 +274,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
                                 </View>
                                 <Ionicons name="chevron-forward" size={20} color={colors.PLACEHOLDER} />
                             </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0 }]}
+                                onPress={handleResetStorage}
+                            >
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                    <Ionicons name="trash-bin" size={20} color="#888" />
+                                    <StyledText style={[styles.aboutLabel, { color: colors.PRIMARY_TEXT }]}>{t("reset_factory")}</StyledText>
+                                </View>
+                                <Ionicons name="chevron-forward" size={20} color={colors.PLACEHOLDER} />
+                            </TouchableOpacity>
                         </View>
                     </View>
 
                 </View>
             </TouchableOpacity>
+            <ResetAppModal
+                isOpen={isResetModalOpen}
+                onClose={() => setIsResetModalOpen(false)}
+                onReset={onConfirmReset}
+            />
         </Modal>
     );
 };
@@ -283,7 +374,6 @@ const styles = StyleSheet.create({
     },
     aboutValue: {
         fontSize: 16,
-        opacity: 0.7,
     },
 });
 

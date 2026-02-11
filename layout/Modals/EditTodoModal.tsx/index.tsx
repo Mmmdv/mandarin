@@ -189,7 +189,14 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
             <View style={modalStyles.modalContainer}>
-                <View style={[modalStyles.iconContainer, { backgroundColor: "rgba(91, 192, 235, 0.15)" }]}>
+                <View style={[modalStyles.iconContainer, {
+                    backgroundColor: useTheme().colors.SECONDARY_BACKGROUND,
+                    shadowColor: "#5BC0EB",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5
+                }]}>
                     <Ionicons name="create-outline" size={28} color="#5BC0EB" />
                 </View>
 
@@ -319,7 +326,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     <StyledButton
                         label={t("cancel")}
                         onPress={onClose}
-                        variant="gray_button"
+                        variant="blue_button"
                     />
                     <StyledButton
                         label={t("save")}
@@ -334,27 +341,36 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
 
 const localStyles = StyleSheet.create({
     inputWrapper: {
-        backgroundColor: "#151616ff",
-        borderRadius: 12,
+        backgroundColor: "rgba(255, 255, 255, 0.05)", // Lighter transparency
+        borderRadius: 16, // Softer corners
         borderWidth: 1,
-        borderColor: "#3a3f47",
-        paddingHorizontal: 12,
-        paddingVertical: 10,
+        borderColor: "rgba(255, 255, 255, 0.1)", // Subtle border
+        paddingHorizontal: 16,
+        paddingVertical: 12,
         minHeight: 60,
         width: "100%",
         marginBottom: 20,
     },
     inputFocused: {
-        borderColor: "#888282ff",
-        backgroundColor: "#151616ff",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderColor: "rgba(255, 255, 255, 0.3)",
+        borderWidth: 1,
+        shadowColor: "rgba(255, 255, 255, 0.5)",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        elevation: 5,
     },
     inputError: {
         borderColor: COLORS.ERROR_INPUT_TEXT,
     },
     textInput: {
         color: COLORS.PRIMARY_TEXT,
-        fontSize: 14,
+        fontSize: 18,
         minHeight: 40,
+        textAlign: 'left',
+        textAlignVertical: 'center',
+        paddingHorizontal: 8,
     },
     sectionLabel: {
         fontSize: 12,

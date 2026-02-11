@@ -18,9 +18,9 @@ export interface AppState {
 }
 
 const initialState: AppState = {
-    lang: Lang.AZ,
+    lang: Lang.EN,
     theme: Theme.DARK,
-    notificationsEnabled: true
+    notificationsEnabled: false
 }
 
 export interface UpdateAppSettingsPayload {

@@ -7,8 +7,9 @@ import { useEffect, useRef } from "react";
 import { Animated, Dimensions, Easing, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const VISIBLE_TABS = 3;
-const TAB_BAR_WIDTH = SCREEN_WIDTH * 0.70;
+const VISIBLE_TABS = 5;
+const SIDE_ITEMS = 50; // Large buffer for fast scrolling
+const TAB_BAR_WIDTH = SCREEN_WIDTH * 0.75;
 const TAB_WIDTH = TAB_BAR_WIDTH / VISIBLE_TABS;
 
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
@@ -18,22 +19,36 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const isManualScrolling = useRef(false);
 
     const routes = state.routes;
-    // [Last, ...All, First]
+
+    // Helper to generate side items by repeating routes
+    const generateSideItems = (count: number, reverse: boolean = false) => {
+        const items = [];
+        for (let i = 0; i < count; i++) {
+            // Logic to pick correct route wrapping around
+            const index = reverse ? (routes.length - 1 - (i % routes.length)) : (i % routes.length);
+            items.push(routes[index]);
+        }
+        return reverse ? items.reverse() : items;
+    }
+
     const extendedRoutes = [
-        { ...routes[routes.length - 1], _fake: true, _keySuffix: '_fake_start', _originalIndex: routes.length - 1 },
+        ...generateSideItems(SIDE_ITEMS, true).map((r, i) => ({
+            ...r,
+            _fake: true,
+            _keySuffix: `_fake_start_${i}`,
+            _originalIndex: routes.findIndex(route => route.key === r.key)
+        })),
         ...routes.map((r, i) => ({ ...r, _fake: false, _keySuffix: '', _originalIndex: i })),
-        { ...routes[0], _fake: true, _keySuffix: '_fake_end', _originalIndex: 0 }
+        ...generateSideItems(SIDE_ITEMS, false).map((r, i) => ({
+            ...r,
+            _fake: true,
+            _keySuffix: `_fake_end_${i}`,
+            _originalIndex: routes.findIndex(route => route.key === r.key)
+        }))
     ];
 
-    // Indices in extended array:
-    // 0: Fake Last
-    // 1: Real First
-    // ...
-    // N: Real Last
-    // N+1: Fake First
-
-    // Map state.index (0..N-1) to Scroll Position (1..N)
-    const getScrollIndex = (realIndex: number) => realIndex + 1;
+    // Map state.index (0..N-1) to Scroll Position
+    const getScrollIndex = (realIndex: number) => realIndex + SIDE_ITEMS;
 
     const scaleAnims = useRef(
         extendedRoutes.map(() => new Animated.Value(1))
@@ -53,8 +68,9 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
     const getIconName = (routeName: string, isFocused: boolean): keyof typeof Ionicons.glyphMap => {
         switch (routeName) {
-            case "home": return isFocused ? "home" : "home-outline";
-            case "index": return isFocused ? "list" : "list-outline";
+            case "index": return isFocused ? "home" : "home-outline";
+            case "todo": return isFocused ? "list" : "list-outline";
+            case "birthday": return isFocused ? "gift" : "gift-outline";
             case "shopping": return isFocused ? "cart" : "cart-outline";
             case "events": return isFocused ? "ticket" : "ticket-outline";
             case "movies": return isFocused ? "film" : "film-outline";
@@ -65,8 +81,9 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
     const getLabelName = (routeName: string): string => {
         switch (routeName) {
-            case "home": return t("tab_home");
-            case "index": return t("tab_todo");
+            case "index": return t("tab_home");
+            case "todo": return t("tab_todo");
+            case "birthday": return t("tab_birthday");
             case "shopping": return t("tab_shopping");
             case "events": return t("tab_events");
             case "movies": return t("tab_movies");
@@ -74,6 +91,8 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             default: return "";
         }
     };
+
+    const isUserDragging = useRef(false);
 
     const scrollToOffset = (offset: number, animated: boolean) => {
         scrollRef.current?.scrollTo({ x: offset, animated });
@@ -148,39 +167,45 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 }, 150);
             } else {
                 navigation.navigate(route.name);
-                scrollToOffset(renderIndex * TAB_WIDTH, true);
+                // Removed redundant scrollToOffset, handled by useEffect
             }
         }
     };
 
+    const onScrollBeginDrag = () => {
+        isUserDragging.current = true;
+    };
+
     const onMomentumScrollEnd = (event: any) => {
+        // Only trigger navigation if the scroll was initiated by the user
+        if (!isUserDragging.current) {
+            return;
+        }
+
         const offsetX = event.nativeEvent.contentOffset.x;
         const index = Math.round(offsetX / TAB_WIDTH);
 
         isManualScrolling.current = true;
 
-        if (index === 0) {
-            // Scrolled to Fake Last -> Go to Real Last
-            const realLastIndex = extendedRoutes.length - 2; // N
-            const realLastRoute = extendedRoutes[realLastIndex];
-            scrollToOffset(realLastIndex * TAB_WIDTH, false);
-            navigation.navigate(realLastRoute.name);
-        } else if (index === extendedRoutes.length - 1) {
-            // Scrolled to Fake First -> Go to Real First
-            const realFirstIndex = 1;
-            const realFirstRoute = extendedRoutes[realFirstIndex];
-            scrollToOffset(realFirstIndex * TAB_WIDTH, false);
-            navigation.navigate(realFirstRoute.name);
+        const route = extendedRoutes[index];
+
+        if (route._fake) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            const realIndex = route._originalIndex;
+            const realScrollIndex = getScrollIndex(realIndex);
+            scrollToOffset(realScrollIndex * TAB_WIDTH, false);
+            navigation.navigate(route.name);
         } else {
             // Scrolled to a normal tab
-            const route = extendedRoutes[index];
             if (route && route._originalIndex !== state.index) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 navigation.navigate(route.name);
             }
         }
 
         setTimeout(() => {
             isManualScrolling.current = false;
+            isUserDragging.current = false;
         }, 100);
     };
 
@@ -195,6 +220,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                     snapToInterval={TAB_WIDTH}
                     decelerationRate="fast"
                     scrollEnabled={true}
+                    onScrollBeginDrag={onScrollBeginDrag}
                     onMomentumScrollEnd={onMomentumScrollEnd}
                 >
                     {extendedRoutes.map((route, index) => {
@@ -234,7 +260,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                                     >
                                         <Ionicons
                                             name={iconName}
-                                            size={28}
+                                            size={26}
                                             color={isFocused ? "#86cfeeff" : "#e6e2e2ff"}
                                         />
                                         <Text style={[
@@ -267,8 +293,8 @@ const styles = StyleSheet.create({
     },
     tabBarWrapper: {
         backgroundColor: COLORS.SECONDARY_BACKGROUND,
-        borderRadius: 30,
-        borderWidth: 0.8,
+        borderRadius: 25,
+        borderWidth: 0.6,
         borderColor: COLORS.PRIMARY_BORDER_DARK,
         height: 70,
         width: TAB_BAR_WIDTH,
@@ -294,7 +320,7 @@ const styles = StyleSheet.create({
     tabBackgroundPill: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: "#353f50ff",
-        borderRadius: 20,
+        borderRadius: 15,
         zIndex: 0,
     },
     tabItemContent: {

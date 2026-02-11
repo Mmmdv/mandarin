@@ -116,7 +116,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                             numberOfLines={1}
                             ellipsizeMode="tail"
                             style={[{
-                                fontSize: 14,
+                                fontSize: 16,
                                 flexShrink: 1,
                                 opacity: isArchived ? 0.9 : (isCompleted ? 0.7 : 1),
                             }]}>

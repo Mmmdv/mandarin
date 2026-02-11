@@ -8,4 +8,5 @@ export interface Todo {
   updatedAt?: string;
   archivedAt?: string;
   reminder?: string;
+  notificationId?: string;
 }

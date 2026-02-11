@@ -30,7 +30,7 @@ const ComingSoon: React.FC = () => {
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
             <Animated.View style={[styles.content, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
                 <View style={[styles.iconContainer, { backgroundColor: colors.SECONDARY_BACKGROUND }]}>
-                    <Ionicons name="rocket-outline" size={60} color={colors.PRIMARY_ACTIVE_BUTTON} />
+                    <Ionicons name="rocket-outline" size={60} color="#4ECDC4" />
                 </View>
                 <StyledText style={[styles.title, { color: colors.PRIMARY_TEXT }]}>
                     {t("coming_soon")}
@@ -59,12 +59,13 @@ const styles = StyleSheet.create({
         borderRadius: 60,
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 10,
+        marginBottom: 24,
         elevation: 5,
-        shadowColor: "#000",
+        backgroundColor: "#131519", // Default dark, overridden by theme
+        shadowColor: "#4ECDC4",
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
     },
     title: {
         fontSize: 22,

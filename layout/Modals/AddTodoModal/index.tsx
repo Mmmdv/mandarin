@@ -17,7 +17,7 @@ import { addNotification } from "@/store/slices/notificationSlice";
 type AddTodoModalProps = {
     isOpen: boolean
     onClose: () => void
-    onAdd: (title: string, reminder?: string) => void
+    onAdd: (title: string, reminder?: string, notificationId?: string) => void
 }
 
 const AddTodoModal: React.FC<AddTodoModalProps> = ({
@@ -56,19 +56,22 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
             return
         }
         const finalDate = dateOverride || reminderDate;
+        let notificationId: string | undefined;
 
         if (finalDate && notificationsEnabled) {
-            await schedulePushNotification(title, t("reminder"), finalDate);
+            notificationId = await schedulePushNotification(title, t("reminder"), finalDate);
             // Add to history
-            dispatch(addNotification({
-                id: Date.now().toString(),
-                title: t("reminder"),
-                body: `${t("title")}: ${title}`,
-                date: finalDate.toISOString(),
-            }));
+            if (notificationId) {
+                dispatch(addNotification({
+                    id: notificationId,
+                    title: t("reminder"),
+                    body: `${t("title")}: ${title}`,
+                    date: finalDate.toISOString(),
+                }));
+            }
         }
 
-        onAdd(title, finalDate?.toISOString())
+        onAdd(title, finalDate?.toISOString(), notificationId)
         onClose()
     }
 
@@ -199,7 +202,14 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
             <View style={modalStyles.modalContainer}>
-                <View style={[modalStyles.iconContainer, { backgroundColor: "rgba(78, 205, 196, 0.15)" }]}>
+                <View style={[modalStyles.iconContainer, {
+                    backgroundColor: COLORS.SECONDARY_BACKGROUND,
+                    shadowColor: COLORS.CHECKBOX_SUCCESS,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5
+                }]}>
                     <Ionicons name="add" size={28} color={COLORS.CHECKBOX_SUCCESS} />
                 </View>
 
@@ -289,27 +299,9 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                     >
                         <View style={localStyles.iosPickerContainer}>
                             <View style={localStyles.iosHeader}>
-                                <TouchableOpacity
-                                    onPress={() => { setShowDatePicker(false); setShowTimePicker(false); }}
-                                    style={localStyles.iconButton}
-                                >
-                                    <Ionicons name="close-circle" size={28} color={COLORS.ERROR_INPUT_TEXT} />
-                                </TouchableOpacity>
-
                                 <StyledText style={localStyles.iosTitle}>
                                     {showDatePicker ? t("date") : t("time")}
                                 </StyledText>
-
-                                <TouchableOpacity
-                                    onPress={showDatePicker ? confirmDateIOS : confirmTimeIOS}
-                                    style={localStyles.iconButton}
-                                >
-                                    <Ionicons
-                                        name={showDatePicker ? "arrow-forward-circle" : "checkmark-circle"}
-                                        size={28}
-                                        color={COLORS.CHECKBOX_SUCCESS}
-                                    />
-                                </TouchableOpacity>
                             </View>
                             <View style={localStyles.pickerWrapper}>
                                 <DateTimePicker
@@ -323,6 +315,25 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                     themeVariant={useTheme().theme} // 'dark' or 'light'
                                 />
                             </View>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 10, paddingTop: 10 }}>
+                                <TouchableOpacity
+                                    onPress={() => { setShowDatePicker(false); setShowTimePicker(false); }}
+                                    style={localStyles.iconButton}
+                                >
+                                    <Ionicons name="close-circle" size={36} color={COLORS.ERROR_INPUT_TEXT} />
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={showDatePicker ? confirmDateIOS : confirmTimeIOS}
+                                    style={localStyles.iconButton}
+                                >
+                                    <Ionicons
+                                        name={showDatePicker ? "arrow-forward-circle" : "checkmark-circle"}
+                                        size={36}
+                                        color={COLORS.CHECKBOX_SUCCESS}
+                                    />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </StyledModal>
                 )}
@@ -331,12 +342,12 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                     <StyledButton
                         label={t("cancel")}
                         onPress={onClose}
-                        variant="gray_button"
+                        variant="blue_button"
                     />
                     <StyledButton
                         label={t("add")}
                         onPress={() => onPressAdd()}
-                        variant="green_button"
+                        variant="blue_button"
                     />
                 </View>
             </View>
@@ -346,27 +357,36 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
 const localStyles = StyleSheet.create({
     inputWrapper: {
-        backgroundColor: "#151616ff",
-        borderRadius: 12,
+        backgroundColor: "rgba(255, 255, 255, 0.05)", // Lighter transparency
+        borderRadius: 16, // Softer corners
         borderWidth: 1,
-        borderColor: "#3a3f47",
-        paddingHorizontal: 12,
-        paddingVertical: 10,
+        borderColor: "rgba(255, 255, 255, 0.1)", // Subtle border
+        paddingHorizontal: 16,
+        paddingVertical: 12,
         minHeight: 60,
         width: "100%",
         marginBottom: 20,
     },
     inputFocused: {
-        borderColor: "#888282ff",
-        backgroundColor: "#151616ff",
+        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        borderColor: "rgba(255, 255, 255, 0.3)",
+        borderWidth: 1,
+        shadowColor: "rgba(255, 255, 255, 0.5)",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        elevation: 5,
     },
     inputError: {
         borderColor: COLORS.ERROR_INPUT_TEXT,
     },
     textInput: {
         color: COLORS.PRIMARY_TEXT,
-        fontSize: 14,
+        fontSize: 18,
         minHeight: 40,
+        textAlign: 'left', // Horizontal: Left
+        textAlignVertical: 'center', // Vertical: Center
+        paddingHorizontal: 8, // Padding requested
     },
     addReminderButton: {
         flexDirection: 'row',
@@ -418,7 +438,7 @@ const localStyles = StyleSheet.create({
     },
     iosHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingVertical: 12,

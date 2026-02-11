@@ -21,7 +21,14 @@ const DeleteTodoModal: React.FC<DeleteTodoModalProps> = ({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
             <View style={modalStyles.modalContainer}>
-                <View style={[modalStyles.iconContainer, { backgroundColor: "rgba(255, 107, 107, 0.15)" }]}>
+                <View style={[modalStyles.iconContainer, {
+                    backgroundColor: useTheme().colors.SECONDARY_BACKGROUND,
+                    shadowColor: "#FF6B6B",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5
+                }]}>
                     <Ionicons name="trash-outline" size={28} color="#FF6B6B" />
                 </View>
 

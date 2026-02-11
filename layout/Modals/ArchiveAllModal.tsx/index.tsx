@@ -27,7 +27,14 @@ const ArchiveAllModal: React.FC<ArchiveAllModalProps> = ({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
             <View style={[modalStyles.modalContainer, { backgroundColor: colors.SECONDARY_BACKGROUND, borderColor: colors.PRIMARY_BORDER_DARK, borderWidth: 1 }]}>
-                <View style={[modalStyles.iconContainer, { backgroundColor: "rgba(78, 205, 196, 0.15)" }]}>
+                <View style={[modalStyles.iconContainer, {
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
+                    shadowColor: "#4ECDC4",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5
+                }]}>
                     <Ionicons name="archive-outline" size={28} color="#4ECDC4" />
                 </View>
 

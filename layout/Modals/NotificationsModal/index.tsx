@@ -4,10 +4,11 @@ import StyledText from "@/components/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { clearNotifications, markAllAsRead, selectNotifications } from "@/store/slices/notificationSlice";
+import { clearNotifications, markAllAsRead, markAsRead, selectNotifications } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
-import { FlatList, Modal, Platform, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import { FlatList, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface NotificationsModalProps {
     visible: boolean;
@@ -19,16 +20,21 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
     const dispatch = useAppDispatch();
     const notifications = useAppSelector(selectNotifications);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const insets = useSafeAreaInsets();
 
-    // Mark all as read when modal opens
-    useEffect(() => {
-        if (visible) {
-            dispatch(markAllAsRead());
-        }
-    }, [visible]);
+    // Remove auto-mark-read effect
+    // useEffect(() => {
+    //     if (visible) {
+    //         dispatch(markAllAsRead());
+    //     }
+    // }, [visible]);
 
     const handleClearAll = () => {
         setIsDeleteConfirmOpen(true);
+    };
+
+    const handleMarkAllRead = () => {
+        dispatch(markAllAsRead());
     };
 
     const confirmClearAll = () => {
@@ -40,15 +46,37 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
         const isPending = new Date(item.date) > new Date();
         const statusColor = isPending ? "#FFB74D" : colors.CHECKBOX_SUCCESS; // Orange for pending, Teal for sent
         const statusIcon = isPending ? "time-outline" : "notifications";
+        const isUnread = !item.read;
 
         return (
-            <View style={[styles.notificationItem, { backgroundColor: colors.SECONDARY_BACKGROUND, borderColor: colors.PRIMARY_BORDER_DARK }]}>
+            <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => {
+                    if (isUnread) {
+                        dispatch(markAsRead(item.id));
+                    }
+                }}
+                style={[
+                    styles.notificationItem,
+                    {
+                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                        borderColor: colors.PRIMARY_BORDER_DARK,
+                        opacity: isUnread ? 1 : 0.6
+                    }
+                ]}
+            >
                 <View style={[styles.iconContainer, { backgroundColor: isPending ? "rgba(255, 183, 77, 0.15)" : "rgba(78, 205, 196, 0.15)" }]}>
                     <Ionicons name={statusIcon} size={20} color={statusColor} />
                 </View>
                 <View style={styles.contentContainer}>
                     <View style={styles.itemHeader}>
-                        <StyledText style={[styles.itemTitle, { color: colors.PRIMARY_TEXT }]}>{item.title}</StyledText>
+                        <StyledText style={[
+                            styles.itemTitle,
+                            {
+                                color: colors.PRIMARY_TEXT,
+                                fontWeight: isUnread ? "700" : "400"
+                            }
+                        ]}>{item.title}</StyledText>
                         <StyledText style={styles.itemDate}>
                             {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </StyledText>
@@ -60,7 +88,12 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                         </View>
                     )}
                 </View>
-            </View>
+                {isUnread && (
+                    <View style={{ justifyContent: 'center' }}>
+                        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.CHECKBOX_SUCCESS }} />
+                    </View>
+                )}
+            </TouchableOpacity>
         );
     };
 
@@ -71,23 +104,37 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
             visible={visible}
             onRequestClose={onClose}
         >
-            <SafeAreaView style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+            <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: insets.bottom }]}>
                 {/* Header */}
-                <View style={[styles.header, { borderBottomColor: colors.PRIMARY_BORDER_DARK }]}>
+                <View style={[
+                    styles.header,
+                    {
+                        borderBottomColor: colors.PRIMARY_BORDER_DARK,
+                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                        paddingTop: insets.top + 16
+                    }
+                ]}>
                     <TouchableOpacity onPress={onClose} style={styles.backButton}>
                         <Ionicons name="arrow-back" size={24} color={colors.PRIMARY_TEXT} />
                     </TouchableOpacity>
 
-                    <View style={styles.titleContainer}>
+                    <View style={[styles.titleContainer, { paddingTop: insets.top + 16, paddingBottom: 16 }]} pointerEvents="none">
                         <StyledText style={[styles.headerTitle, { color: colors.PRIMARY_TEXT }]}>{t("notifications")}</StyledText>
                     </View>
 
                     <View style={styles.rightPlaceholder}>
-                        {notifications.length > 0 && (
-                            <TouchableOpacity onPress={handleClearAll}>
-                                <Ionicons name="trash-outline" size={22} color={colors.ERROR_INPUT_TEXT} />
-                            </TouchableOpacity>
-                        )}
+                        <View style={{ flexDirection: 'row', gap: 15 }}>
+                            {notifications.some(n => !n.read) && (
+                                <TouchableOpacity onPress={handleMarkAllRead}>
+                                    <Ionicons name="checkmark-done-outline" size={22} color={colors.CHECKBOX_SUCCESS} />
+                                </TouchableOpacity>
+                            )}
+                            {notifications.length > 0 && (
+                                <TouchableOpacity onPress={handleClearAll}>
+                                    <Ionicons name="trash-outline" size={22} color={colors.ERROR_INPUT_TEXT} />
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     </View>
                 </View>
 
@@ -120,7 +167,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                         </View>
                     </View>
                 </StyledModal>
-            </SafeAreaView>
+            </View>
         </Modal>
     );
 };
@@ -134,15 +181,15 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: 20,
-        paddingVertical: 16,
+        paddingBottom: 16,
         borderBottomWidth: 1,
-        paddingTop: Platform.OS === 'android' ? 40 : 16,
-        position: 'relative', // Ensure containment for absolute positioning if needed, but flex row with 3 items is safer
+        // paddingTop: Platform.OS === 'android' ? 40 : 16, // Removed because we use padding on container now
+        position: 'relative',
     },
     backButton: {
         padding: 8,
         marginLeft: -8,
-        zIndex: 10, // Ensure clickable
+        zIndex: 10,
     },
     titleContainer: {
         position: 'absolute',
@@ -152,8 +199,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: Platform.OS === 'android' ? 40 : 16, // Match header padding
-        zIndex: -1,
+        zIndex: 1, // Brought to front but transparent to touches
     },
     headerTitle: {
         fontSize: 20,
@@ -162,11 +208,13 @@ const styles = StyleSheet.create({
     rightPlaceholder: {
         minWidth: 40,
         alignItems: 'flex-end',
+        zIndex: 10,
     },
     listContent: {
         padding: 20,
         paddingBottom: 40,
     },
+
     notificationItem: {
         flexDirection: "row",
         padding: 16,

@@ -1,6 +1,8 @@
 import { useAppDispatch, useAppSelector } from "@/store";
+import { deleteNotification } from "@/store/slices/notificationSlice";
 import { addTodo, archiveAllTodos, archiveTodo, checkTodo, clearArchive, deleteTodo, editTodo, selectTodos } from "@/store/slices/todoSlice";
 import { Todo } from "@/types/todo";
+import * as Notifications from 'expo-notifications';
 
 // Random ID generator 
 const generateId = (): string => {
@@ -11,17 +13,23 @@ const useTodo = () => {
     const todos = useAppSelector(selectTodos);
     const dispatch = useAppDispatch();
 
-    const onAddTodo = (title: Todo["title"], reminder?: string) => {
+    const onAddTodo = (title: Todo["title"], reminder?: string, notificationId?: string) => {
         dispatch(addTodo({
             id: generateId(),
             title,
             isCompleted: false,
             createdAt: new Date().toISOString(),
-            reminder
+            reminder,
+            notificationId
         }))
     }
 
-    const onDeleteTodo = (id: Todo["id"]) => {
+    const onDeleteTodo = async (id: Todo["id"]) => {
+        const todo = todos.find(t => t.id === id);
+        if (todo && todo.notificationId && !todo.isCompleted) {
+            await Notifications.cancelScheduledNotificationAsync(todo.notificationId);
+            dispatch(deleteNotification(todo.notificationId));
+        }
         dispatch(deleteTodo(id))
     }
 
@@ -29,7 +37,13 @@ const useTodo = () => {
         dispatch(editTodo({ id, title, reminder }))
     }
 
-    const onCheckTodo = (id: Todo["id"]) => {
+    const onCheckTodo = async (id: Todo["id"]) => {
+        const todo = todos.find(t => t.id === id);
+        if (todo && !todo.isCompleted && todo.notificationId) {
+            console.log("Cancelling notification:", todo.notificationId);
+            await Notifications.cancelScheduledNotificationAsync(todo.notificationId);
+            dispatch(deleteNotification(todo.notificationId));
+        }
         dispatch(checkTodo(id))
     }
 

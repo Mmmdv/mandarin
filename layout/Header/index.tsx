@@ -26,19 +26,19 @@ const Header: React.FC = () => {
     <View style={[styles.container, { backgroundColor: colors.SECONDARY_BACKGROUND, borderBottomColor: colors.PRIMARY_BORDER_DARK }]}>
       <View style={styles.leftSection}>
         <View style={styles.iconWrapper}>
-          <Image source={require("@/assets/images/nar_4_1_1.png")} style={styles.logoImage} />
+          <Image source={require("@/assets/images/nar_48x48.png")} style={styles.logoImage} />
         </View>
         <StyledText style={styles.appName}>Nar</StyledText>
       </View>
       <View style={styles.rightSection}>
-        <TouchableOpacity onPress={() => setSettingsVisible(true)} activeOpacity={0.7} style={styles.iconButton}>
-          <Ionicons name="settings-outline" size={22} color={colors.PRIMARY_TEXT} />
+        <TouchableOpacity onPress={onShare} activeOpacity={0.7} style={styles.iconButton}>
+          <Ionicons name="share-outline" size={22} color={colors.PRIMARY_TEXT} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setNotificationsVisible(true)} activeOpacity={0.7} style={styles.iconButton}>
           <Ionicons name="notifications-outline" size={22} color={colors.PRIMARY_TEXT} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={onShare} activeOpacity={0.7} style={styles.iconButton}>
-          <Ionicons name="share-outline" size={22} color={colors.PRIMARY_TEXT} />
+        <TouchableOpacity onPress={() => setSettingsVisible(true)} activeOpacity={0.7} style={styles.iconButton}>
+          <Ionicons name="settings-outline" size={22} color={colors.PRIMARY_TEXT} />
         </TouchableOpacity>
       </View>
 
@@ -85,10 +85,10 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   appName: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "800",
-    color: "#a11708ff",
-    letterSpacing: 1,
+    color: "#e20026d8",
+    letterSpacing: 0.5,
   },
   iconButton: {
     padding: 8,

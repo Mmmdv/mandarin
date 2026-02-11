@@ -41,7 +41,7 @@ export const styles = StyleSheet.create({
         flexShrink: 1,
     },
     dateText: {
-        fontSize: 11,
+        fontSize: 13,
         color: "#aaa",
         marginTop: 2,
     },

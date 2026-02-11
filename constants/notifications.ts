@@ -20,7 +20,7 @@ export async function registerForPushNotificationsAsync() {
         finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
+        // alert('Failed to get push token for push notification!');
         return;
     }
     // token = (await Notifications.getExpoPushTokenAsync()).data;
@@ -33,7 +33,7 @@ export async function schedulePushNotification(title: string, body: string, trig
     const trigger = triggerDate.getTime() - Date.now();
     if (trigger <= 0) return; // Don't schedule past dates
 
-    await Notifications.scheduleNotificationAsync({
+    return await Notifications.scheduleNotificationAsync({
         content: {
             title,
             body,

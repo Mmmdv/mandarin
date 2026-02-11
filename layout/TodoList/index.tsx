@@ -33,8 +33,8 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const [archiveSortBy, setArchiveSortBy] = useState<SortBy>("date")
     const [archiveSortOrder, setArchiveSortOrder] = useState<SortOrder>("desc")
 
-    const [todoExpanded, setTodoExpanded] = useState(true)
-    const [doneExpanded, setDoneExpanded] = useState(true)
+    const [todoExpanded, setTodoExpanded] = useState(false)
+    const [doneExpanded, setDoneExpanded] = useState(false)
     const [archiveExpanded, setArchiveExpanded] = useState(false)
     const [isClearArchiveModalOpen, setIsClearArchiveModalOpen] = useState(false)
     const [isArchiveAllModalOpen, setIsArchiveAllModalOpen] = useState(false)
@@ -44,16 +44,25 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     const prevPendingCount = useRef(pendingTodos.length)
     const prevCompletedCount = useRef(completedTodos.length)
+    const prevArchivedCount = useRef(archivedTodos.length)
 
     useEffect(() => {
-        if (pendingTodos.length > prevPendingCount.current) setTodoExpanded(true)
+        if (pendingTodos.length === 0) setTodoExpanded(false)
+        else if (pendingTodos.length > prevPendingCount.current) setTodoExpanded(true)
         prevPendingCount.current = pendingTodos.length
     }, [pendingTodos.length])
 
     useEffect(() => {
-        if (completedTodos.length > prevCompletedCount.current) setDoneExpanded(true)
+        if (completedTodos.length === 0) setDoneExpanded(false)
+        else if (completedTodos.length > prevCompletedCount.current) setDoneExpanded(true)
         prevCompletedCount.current = completedTodos.length
     }, [completedTodos.length])
+
+    useEffect(() => {
+        if (archivedTodos.length === 0) setArchiveExpanded(false)
+        else if (archivedTodos.length > prevArchivedCount.current) setArchiveExpanded(true)
+        prevArchivedCount.current = archivedTodos.length
+    }, [archivedTodos.length])
 
     const sortedPendingTodos = sortTodos(pendingTodos, todoSortBy, todoSortOrder, "createdAt")
     const sortedCompletedTodos = sortTodos(completedTodos, doneSortBy, doneSortOrder, "completedAt")
@@ -66,9 +75,50 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     if (todos.length === 0) {
         return (
-            <View style={styles.emptyContainer}>
-                <StyledText style={[styles.emptyText, { color: colors.PRIMARY_TEXT }]}>{t("empty_list")}</StyledText>
-                <StyledText style={[styles.emptySubtext, { color: colors.PLACEHOLDER }]}>{t("todo_placeholder")}</StyledText>
+            <View style={[styles.emptyContainer, { justifyContent: 'center', flex: 1 }]}>
+                <View style={{
+                    width: 120,
+                    height: 120,
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
+                    borderRadius: 60,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 24,
+                    shadowColor: colors.CHECKBOX_SUCCESS,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5
+                }}>
+                    <Ionicons name="add-outline" size={64} color={colors.CHECKBOX_SUCCESS} />
+                </View>
+                <StyledText style={{ fontSize: 22, fontWeight: 'bold', color: colors.PRIMARY_TEXT, marginBottom: 8 }}>
+                    {t("start_journey")}
+                </StyledText>
+                <StyledText style={{ fontSize: 16, color: colors.PLACEHOLDER, textAlign: 'center', marginBottom: 32, paddingHorizontal: 40 }}>
+                    {t("empty_desc")}
+                </StyledText>
+                <TouchableOpacity
+                    onPress={onAddRequest}
+                    activeOpacity={0.8}
+                    style={{
+                        backgroundColor: colors.CHECKBOX_SUCCESS,
+                        paddingVertical: 16,
+                        paddingHorizontal: 32,
+                        borderRadius: 30,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 8,
+                        shadowColor: colors.CHECKBOX_SUCCESS,
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 8,
+                        elevation: 5
+                    }}
+                >
+                    <Ionicons name="add" size={24} color="#FFF" />
+                    <StyledText style={{ color: '#FFF', fontSize: 16, fontWeight: 'bold' }}>{t("create_task")}</StyledText>
+                </TouchableOpacity>
             </View>
         )
     }
