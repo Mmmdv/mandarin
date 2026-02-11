@@ -204,7 +204,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                 }, 100);
             } else {
                 // iOS: Update temp state only
-                const currentReminder = reminderDate || new Date();
+                const currentReminder = tempDate || reminderDate || new Date();
                 const newDate = new Date(currentReminder);
 
                 newDate.setHours(selectedTime.getHours());

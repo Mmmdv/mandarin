@@ -79,6 +79,10 @@ export const TRANSLATIONS = {
         past_reminder_error: "Keçmiş zamana xatırlatma təyin etmək olmur",
         attention: "Diqqət",
         next: "Növbəti",
+        updated_status: "Yeniləndi",
+        changed_status: "Dəyişdirildi",
+        disable_notifications_confirm: "Bütün aktiv bildirişləri dayandırmaq istədiyinizə əminsiniz?",
+        clear_history_confirm: "Bütün bildiriş tarixçəsini silmək istədiyinizə əminsiniz?",
     },
     en: {
         welcome: "Welcome",
@@ -160,6 +164,10 @@ export const TRANSLATIONS = {
         past_reminder_error: "Reminder time cannot be in the past",
         attention: "Attention",
         next: "Next",
+        updated_status: "Updated",
+        changed_status: "Changed",
+        disable_notifications_confirm: "Are you sure you want to stop all active notifications?",
+        clear_history_confirm: "Are you sure you want to delete the entire notification history?",
     },
     ru: {
         welcome: "Добро пожаловать",
@@ -241,6 +249,10 @@ export const TRANSLATIONS = {
         past_reminder_error: "Время напоминания не может быть в прошлом",
         attention: "Внимание",
         next: "Далее",
+        updated_status: "Обновлено",
+        changed_status: "Изменено",
+        disable_notifications_confirm: "Вы уверены, что хотите остановить все активные уведомления?",
+        clear_history_confirm: "Вы уверены, что хотите удалить всю историю уведомлений?",
     },
 };
 

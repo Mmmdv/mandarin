@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import { clearNotifications, markAllAsRead, markAsRead, selectNotifications } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { FlatList, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import { FlatList, Modal, RefreshControl, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface NotificationsModalProps {
@@ -21,6 +21,15 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
     const notifications = useAppSelector(selectNotifications);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const insets = useSafeAreaInsets();
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        // Simulate refresh
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1500);
+    };
 
     // Remove auto-mark-read effect
     // useEffect(() => {
@@ -55,6 +64,11 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
             statusIcon = "notifications-off";
             statusBg = "rgba(255, 69, 58, 0.1)";
             opacity = 0.6;
+        } else if (item.status === 'changed') {
+            statusColor = "#5BC0EB";
+            statusIcon = "create-outline";
+            statusBg = "rgba(91, 192, 235, 0.15)";
+            opacity = 0.7;
         } else if (isPending) {
             statusColor = "#FFB74D";
             statusIcon = "time-outline";
@@ -115,12 +129,17 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                             <StyledText style={{ fontSize: 12, color: colors.ERROR_INPUT_TEXT, fontWeight: "600" }}>{t("canceled")}</StyledText>
                         </View>
                     )}
-                    {item.status !== 'cancelled' && isPending && (
+                    {item.status === 'changed' && (
+                        <View style={{ marginTop: 4 }}>
+                            <StyledText style={{ fontSize: 12, color: "#5BC0EB", fontWeight: "600" }}>{t("changed_status")}</StyledText>
+                        </View>
+                    )}
+                    {item.status !== 'cancelled' && item.status !== 'changed' && isPending && (
                         <View style={{ marginTop: 4 }}>
                             <StyledText style={{ fontSize: 12, color: "#FFB74D", fontWeight: "600" }}>{t("pending")}</StyledText>
                         </View>
                     )}
-                    {item.status !== 'cancelled' && !isPending && (
+                    {item.status !== 'cancelled' && item.status !== 'changed' && !isPending && (
                         <View style={{ marginTop: 4 }}>
                             <StyledText style={{ fontSize: 12, color: colors.CHECKBOX_SUCCESS, fontWeight: "600" }}>{t("sent")}</StyledText>
                         </View>
@@ -182,6 +201,14 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={styles.listContent}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                            tintColor={colors.CHECKBOX_SUCCESS}
+                            colors={[colors.CHECKBOX_SUCCESS]}
+                        />
+                    }
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
                             <Ionicons name="notifications-off-outline" size={64} color="#666" style={{ marginBottom: 16 }} />
@@ -205,7 +232,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                         </View>
                         <StyledText style={modalStyles.headerText}>{t("confirm_delete")}</StyledText>
                         <View style={modalStyles.divider} />
-                        <StyledText style={modalStyles.messageText}>{t("confirm_delete_message")}</StyledText>
+                        <StyledText style={modalStyles.messageText}>{t("clear_history_confirm")}</StyledText>
                         <View style={modalStyles.buttonsContainer}>
                             <StyledButton label={t("cancel")} onPress={() => setIsDeleteConfirmOpen(false)} variant="dark_button" />
                             <StyledButton label={t("delete")} onPress={confirmClearAll} variant="dark_button" />

@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme"
 import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
 import { useEffect, useRef, useState } from "react"
-import { LayoutAnimation, ScrollView, TouchableOpacity, View } from "react-native"
+import { LayoutAnimation, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native"
 import ArchiveAllModal from "../Modals/ArchiveAllModal.tsx"
 import ClearArchiveModal from "../Modals/ClearArchiveModal.tsx"
 import TodoItem from "../TodoItem"
@@ -16,7 +16,7 @@ type TodoListProps = {
     todos: Todo[]
     onDeleteTodo: (id: Todo["id"]) => void
     onCheckTodo: (id: Todo["id"]) => void
-    onEditTodo: (id: Todo["id"], title: Todo["title"], reminder?: string) => void
+    onEditTodo: (id: Todo["id"], title: Todo["title"], reminder?: string, notificationId?: string) => void
     onArchiveTodo: (id: Todo["id"]) => void
     onArchiveAll?: () => void
     onClearArchive: () => void
@@ -73,58 +73,90 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
         setter(prev => !prev);
     }
 
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        // Simulate refresh
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1500);
+    };
+
     if (todos.length === 0) {
         return (
-            <View style={[styles.emptyContainer, { justifyContent: 'center', flex: 1 }]}>
-                <View style={{
-                    width: 120,
-                    height: 120,
-                    backgroundColor: colors.SECONDARY_BACKGROUND,
-                    borderRadius: 60,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 24,
-                    shadowColor: colors.CHECKBOX_SUCCESS,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 5
-                }}>
-                    <Ionicons name="add-outline" size={64} color={colors.CHECKBOX_SUCCESS} />
-                </View>
-                <StyledText style={{ fontSize: 22, fontWeight: 'bold', color: colors.PRIMARY_TEXT, marginBottom: 8 }}>
-                    {t("start_journey")}
-                </StyledText>
-                <StyledText style={{ fontSize: 16, color: colors.PLACEHOLDER, textAlign: 'center', marginBottom: 32, paddingHorizontal: 40 }}>
-                    {t("empty_desc")}
-                </StyledText>
-                <TouchableOpacity
-                    onPress={onAddRequest}
-                    activeOpacity={0.8}
-                    style={{
-                        backgroundColor: colors.CHECKBOX_SUCCESS,
-                        paddingVertical: 16,
-                        paddingHorizontal: 32,
-                        borderRadius: 30,
-                        flexDirection: 'row',
+            <ScrollView
+                contentContainerStyle={{ flex: 1, justifyContent: 'center' }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={colors.CHECKBOX_SUCCESS}
+                        colors={[colors.CHECKBOX_SUCCESS]} // Android
+                    />
+                }
+            >
+                <View style={[styles.emptyContainer, { justifyContent: 'center', flex: 1 }]}>
+                    <View style={{
+                        width: 120,
+                        height: 120,
+                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                        borderRadius: 60,
                         alignItems: 'center',
-                        gap: 8,
+                        justifyContent: 'center',
+                        marginBottom: 24,
                         shadowColor: colors.CHECKBOX_SUCCESS,
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: 0.3,
                         shadowRadius: 8,
                         elevation: 5
-                    }}
-                >
-                    <Ionicons name="add" size={24} color="#FFF" />
-                    <StyledText style={{ color: '#FFF', fontSize: 16, fontWeight: 'bold' }}>{t("create_task")}</StyledText>
-                </TouchableOpacity>
-            </View>
+                    }}>
+                        <Ionicons name="add-outline" size={64} color={colors.CHECKBOX_SUCCESS} />
+                    </View>
+                    <StyledText style={{ fontSize: 22, fontWeight: 'bold', color: colors.PRIMARY_TEXT, marginBottom: 8 }}>
+                        {t("start_journey")}
+                    </StyledText>
+                    <StyledText style={{ fontSize: 16, color: colors.PLACEHOLDER, textAlign: 'center', marginBottom: 32, paddingHorizontal: 40 }}>
+                        {t("empty_desc")}
+                    </StyledText>
+                    <TouchableOpacity
+                        onPress={onAddRequest}
+                        activeOpacity={0.8}
+                        style={{
+                            backgroundColor: colors.CHECKBOX_SUCCESS,
+                            paddingVertical: 16,
+                            paddingHorizontal: 32,
+                            borderRadius: 30,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 8,
+                            shadowColor: colors.CHECKBOX_SUCCESS,
+                            shadowOffset: { width: 0, height: 4 },
+                            shadowOpacity: 0.3,
+                            shadowRadius: 8,
+                            elevation: 5
+                        }}
+                    >
+                        <Ionicons name="add" size={24} color="#FFF" />
+                        <StyledText style={{ color: '#FFF', fontSize: 16, fontWeight: 'bold' }}>{t("create_task")}</StyledText>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
         )
     }
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView
+            style={styles.container}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    tintColor={colors.CHECKBOX_SUCCESS}
+                    colors={[colors.CHECKBOX_SUCCESS]}
+                />
+            }
+        >
             {/* To Do Section */}
             <View style={styles.sectionContainer}>
                 <TouchableOpacity

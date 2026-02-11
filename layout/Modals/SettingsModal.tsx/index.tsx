@@ -347,7 +347,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
                     <View style={modalStyles.divider} />
 
                     <StyledText style={modalStyles.messageText}>
-                        {t("confirm_delete_message")}
+                        {t("disable_notifications_confirm")}
                     </StyledText>
 
                     <View style={modalStyles.buttonsContainer}>

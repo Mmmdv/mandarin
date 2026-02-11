@@ -33,8 +33,8 @@ const useTodo = () => {
         dispatch(deleteTodo(id))
     }
 
-    const onEditTodo = (id: Todo["id"], title: Todo["title"], reminder?: string) => {
-        dispatch(editTodo({ id, title, reminder }))
+    const onEditTodo = (id: Todo["id"], title: Todo["title"], reminder?: string, notificationId?: string) => {
+        dispatch(editTodo({ id, title, reminder, notificationId }))
     }
 
     const onCheckTodo = async (id: Todo["id"]) => {

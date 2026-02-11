@@ -19,13 +19,13 @@ type TodoItemProps = Todo & {
     reminderCancelled?: boolean;
     checkTodo: (id: Todo["id"]) => void
     deleteTodo: (id: Todo["id"]) => void
-    editTodo: (id: Todo["id"], title: Todo["title"], reminder?: string) => void
+    editTodo: (id: Todo["id"], title: Todo["title"], reminder?: string, notificationId?: string) => void
     archiveTodo?: (id: Todo["id"]) => void
 }
 
 import { useTheme } from "@/hooks/useTheme"
 
-const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived, createdAt, completedAt, updatedAt, archivedAt, reminder, reminderCancelled, checkTodo, deleteTodo, editTodo, archiveTodo }) => {
+const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived, createdAt, completedAt, updatedAt, archivedAt, reminder, reminderCancelled, notificationId, checkTodo, deleteTodo, editTodo, archiveTodo }) => {
     const { t, notificationsEnabled } = useTheme();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -184,9 +184,10 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                             title={title}
                             isOpen={isEditModalOpen}
                             onClose={() => setIsEditModalOpen(false)}
-                            onUpdate={(title, reminder) => editTodo(id, title, reminder)}
+                            onUpdate={(title, reminder, notificationId) => editTodo(id, title, reminder, notificationId)}
                             reminder={reminder}
                             reminderCancelled={reminderCancelled}
+                            notificationId={notificationId}
                         />
                         <TouchableOpacity onPress={onPressDelete} activeOpacity={0.7}>
                             <Ionicons name="trash-outline" size={24} color={COLORS.PRIMARY_TEXT} />

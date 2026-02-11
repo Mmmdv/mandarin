@@ -7,25 +7,27 @@ import { COLORS } from "@/constants/ui";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
-import { addNotification } from "@/store/slices/notificationSlice";
+import { addNotification, updateNotificationStatus } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Haptics from "expo-haptics";
+import * as Notifications from 'expo-notifications';
 import { useEffect, useRef, useState } from "react";
 import { Animated, Platform, Pressable, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 type EditTodoModalProps = {
     isOpen: boolean
     onClose: () => void
-    onUpdate: (title: string, reminder?: string) => void
+    onUpdate: (title: string, reminder?: string, notificationId?: string) => void
     title: Todo["title"]
     reminder?: string
+    notificationId?: string
     reminderCancelled?: boolean
 }
 
 const EditTodoModal: React.FC<EditTodoModalProps> = ({
-    isOpen, onClose, onUpdate, title, reminder, reminderCancelled }) => {
+    isOpen, onClose, onUpdate, title, reminder, reminderCancelled, notificationId }) => {
     const { t, lang, notificationsEnabled } = useTheme();
     const dispatch = useAppDispatch();
 
@@ -72,18 +74,43 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
             return
         }
 
-        if (reminderDate && notificationsEnabled) {
-            await schedulePushNotification(updatedTitle, t("reminder"), reminderDate);
-            // Add to history
-            dispatch(addNotification({
-                id: Date.now().toString(),
-                title: t("reminder"),
-                body: `${t("title")}: ${updatedTitle}`,
-                date: reminderDate.toISOString(),
+        let newNotificationId = notificationId;
+
+        // If there's an existing notification and the reminder has changed or is being removed
+
+        if (notificationId && (reminderDate?.toISOString() !== reminder)) {
+            // Cancel the OLD notification
+            try {
+                await Notifications.cancelScheduledNotificationAsync(notificationId);
+            } catch (error) {
+                console.log("Error canceling notification:", error);
+            }
+
+            // Update OLD notification status in history to 'changed'
+            dispatch(updateNotificationStatus({
+                id: notificationId,
+                status: 'changed'
             }));
         }
 
-        onUpdate(updatedTitle, reminderDate?.toISOString())
+        if (reminderDate && notificationsEnabled) {
+            // Schedule NEW notification
+            const newId = await schedulePushNotification(updatedTitle, t("reminder"), reminderDate);
+            newNotificationId = newId;
+
+            // Add NEW notification to history as 'pending'
+            if (newId) {
+                dispatch(addNotification({
+                    id: newId,
+                    title: t("reminder"),
+                    body: `${t("title")}: ${updatedTitle}`,
+                    date: reminderDate.toISOString(),
+                    status: 'pending'
+                }));
+            }
+        }
+
+        onUpdate(updatedTitle, reminderDate?.toISOString(), newNotificationId)
         onClose()
     }
 
@@ -194,7 +221,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                 setReminderDate(newDate);
             } else {
                 // iOS: Update temp state only
-                const currentReminder = reminderDate || new Date();
+                const currentReminder = tempDate || reminderDate || new Date();
                 const newDate = new Date(currentReminder);
                 newDate.setHours(selectedTime.getHours());
                 newDate.setMinutes(selectedTime.getMinutes());

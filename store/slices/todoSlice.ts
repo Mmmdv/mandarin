@@ -34,14 +34,17 @@ export const todoSlice = createSlice({
                 id: Todo["id"]
                 title: Todo["title"]
                 reminder?: string
+                notificationId?: string
             }>,
         ) => {
-            const { id, title, reminder } = action.payload;
+            const { id, title, reminder, notificationId } = action.payload;
             state.todos = state.todos.map((todo) =>
                 todo.id === id ? {
                     ...todo,
                     title,
                     reminder,
+                    // Update notificationId if provided
+                    notificationId: notificationId !== undefined ? notificationId : todo.notificationId,
                     updatedAt: new Date().toISOString(),
                     // If reminder is updated/set, reset cancelled status
                     reminderCancelled: reminder ? false : todo.reminderCancelled
