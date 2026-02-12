@@ -141,4 +141,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default StyledButton
+export default React.memo(StyledButton)

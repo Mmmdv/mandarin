@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "679359366355",
+    "project_id": "mandarin-001",
+    "storage_bucket": "mandarin-001.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:679359366355:android:863637b32b5c1745274026",
+        "android_client_info": {
+          "package_name": "com.onesquadman.mandarin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBj4LEDVu0YoF4jeMoqT0tWp-01aa4QY1M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

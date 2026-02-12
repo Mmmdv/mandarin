@@ -40,7 +40,7 @@ const useTodo = () => {
     const onCheckTodo = async (id: Todo["id"]) => {
         const todo = todos.find(t => t.id === id);
         if (todo && !todo.isCompleted && todo.notificationId) {
-            console.log("Cancelling notification:", todo.notificationId);
+
             await Notifications.cancelScheduledNotificationAsync(todo.notificationId);
             dispatch(deleteNotification(todo.notificationId));
         }

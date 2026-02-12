@@ -6,13 +6,12 @@ import * as Haptics from "expo-haptics";
 import * as Notifications from 'expo-notifications';
 import { Stack } from "expo-router";
 import { useEffect } from "react";
+import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import persistStore from "redux-persist/es/persistStore";
 import { PersistGate } from "redux-persist/integration/react";
-
-import { LogBox } from "react-native";
 
 LogBox.ignoreLogs([
   "expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed",
@@ -51,6 +50,10 @@ export default function RootLayout() {
   useEffect(() => {
     Haptics.selectionAsync();
     registerForLocalNotificationsAsync();
+
+    // Firebase Initialization
+    analytics().logAppOpen().catch(e => console.log('Analytics error:', e));
+    crashlytics().log('App Started');
   }, []);
 
   return (

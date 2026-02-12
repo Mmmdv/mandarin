@@ -19,6 +19,7 @@ export interface AppState {
     birthdayNotifications: boolean
     movieNotifications: boolean
     username?: string
+    usageStats: Record<string, number>
 }
 
 const initialState: AppState = {
@@ -28,7 +29,15 @@ const initialState: AppState = {
     todoNotifications: true,
     birthdayNotifications: true,
     movieNotifications: true,
-    username: ""
+    username: "",
+    usageStats: {
+        todo: 0,
+        movies: 0,
+        birthday: 0,
+        shopping: 0,
+        events: 0,
+        expenses: 0
+    }
 }
 
 export interface UpdateAppSettingsPayload {
@@ -58,11 +67,29 @@ export const appSlice = createSlice({
             if (action.payload.movieNotifications !== undefined) state.movieNotifications = action.payload.movieNotifications
             if (username !== undefined) state.username = username
         },
+        incrementUsage: (state, action: PayloadAction<string>) => {
+            if (!state.usageStats) {
+                state.usageStats = {
+                    todo: 0,
+                    movies: 0,
+                    birthday: 0,
+                    shopping: 0,
+                    events: 0,
+                    expenses: 0
+                };
+            }
+            if (state.usageStats[action.payload] !== undefined) {
+                state.usageStats[action.payload] += 1;
+            } else {
+                state.usageStats[action.payload] = 1;
+            }
+        }
     },
 })
 
-export const { updateAppSetting } = appSlice.actions
+export const { updateAppSetting, incrementUsage } = appSlice.actions
 
 export const selectAppSettings = (state: { app: AppState }): AppState => state.app
+export const selectUsageStats = (state: { app: AppState }) => state.app.usageStats
 
 export default appSlice.reducer 

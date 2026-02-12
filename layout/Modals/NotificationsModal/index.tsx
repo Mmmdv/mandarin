@@ -6,9 +6,10 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { clearNotifications, markAllAsRead, markAsRead, selectNotifications } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { FlatList, Modal, RefreshControl, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import { FlatList, Modal, RefreshControl, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { styles } from "./styles";
 
 interface NotificationsModalProps {
     visible: boolean;
@@ -23,52 +24,40 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
     const insets = useSafeAreaInsets();
     const [refreshing, setRefreshing] = useState(false);
 
-    const onRefresh = () => {
+    const onRefresh = useCallback(() => {
         setRefreshing(true);
-        // Simulate refresh
         setTimeout(() => {
             setRefreshing(false);
         }, 1500);
-    };
+    }, []);
 
-    // Remove auto-mark-read effect
-    // useEffect(() => {
-    //     if (visible) {
-    //         dispatch(markAllAsRead());
-    //     }
-    // }, [visible]);
-
-    const handleClearAll = () => {
+    const handleClearAll = useCallback(() => {
         setIsDeleteConfirmOpen(true);
-    };
+    }, []);
 
-    const handleMarkAllRead = () => {
+    const handleMarkAllRead = useCallback(() => {
         dispatch(markAllAsRead());
-    };
+    }, [dispatch]);
 
-    const confirmClearAll = () => {
+    const confirmClearAll = useCallback(() => {
         dispatch(clearNotifications());
         setIsDeleteConfirmOpen(false);
-    };
+    }, [dispatch]);
 
-    const renderItem = ({ item }: { item: any }) => {
+    const renderItem = useCallback(({ item }: { item: any }) => {
         const isPending = new Date(item.date) > new Date();
-        // Determine status style
         let statusColor = colors.CHECKBOX_SUCCESS;
         let statusIcon: any = "notifications";
         let statusBg = "rgba(78, 205, 196, 0.15)";
-        let opacity = 1;
 
         if (item.status === 'cancelled') {
             statusColor = colors.ERROR_INPUT_TEXT;
             statusIcon = "notifications-off";
             statusBg = "rgba(255, 69, 58, 0.1)";
-            opacity = 0.6;
         } else if (item.status === 'changed') {
             statusColor = "#5BC0EB";
             statusIcon = "create-outline";
             statusBg = "rgba(91, 192, 235, 0.15)";
-            opacity = 0.7;
         } else if (isPending) {
             statusColor = "#FFB74D";
             statusIcon = "time-outline";
@@ -76,8 +65,6 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
         }
 
         const isUnread = !item.read;
-
-        // Clean body text (remove "Title: " or "Başlıq: " etc)
         const cleanBody = item.body.replace(/^(Title|Başlıq|Заголовок): /i, "");
 
         return (
@@ -152,7 +139,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                 )}
             </TouchableOpacity>
         );
-    };
+    }, [colors, t, dispatch]);
 
     return (
         <Modal
@@ -243,94 +230,5 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
         </Modal>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 20,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-        // paddingTop: Platform.OS === 'android' ? 40 : 16, // Removed because we use padding on container now
-        position: 'relative',
-    },
-    backButton: {
-        padding: 8,
-        marginLeft: -8,
-        zIndex: 10,
-    },
-    titleContainer: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1, // Brought to front but transparent to touches
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: "bold",
-    },
-    rightPlaceholder: {
-        minWidth: 40,
-        alignItems: 'flex-end',
-        zIndex: 10,
-    },
-    listContent: {
-        padding: 20,
-        paddingBottom: 40,
-    },
-
-    notificationItem: {
-        flexDirection: "row",
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 12,
-        borderWidth: 1,
-        gap: 16,
-    },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    contentContainer: {
-        flex: 1,
-    },
-    itemHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        marginBottom: 4,
-    },
-    itemTitle: {
-        fontSize: 16,
-        fontWeight: "600",
-        flex: 1,
-        marginRight: 8,
-    },
-    itemDate: {
-        fontSize: 12,
-        color: "#888",
-    },
-    itemBody: {
-        fontSize: 14,
-        lineHeight: 20,
-    },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 100,
-    },
-});
 
 export default NotificationsModal;

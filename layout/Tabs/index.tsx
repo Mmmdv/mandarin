@@ -1,45 +1,41 @@
-import { COLORS } from "@/constants/ui";
 import { useTheme } from "@/hooks/useTheme";
+import { incrementUsage } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
+import analytics from "@react-native-firebase/analytics";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef } from "react";
-import { Animated, Dimensions, Easing, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const VISIBLE_TABS = 5;
-const SIDE_ITEMS = 50; // Large buffer for fast scrolling
-const TAB_BAR_WIDTH = SCREEN_WIDTH * 0.75;
-const TAB_WIDTH = TAB_BAR_WIDTH / VISIBLE_TABS;
+import { Animated, Easing, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useDispatch } from "react-redux";
+import { generateSideItems, getIconName, getLabelName } from "./helpers";
+import { SIDE_ITEMS, TAB_WIDTH, styles } from "./styles";
 
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { t } = useTheme();
+    const dispatch = useDispatch();
     const scrollRef = useRef<ScrollView>(null);
     const isWrapping = useRef(false);
     const isManualScrolling = useRef(false);
+    const isUserDragging = useRef(false);
+    const currentScrollIndex = useRef(SIDE_ITEMS);
 
     const routes = state.routes;
 
-    // Helper to generate side items by repeating routes
-    const generateSideItems = (count: number, reverse: boolean = false) => {
-        const items = [];
-        for (let i = 0; i < count; i++) {
-            // Logic to pick correct route wrapping around
-            const index = reverse ? (routes.length - 1 - (i % routes.length)) : (i % routes.length);
-            items.push(routes[index]);
-        }
-        return reverse ? items.reverse() : items;
-    }
+    // Helper to map route name to usage ID
+    const getUsageId = (routeName: string) => {
+        if (routeName === 'index') return null; // Skip home
+        return routeName; // other routes like 'todo', 'movies' match their screen names
+    };
 
     const extendedRoutes = [
-        ...generateSideItems(SIDE_ITEMS, true).map((r, i) => ({
+        ...generateSideItems(routes, SIDE_ITEMS, true).map((r, i) => ({
             ...r,
             _fake: true,
             _keySuffix: `_fake_start_${i}`,
             _originalIndex: routes.findIndex(route => route.key === r.key)
         })),
         ...routes.map((r, i) => ({ ...r, _fake: false, _keySuffix: '', _originalIndex: i })),
-        ...generateSideItems(SIDE_ITEMS, false).map((r, i) => ({
+        ...generateSideItems(routes, SIDE_ITEMS, false).map((r, i) => ({
             ...r,
             _fake: true,
             _keySuffix: `_fake_end_${i}`,
@@ -47,7 +43,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         }))
     ];
 
-    // Map state.index (0..N-1) to Scroll Position
     const getScrollIndex = (realIndex: number) => realIndex + SIDE_ITEMS;
 
     const scaleAnims = useRef(
@@ -59,40 +54,12 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     ).current;
 
     const bgScaleAnims = useRef(
-        extendedRoutes.map(() => new Animated.Value(0)) // Start at 0 scale for background
+        extendedRoutes.map(() => new Animated.Value(0))
     ).current;
 
     const bgOpacityAnims = useRef(
-        extendedRoutes.map(() => new Animated.Value(0)) // Start invisible
+        extendedRoutes.map(() => new Animated.Value(0))
     ).current;
-
-    const getIconName = (routeName: string, isFocused: boolean): keyof typeof Ionicons.glyphMap => {
-        switch (routeName) {
-            case "index": return isFocused ? "home" : "home-outline";
-            case "todo": return isFocused ? "list" : "list-outline";
-            case "birthday": return isFocused ? "gift" : "gift-outline";
-            case "shopping": return isFocused ? "cart" : "cart-outline";
-            case "events": return isFocused ? "ticket" : "ticket-outline";
-            case "movies": return isFocused ? "film" : "film-outline";
-            case "expenses": return isFocused ? "wallet" : "wallet-outline";
-            default: return "ellipse-outline";
-        }
-    };
-
-    const getLabelName = (routeName: string): string => {
-        switch (routeName) {
-            case "index": return t("tab_home");
-            case "todo": return t("tab_todo");
-            case "birthday": return t("tab_birthday");
-            case "shopping": return t("tab_shopping");
-            case "events": return t("tab_events");
-            case "movies": return t("tab_movies");
-            case "expenses": return t("tab_expenses");
-            default: return "";
-        }
-    };
-
-    const isUserDragging = useRef(false);
 
     const scrollToOffset = (offset: number, animated: boolean) => {
         scrollRef.current?.scrollTo({ x: offset, animated });
@@ -100,9 +67,8 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
     const animateTab = (index: number, focused: boolean) => {
         Animated.parallel([
-            // Icon Scale/Float
             Animated.spring(scaleAnims[index], {
-                toValue: focused ? 1.1 : 1, // Slightly smaller scale for scale
+                toValue: focused ? 1.1 : 1,
                 friction: 5,
                 useNativeDriver: true,
             }),
@@ -111,9 +77,8 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 friction: 4,
                 useNativeDriver: true,
             }),
-            // Background Pill Expansion
             Animated.timing(bgScaleAnims[index], {
-                toValue: focused ? 1 : 0.5, // Expand from center
+                toValue: focused ? 1 : 0.5,
                 duration: 250,
                 easing: Easing.out(Easing.quad),
                 useNativeDriver: true,
@@ -126,8 +91,31 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         ]).start();
     };
 
+    // Find the closest extended route index that matches the target originalIndex
+    const findClosestMatchingIndex = (targetOriginalIndex: number) => {
+        const currentIdx = currentScrollIndex.current;
+        let closestIdx = getScrollIndex(targetOriginalIndex); // default: real position
+        let closestDist = Math.abs(closestIdx - currentIdx);
+
+        for (let i = 0; i < extendedRoutes.length; i++) {
+            if (extendedRoutes[i]._originalIndex === targetOriginalIndex) {
+                const dist = Math.abs(i - currentIdx);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestIdx = i;
+                }
+            }
+        }
+
+        return closestIdx;
+    };
+
+    const onScroll = (event: any) => {
+        const offsetX = event.nativeEvent.contentOffset.x;
+        currentScrollIndex.current = Math.round(offsetX / TAB_WIDTH);
+    };
+
     useEffect(() => {
-        // Animate all tabs based on current focus
         extendedRoutes.forEach((route, index) => {
             const isFocused = state.index === route._originalIndex;
             animateTab(index, isFocused);
@@ -138,8 +126,21 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             return;
         }
 
-        const scrollIndex = getScrollIndex(state.index);
-        scrollToOffset(scrollIndex * TAB_WIDTH, true);
+        // Find the closest copy of the target tab and animate to it
+        const closestIdx = findClosestMatchingIndex(state.index);
+        const realScrollIndex = getScrollIndex(state.index);
+
+        if (closestIdx !== realScrollIndex) {
+            // Animate to the closest fake copy, then silently jump to the real position
+            scrollToOffset(closestIdx * TAB_WIDTH, true);
+            setTimeout(() => {
+                scrollToOffset(realScrollIndex * TAB_WIDTH, false);
+                currentScrollIndex.current = realScrollIndex;
+            }, 250);
+        } else {
+            scrollToOffset(realScrollIndex * TAB_WIDTH, true);
+            currentScrollIndex.current = realScrollIndex;
+        }
     }, [state.index]);
 
     const onTabPress = (renderIndex: number, route: any, isFocused: boolean) => {
@@ -154,12 +155,19 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         if (!isFocused && !event.defaultPrevented) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
+            const usageId = getUsageId(route.name);
+            if (usageId) {
+                dispatch(incrementUsage(usageId));
+                analytics().logSelectContent({
+                    content_type: 'tab_navigation',
+                    item_id: usageId,
+                });
+            }
+
             if (route._fake) {
                 isWrapping.current = true;
-                // 1. Scroll to fake position
                 scrollToOffset(renderIndex * TAB_WIDTH, true);
 
-                // 2. Snap to real position after animation and navigate
                 setTimeout(() => {
                     const realScrollIndex = getScrollIndex(originalIndex);
                     scrollToOffset(realScrollIndex * TAB_WIDTH, false);
@@ -167,7 +175,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 }, 150);
             } else {
                 navigation.navigate(route.name);
-                // Removed redundant scrollToOffset, handled by useEffect
             }
         }
     };
@@ -177,7 +184,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     };
 
     const onMomentumScrollEnd = (event: any) => {
-        // Only trigger navigation if the scroll was initiated by the user
         if (!isUserDragging.current) {
             return;
         }
@@ -189,6 +195,17 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
         const route = extendedRoutes[index];
 
+        if (route) {
+            const usageId = getUsageId(route.name);
+            if (usageId && route._originalIndex !== state.index) {
+                dispatch(incrementUsage(usageId));
+                analytics().logSelectContent({
+                    content_type: 'tab_swipe',
+                    item_id: usageId,
+                });
+            }
+        }
+
         if (route._fake) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             const realIndex = route._originalIndex;
@@ -196,7 +213,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             scrollToOffset(realScrollIndex * TAB_WIDTH, false);
             navigation.navigate(route.name);
         } else {
-            // Scrolled to a normal tab
             if (route && route._originalIndex !== state.index) {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 navigation.navigate(route.name);
@@ -209,8 +225,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         }, 100);
     };
 
-
-
     return (
         <View style={styles.tabBarContainer}>
             <View style={styles.tabBarWrapper}>
@@ -222,13 +236,15 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                     snapToInterval={TAB_WIDTH}
                     decelerationRate="fast"
                     scrollEnabled={true}
+                    onScroll={onScroll}
+                    scrollEventThrottle={16}
                     onScrollBeginDrag={onScrollBeginDrag}
                     onMomentumScrollEnd={onMomentumScrollEnd}
                 >
                     {extendedRoutes.map((route, index) => {
                         const isFocused = state.index === route._originalIndex;
                         const iconName = getIconName(route.name, isFocused);
-                        const label = getLabelName(route.name);
+                        const label = getLabelName(route.name, t);
 
                         return (
                             <TouchableOpacity
@@ -238,7 +254,6 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                                 style={styles.tabButton}
                             >
                                 <View style={styles.tabItemContainer}>
-                                    {/* Animated Background Pill */}
                                     <Animated.View
                                         style={[
                                             styles.tabBackgroundPill,
@@ -284,57 +299,5 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    tabBarContainer: {
-        position: "absolute",
-        bottom: 20,
-        left: 0,
-        right: 0,
-        alignItems: "center",
-    },
-    tabBarWrapper: {
-        backgroundColor: COLORS.SECONDARY_BACKGROUND,
-        borderRadius: 25,
-        borderWidth: 0.6,
-        borderColor: COLORS.PRIMARY_BORDER_DARK,
-        height: 70,
-        width: TAB_BAR_WIDTH,
-        overflow: "hidden",
-    },
-    scrollContent: {
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: (TAB_BAR_WIDTH - TAB_WIDTH) / 2, // Dynamically center
-    },
-    tabButton: {
-        width: TAB_WIDTH,
-        height: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    tabItemContainer: {
-        width: "100%",
-        height: "80%",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    tabBackgroundPill: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "#353f50ff",
-        borderRadius: 15,
-        zIndex: 0,
-    },
-    tabItemContent: {
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1,
-    },
-    tabLabel: {
-        fontSize: 8.5,
-        marginTop: 3,
-        textAlign: "center",
-    },
-});
 
 export default CustomTabBar;

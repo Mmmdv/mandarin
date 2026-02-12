@@ -18,12 +18,9 @@ export async function registerForLocalNotificationsAsync() {
             const { status } = await Notifications.requestPermissionsAsync();
             finalStatus = status;
         }
-        if (finalStatus !== 'granted') {
-            console.log('Failed to get push token for push notification!');
-            return;
-        }
+
     } catch (error) {
-        console.log('Error registering for notifications:', error);
+        // failed silently
     }
 }
 

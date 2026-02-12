@@ -1,5 +1,5 @@
 import { COLORS } from "@/constants/ui"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Keyboard, KeyboardAvoidingView, LayoutAnimation, Modal, Platform, Pressable, ScrollView, StyleSheet, UIManager } from "react-native"
 
 type StyledModalProps = {
@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default StyledModal
+export default React.memo(StyledModal)

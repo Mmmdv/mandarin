@@ -150,6 +150,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     return (
         <ScrollView
             style={styles.container}
+            contentContainerStyle={{ flexGrow: 1 }}
             refreshControl={
                 <RefreshControl
                     refreshing={refreshing}

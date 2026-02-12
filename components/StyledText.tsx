@@ -1,4 +1,5 @@
 import { COLORS } from "@/constants/ui";
+import React from "react";
 import { StyleSheet, Text, TextProps } from "react-native";
 
 type StyledTextProps = TextProps & {
@@ -47,4 +48,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default StyledText;
+export default React.memo(StyledText);

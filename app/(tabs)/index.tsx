@@ -1,30 +1,38 @@
 import StyledText from "@/components/StyledText";
+import { COL_2_WIDTH, GAP, PADDING, styles } from "@/constants/homeStyles";
 import { useTheme } from "@/hooks/useTheme";
+import { incrementUsage, selectUsageStats } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
+import analytics from "@react-native-firebase/analytics";
 import { useRouter } from "expo-router";
-import { Dimensions, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useCallback, useMemo, useState } from "react";
+import { Dimensions, LayoutAnimation, Pressable, ScrollView, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
 const { width } = Dimensions.get("window");
-const GAP = 12;
-const PADDING = 20;
-// Width for 2-column row
-const COL_2_WIDTH = (width - (PADDING * 2) - GAP) / 2;
-// Width for 3-column row
-const COL_3_WIDTH = (width - (PADDING * 2) - (GAP * 2)) / 3;
+
+type ViewMode = "card" | "list";
 
 export default function Home() {
     const { colors, t, username } = useTheme();
     const router = useRouter();
+    const dispatch = useDispatch();
+    const usageStats = useSelector(selectUsageStats);
+    const [viewMode, setViewMode] = useState<ViewMode>("card");
 
-    const features = [
+    const toggleViewMode = useCallback(() => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setViewMode(prev => prev === "card" ? "list" : "card");
+    }, []);
+
+    const baseFeatures = useMemo(() => [
         {
             id: 'todo',
             title: t("tab_todo"),
             description: t("home_plan_day"),
             icon: "checkbox" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/todo",
-            color: "#4F46E5", // Indigo
+            color: "#4F46E5",
             iconColor: "#FFF"
         },
         {
@@ -33,7 +41,7 @@ export default function Home() {
             description: t("home_movies_desc"),
             icon: "film" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/movies",
-            color: "#E11D48", // Rose
+            color: "#E11D48",
             iconColor: "#FFF"
         },
         {
@@ -42,7 +50,7 @@ export default function Home() {
             description: t("home_birthdays_desc"),
             icon: "gift" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/birthday",
-            color: "#F59E0B", // Amber
+            color: "#F59E0B",
             iconColor: "#FFF"
         },
         {
@@ -51,7 +59,7 @@ export default function Home() {
             description: t("home_shopping_desc"),
             icon: "cart" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/shopping",
-            color: "#06B6D4", // Cyan
+            color: "#06B6D4",
             iconColor: "#FFF"
         },
         {
@@ -60,7 +68,7 @@ export default function Home() {
             description: t("home_events_desc"),
             icon: "calendar" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/events",
-            color: "#8B5CF6", // Violet
+            color: "#8B5CF6",
             iconColor: "#FFF"
         },
         {
@@ -69,16 +77,43 @@ export default function Home() {
             description: t("home_expenses_desc"),
             icon: "wallet" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/expenses",
-            color: "#10B981", // Emerald
+            color: "#10B981",
             iconColor: "#FFF"
         }
-    ];
+    ], [t]);
 
-    const handlePress = (route: string) => {
+    const dynamicFeatures = useMemo(() => {
+        const sorted = [...baseFeatures];
+        let maxUsage = 0;
+        let mostUsedId = 'todo';
+
+        Object.entries(usageStats || {}).forEach(([id, count]) => {
+            if (count > maxUsage) {
+                maxUsage = count;
+                mostUsedId = id;
+            } else if (count === maxUsage && id === 'todo') {
+                mostUsedId = id;
+            }
+        });
+
+        const mostUsedIdx = sorted.findIndex(f => f.id === mostUsedId);
+        if (mostUsedIdx > 0) {
+            const [item] = sorted.splice(mostUsedIdx, 1);
+            sorted.unshift(item);
+        }
+        return sorted;
+    }, [baseFeatures, usageStats]);
+
+    const handlePress = useCallback((id: string, route: string) => {
+        dispatch(incrementUsage(id));
+        analytics().logSelectContent({
+            content_type: 'feature_card',
+            item_id: id,
+        });
         router.push(route as any);
-    };
+    }, [router, dispatch]);
 
-    const renderCard = (item: any, width: number, height: number = 150, isFullWidth: boolean = false) => {
+    const renderCard = useCallback((item: any, cardWidth: number, height: number = 150, isFullWidth: boolean = false) => {
         return (
             <Pressable
                 key={item.id}
@@ -86,13 +121,13 @@ export default function Home() {
                     styles.card,
                     {
                         backgroundColor: item.color,
-                        width: width,
+                        width: cardWidth,
                         height: height,
                         opacity: pressed ? 0.9 : 1,
                         transform: [{ scale: pressed ? 0.98 : 1 }]
                     }
                 ]}
-                onPress={() => handlePress(item.route)}
+                onPress={() => handlePress(item.id, item.route)}
             >
                 <View style={styles.cardHeader}>
                     <View style={[styles.iconContainer, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
@@ -111,129 +146,98 @@ export default function Home() {
                     )}
                 </View>
 
-                {/* Decorative circle/shape */}
                 <View style={[styles.decorativeCircle, { backgroundColor: 'rgba(255,255,255,0.1)' }]} />
             </Pressable>
         );
-    };
+    }, [handlePress]);
+
+    const renderListItem = useCallback((item: any) => {
+        return (
+            <Pressable
+                key={item.id}
+                style={({ pressed }) => [
+                    styles.listItem,
+                    {
+                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                        opacity: pressed ? 0.85 : 1,
+                        transform: [{ scale: pressed ? 0.98 : 1 }]
+                    }
+                ]}
+                onPress={() => handlePress(item.id, item.route)}
+            >
+                <View style={[styles.listIconContainer, { backgroundColor: item.color }]}>
+                    <Ionicons name={item.icon} size={22} color={item.iconColor} />
+                </View>
+                <View style={styles.listTextContainer}>
+                    <StyledText style={[styles.listTitle, { color: colors.PRIMARY_TEXT }]}>{item.title}</StyledText>
+                    <StyledText style={[styles.listDesc, { color: colors.PLACEHOLDER }]} numberOfLines={1}>{item.description}</StyledText>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={colors.PLACEHOLDER} />
+            </Pressable>
+        );
+    }, [handlePress, colors]);
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]} edges={['top']}>
+        <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
             <View style={styles.header}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={[styles.greeting, { color: colors.PRIMARY_TEXT, fontSize: 24, fontWeight: 'bold' }]}>
                         {t("welcome")}{username ? `, ${username}` : ''}
                     </StyledText>
                 </View>
+                <Pressable
+                    onPress={toggleViewMode}
+                    style={({ pressed }) => [
+                        styles.viewToggleButton,
+                        {
+                            backgroundColor: colors.SECONDARY_BACKGROUND,
+                            opacity: pressed ? 0.7 : 1,
+                        }
+                    ]}
+                    hitSlop={8}
+                >
+                    <Ionicons
+                        name={viewMode === "card" ? "list" : "grid"}
+                        size={22}
+                        color={colors.PRIMARY_TEXT}
+                    />
+                </Pressable>
             </View>
 
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* 1. Full Width - Todo */}
-                <View style={styles.row}>
-                    {renderCard(features[0], width - (PADDING * 2), 160, true)}
-                </View>
+                {viewMode === "card" ? (
+                    <>
+                        {/* 1. Full Width - Dynamic Main Card */}
+                        <View style={styles.row}>
+                            {renderCard(dynamicFeatures[0], width - (PADDING * 2), 160, true)}
+                        </View>
 
-                {/* 2. Mosaic Row (Movies + Birthday/Shopping) */}
-                <View style={styles.row}>
-                    {/* Left Column - Movies (Tall) */}
-                    <View style={{ width: COL_2_WIDTH }}>
-                        {renderCard(features[1], COL_2_WIDTH, 260 + GAP)}
+                        {/* 2. Mosaic Row */}
+                        <View style={styles.row}>
+                            <View style={{ width: COL_2_WIDTH }}>
+                                {renderCard(dynamicFeatures[1], COL_2_WIDTH, 260 + GAP)}
+                            </View>
+                            <View style={{ width: COL_2_WIDTH, gap: GAP }}>
+                                {renderCard(dynamicFeatures[2], COL_2_WIDTH, 125)}
+                                {renderCard(dynamicFeatures[3], COL_2_WIDTH, 125)}
+                            </View>
+                        </View>
+
+                        {/* 3. Bottom Row */}
+                        <View style={styles.row}>
+                            {renderCard(dynamicFeatures[4], COL_2_WIDTH, 130)}
+                            {renderCard(dynamicFeatures[5], COL_2_WIDTH, 130)}
+                        </View>
+                    </>
+                ) : (
+                    <View style={styles.listContainer}>
+                        {dynamicFeatures.map(item => renderListItem(item))}
                     </View>
-
-                    {/* Right Column - Stacked */}
-                    <View style={{ width: COL_2_WIDTH, gap: GAP }}>
-                        {renderCard(features[2], COL_2_WIDTH, 125)}
-                        {renderCard(features[3], COL_2_WIDTH, 125)}
-                    </View>
-                </View>
-
-                {/* 3. Bottom Row - Events, Expenses */}
-                <View style={styles.row}>
-                    {renderCard(features[4], COL_2_WIDTH, 130)}
-                    {renderCard(features[5], COL_2_WIDTH, 130)}
-                </View>
-
+                )}
             </ScrollView>
-
-
-        </SafeAreaView>
+        </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: PADDING,
-        paddingBottom: 20,
-    },
-    greeting: {
-        fontSize: 16,
-        marginBottom: 4,
-    },
-    scrollContent: {
-        paddingHorizontal: PADDING,
-        paddingBottom: 100,
-        gap: GAP,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        gap: GAP,
-    },
-    card: {
-        borderRadius: 24,
-        padding: 12,
-        justifyContent: 'space-between',
-        overflow: 'hidden',
-        position: 'relative',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    cardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        zIndex: 2,
-    },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    cardContent: {
-        zIndex: 2,
-    },
-    cardTitle: {
-        fontSize: 16, // Slightly smaller for dense items
-        fontWeight: '700',
-        color: '#FFF',
-        marginBottom: 2,
-    },
-    cardDesc: {
-        fontSize: 12,
-        color: 'rgba(255,255,255,0.85)',
-        lineHeight: 16,
-    },
-    decorativeCircle: {
-        position: 'absolute',
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        bottom: -20,
-        right: -20,
-        zIndex: 1,
-    }
-});
