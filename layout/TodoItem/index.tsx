@@ -134,24 +134,24 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     </View>
                     {!isCompleted && createdAt && !updatedAt && (
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 4 }}>
-                            <Ionicons name="add-circle" size={12} color="#eceaeaff" />
-                            <StyledText style={[styles.dateText, { fontSize: 10.5, marginTop: 0 }]}>
+                            <Ionicons name="add-circle" size={14} color="#eceaeaff" />
+                            <StyledText style={[styles.dateText, { fontSize: 12, marginTop: 0 }]}>
                                 {formatDate(createdAt)}
                             </StyledText>
                         </View>
                     )}
                     {!isCompleted && updatedAt && (
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 4 }}>
-                            <Ionicons name="create-outline" size={12} color="#5BC0EB" />
-                            <StyledText style={[styles.dateText, { color: '#5BC0EB', fontSize: 10.5, marginTop: 0 }]}>
+                            <Ionicons name="create-outline" size={14} color="#5BC0EB" />
+                            <StyledText style={[styles.dateText, { color: '#5BC0EB', fontSize: 12, marginTop: 0 }]}>
                                 {formatDate(updatedAt)}
                             </StyledText>
                         </View>
                     )}
                     {isCompleted && !isArchived && completedAt && (
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 4 }}>
-                            <Ionicons name="checkmark-done-outline" size={12} color="#69c4dbe8" />
-                            <StyledText style={{ color: '#69c4dbe8', fontSize: 10.5 }}>
+                            <Ionicons name="checkmark-done-outline" size={14} color="#69c4dbe8" />
+                            <StyledText style={{ color: '#69c4dbe8', fontSize: 12 }}>
                                 {formatDate(completedAt)}
                             </StyledText>
                         </View>
@@ -160,12 +160,12 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 4 }}>
                             <Ionicons
                                 name={(notificationsEnabled && !reminderCancelled) ? "alarm-outline" : "notifications-off-outline"}
-                                size={12}
+                                size={14}
                                 color={(notificationsEnabled && !reminderCancelled) ? "#FFD166" : "#888"}
                             />
                             <StyledText style={{
                                 color: (notificationsEnabled && !reminderCancelled) ? '#FFD166' : "#888",
-                                fontSize: 10.5,
+                                fontSize: 14,
                                 textDecorationLine: (notificationsEnabled && !reminderCancelled) ? 'none' : 'line-through'
                             }}>
                                 {formatDate(reminder)}

@@ -1,7 +1,7 @@
 import { useTheme } from "@/hooks/useTheme";
 import { incrementUsage } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
-import analytics from "@react-native-firebase/analytics";
+// import analytics from "@react-native-firebase/analytics";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef } from "react";
@@ -158,10 +158,16 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             const usageId = getUsageId(route.name);
             if (usageId) {
                 dispatch(incrementUsage(usageId));
-                analytics().logSelectContent({
-                    content_type: 'tab_navigation',
-                    item_id: usageId,
-                });
+                // try {
+                //     if (analytics().logSelectContent) {
+                //         analytics().logSelectContent({
+                //             content_type: 'tab_navigation',
+                //             item_id: usageId,
+                //         });
+                //     }
+                // } catch (e) {
+                //     // Silently fail in Expo Go
+                // }
             }
 
             if (route._fake) {
@@ -199,10 +205,16 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             const usageId = getUsageId(route.name);
             if (usageId && route._originalIndex !== state.index) {
                 dispatch(incrementUsage(usageId));
-                analytics().logSelectContent({
-                    content_type: 'tab_swipe',
-                    item_id: usageId,
-                });
+                // try {
+                //     if (analytics().logSelectContent) {
+                //         analytics().logSelectContent({
+                //             content_type: 'tab_swipe',
+                //             item_id: usageId,
+                //         });
+                //     }
+                // } catch (e) {
+                //     // Silently fail in Expo Go
+                // }
             }
         }
 

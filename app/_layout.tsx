@@ -2,6 +2,8 @@ import { AppStatusBar } from "@/components/AppStatusBar";
 import { registerForLocalNotificationsAsync } from '@/constants/notifications';
 import Header from "@/layout/Header";
 import store from "@/store";
+// import analytics from "@react-native-firebase/analytics";
+// import crashlytics from "@react-native-firebase/crashlytics";
 import * as Haptics from "expo-haptics";
 import * as Notifications from 'expo-notifications';
 import { Stack } from "expo-router";
@@ -52,8 +54,16 @@ export default function RootLayout() {
     registerForLocalNotificationsAsync();
 
     // Firebase Initialization
-    analytics().logAppOpen().catch(e => console.log('Analytics error:', e));
-    crashlytics().log('App Started');
+    // try {
+    //   if (analytics().logAppOpen) {
+    //     analytics().logAppOpen().catch(e => console.log('Analytics error:', e));
+    //   }
+    //   if (crashlytics().log) {
+    //     crashlytics().log('App Started');
+    //   }
+    // } catch (e) {
+    //   console.log('Firebase not available in this environment');
+    // }
   }, []);
 
   return (

@@ -3,7 +3,7 @@ import { COL_2_WIDTH, GAP, PADDING, styles } from "@/constants/homeStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { incrementUsage, selectUsageStats } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
-import analytics from "@react-native-firebase/analytics";
+// import analytics from "@react-native-firebase/analytics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Dimensions, LayoutAnimation, Pressable, ScrollView, View } from "react-native";
@@ -83,33 +83,33 @@ export default function Home() {
     ], [t]);
 
     const dynamicFeatures = useMemo(() => {
-        const sorted = [...baseFeatures];
-        let maxUsage = 0;
-        let mostUsedId = 'todo';
+        return [...baseFeatures].sort((a, b) => {
+            const usageA = usageStats?.[a.id] || 0;
+            const usageB = usageStats?.[b.id] || 0;
 
-        Object.entries(usageStats || {}).forEach(([id, count]) => {
-            if (count > maxUsage) {
-                maxUsage = count;
-                mostUsedId = id;
-            } else if (count === maxUsage && id === 'todo') {
-                mostUsedId = id;
+            // If usage is same, keep original order (or prioritize todo)
+            if (usageB === usageA) {
+                if (a.id === 'todo') return -1;
+                if (b.id === 'todo') return 1;
+                return 0;
             }
-        });
 
-        const mostUsedIdx = sorted.findIndex(f => f.id === mostUsedId);
-        if (mostUsedIdx > 0) {
-            const [item] = sorted.splice(mostUsedIdx, 1);
-            sorted.unshift(item);
-        }
-        return sorted;
+            return usageB - usageA;
+        });
     }, [baseFeatures, usageStats]);
 
     const handlePress = useCallback((id: string, route: string) => {
         dispatch(incrementUsage(id));
-        analytics().logSelectContent({
-            content_type: 'feature_card',
-            item_id: id,
-        });
+        // try {
+        //     if (analytics().logSelectContent) {
+        //         analytics().logSelectContent({
+        //             content_type: 'feature_card',
+        //             item_id: id,
+        //         });
+        //     }
+        // } catch (e) {
+        //     // Silently fail in Expo Go
+        // }
         router.push(route as any);
     }, [router, dispatch]);
 
@@ -133,7 +133,6 @@ export default function Home() {
                     <View style={[styles.iconContainer, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
                         <Ionicons name={item.icon} size={24} color={item.iconColor} />
                     </View>
-                    {isFullWidth && <Ionicons name="arrow-forward" size={24} color="#FFF" style={{ opacity: 0.8 }} />}
                 </View>
 
                 <View style={styles.cardContent}>
