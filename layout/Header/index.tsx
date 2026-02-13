@@ -9,7 +9,7 @@ import { Image, Share, StyleSheet, TouchableOpacity, View } from "react-native";
 import NotificationsModal from "@/layout/Modals/NotificationsModal";
 
 const Header: React.FC = () => {
-  const { colors, t } = useTheme();
+  const { colors, t, isDark } = useTheme();
   const router = useRouter();
   const [notificationsVisible, setNotificationsVisible] = useState(false);
 
@@ -35,9 +35,9 @@ const Header: React.FC = () => {
     <View style={[styles.container, { backgroundColor: colors.SECONDARY_BACKGROUND, borderBottomColor: colors.PRIMARY_BORDER_DARK }]}>
       <View style={styles.leftSection}>
         <View style={styles.iconWrapper}>
-          <Image source={require("@/assets/images/mandarin_75x75.png")} style={styles.logoImage} />
+          <Image source={require("@/assets/images/logo.png")} style={styles.logoImage} />
         </View>
-        <StyledText style={styles.appName}>Mandarin</StyledText>
+        <StyledText style={[styles.appName, { color: isDark ? '#E5E7EB' : '#1F2937' }]}>Mandarin</StyledText>
       </View>
       <View style={styles.rightSection}>
         <TouchableOpacity onPress={onShare} activeOpacity={0.7} style={styles.iconButton}>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   appName: {
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 20,
-    color: '#FF6F00',
+    color: '#E5E7EB',
   },
   iconButton: {
     padding: 8,

@@ -11,16 +11,6 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         paddingVertical: 50,
     },
-    emptyText: {
-        fontSize: 18,
-        fontWeight: "600",
-        color: COLORS.PRIMARY_TEXT,
-        marginBottom: 8,
-    },
-    emptySubtext: {
-        fontSize: 14,
-        color: COLORS.PLACEHOLDER,
-    },
     sectionContainer: {
         marginTop: 10,
     },

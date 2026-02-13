@@ -12,6 +12,39 @@ import TodoItem from "../TodoItem"
 import SortControls, { SortBy, SortOrder } from "./SortControls"
 import { styles } from "./styles"
 
+type MascotHeaderProps = {
+    refreshing: boolean;
+    pullOpacity: any;
+    pullScale: any;
+    pullRotation: any;
+    refreshRotation: any;
+    refreshScale: any;
+}
+
+const MascotHeader: React.FC<MascotHeaderProps> = ({ refreshing, pullOpacity, pullScale, pullRotation, refreshRotation, refreshScale }) => (
+    <Animated.View
+        pointerEvents="none"
+        style={{
+            position: 'absolute',
+            top: 20,
+            left: 0,
+            right: 0,
+            alignItems: 'center',
+            zIndex: 10,
+            opacity: refreshing ? 1 : pullOpacity,
+            transform: [
+                { scale: refreshing ? refreshScale : pullScale },
+                { rotate: refreshing ? refreshRotation : pullRotation }
+            ]
+        }}
+    >
+        <Image
+            source={refreshing ? require("@/assets/images/logo.png") : require("@/assets/images/logo.png")}
+            style={{ width: 30, height: 30, resizeMode: 'contain' }}
+        />
+    </Animated.View>
+)
+
 type TodoListProps = {
     todos: Todo[]
     onDeleteTodo: (id: Todo["id"]) => void
@@ -43,21 +76,41 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     const scrollY = useRef(new Animated.Value(0)).current
     const rotateAnim = useRef(new Animated.Value(0)).current
+    const pulseAnim = useRef(new Animated.Value(1)).current
     const [refreshing, setRefreshing] = useState(false)
 
     useEffect(() => {
         if (refreshing) {
-            Animated.loop(
-                Animated.timing(rotateAnim, {
-                    toValue: 1,
-                    duration: 1000,
-                    easing: Easing.linear,
-                    useNativeDriver: true,
-                })
-            ).start()
+            // Pulse and Rotate sequence
+            Animated.parallel([
+                Animated.loop(
+                    Animated.timing(rotateAnim, {
+                        toValue: 1,
+                        duration: 800,
+                        easing: Easing.bezier(0.4, 0, 0.2, 1),
+                        useNativeDriver: true,
+                    })
+                ),
+                Animated.loop(
+                    Animated.sequence([
+                        Animated.timing(pulseAnim, {
+                            toValue: 1.2,
+                            duration: 400,
+                            useNativeDriver: true,
+                        }),
+                        Animated.timing(pulseAnim, {
+                            toValue: 0.9,
+                            duration: 400,
+                            useNativeDriver: true,
+                        })
+                    ])
+                )
+            ]).start()
         } else {
             rotateAnim.setValue(0)
+            pulseAnim.setValue(1)
             rotateAnim.stopAnimation()
+            pulseAnim.stopAnimation()
         }
     }, [refreshing])
 
@@ -140,28 +193,19 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         onRefresh={onRefresh}
                         tintColor="transparent"
                         colors={["transparent"]}
+                        progressViewOffset={-5000} // Hide native spinner completely
                     />
                 }
             >
-                <Animated.View style={{
-                    position: 'absolute',
-                    top: 20,
-                    left: 0,
-                    right: 0,
-                    alignItems: 'center',
-                    zIndex: 10,
-                    opacity: refreshing ? 1 : pullOpacity,
-                    transform: [
-                        { scale: refreshing ? 1 : pullScale },
-                        { rotate: refreshing ? refreshRotation : pullRotation }
-                    ]
-                }}>
-                    <Image
-                        source={require("@/assets/images/mandarin_75x75.png")}
-                        style={{ width: 40, height: 40, resizeMode: 'contain' }}
-                    />
-                </Animated.View>
-                <View style={[styles.emptyContainer, { justifyContent: 'center', flex: 1 }]}>
+                <MascotHeader
+                    refreshing={refreshing}
+                    pullOpacity={pullOpacity}
+                    pullScale={pullScale}
+                    pullRotation={pullRotation}
+                    refreshRotation={refreshRotation}
+                    refreshScale={pulseAnim}
+                />
+                <View style={styles.emptyContainer}>
                     <View style={{
                         width: 120,
                         height: 120,
@@ -214,24 +258,14 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     return (
         <View style={{ flex: 1 }}>
-            <Animated.View style={{
-                position: 'absolute',
-                top: 20,
-                left: 0,
-                right: 0,
-                alignItems: 'center',
-                zIndex: 10,
-                opacity: refreshing ? 1 : pullOpacity,
-                transform: [
-                    { scale: refreshing ? 1 : pullScale },
-                    { rotate: refreshing ? refreshRotation : pullRotation }
-                ]
-            }}>
-                <Image
-                    source={require("@/assets/images/mandarin_75x75.png")}
-                    style={{ width: 40, height: 40, resizeMode: 'contain' }}
-                />
-            </Animated.View>
+            <MascotHeader
+                refreshing={refreshing}
+                pullOpacity={pullOpacity}
+                pullScale={pullScale}
+                pullRotation={pullRotation}
+                refreshRotation={refreshRotation}
+                refreshScale={pulseAnim}
+            />
 
             <Animated.ScrollView
                 style={styles.container}
@@ -247,6 +281,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         onRefresh={onRefresh}
                         tintColor="transparent"
                         colors={["transparent"]}
+                        progressViewOffset={-5000} // Hide native spinner completely
                     />
                 }
             >
@@ -291,17 +326,10 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     {todoExpanded && sortedPendingTodos.map(item => (
                         <TodoItem
                             key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            isCompleted={item.isCompleted}
-                            createdAt={item.createdAt}
-                            completedAt={item.completedAt}
-                            updatedAt={item.updatedAt}
+                            {...item}
                             deleteTodo={onDeleteTodo}
                             checkTodo={onCheckTodo}
                             editTodo={onEditTodo}
-                            reminder={item.reminder}
-                            reminderCancelled={item.reminderCancelled}
                             categoryTitle={categoryTitle}
                             categoryIcon={categoryIcon}
                         />
@@ -400,14 +428,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     {archiveExpanded && sortedArchivedTodos.map(item => (
                         <TodoItem
                             key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            isCompleted={item.isCompleted}
-                            isArchived={item.isArchived}
-                            createdAt={item.createdAt}
-                            completedAt={item.completedAt}
-                            updatedAt={item.updatedAt}
-                            archivedAt={item.archivedAt}
+                            {...item}
                             deleteTodo={onDeleteTodo}
                             checkTodo={onCheckTodo}
                             editTodo={onEditTodo}

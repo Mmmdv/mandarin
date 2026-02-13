@@ -61,7 +61,7 @@ const ApplicationSection: React.FC = () => {
                     <View style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0 }]}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                             <Image
-                                source={require("@/assets/images/mandarin_75x75.png")}
+                                source={require("@/assets/images/logo.png")}
                                 style={{ width: 35, height: 35, borderRadius: 8 }}
                             />
                             <View>

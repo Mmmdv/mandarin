@@ -21,7 +21,6 @@ export default function Index() {
 
   const {
     todos,
-    completedTodos,
     archivedTodos,
     onAddTodo,
     onDeleteTodo,
