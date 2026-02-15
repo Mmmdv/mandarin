@@ -5,45 +5,12 @@ import { useTheme } from "@/hooks/useTheme"
 import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
 import { useEffect, useRef, useState } from "react"
-import { Animated, Easing, Image, LayoutAnimation, RefreshControl, TouchableOpacity, View } from "react-native"
+import { LayoutAnimation, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native"
 import ArchiveAllModal from "../Modals/ArchiveAllModal.tsx"
 import ClearArchiveModal from "../Modals/ClearArchiveModal.tsx"
 import TodoItem from "../TodoItem"
 import SortControls, { SortBy, SortOrder } from "./SortControls"
 import { styles } from "./styles"
-
-type MascotHeaderProps = {
-    refreshing: boolean;
-    pullOpacity: any;
-    pullScale: any;
-    pullRotation: any;
-    refreshRotation: any;
-    refreshScale: any;
-}
-
-const MascotHeader: React.FC<MascotHeaderProps> = ({ refreshing, pullOpacity, pullScale, pullRotation, refreshRotation, refreshScale }) => (
-    <Animated.View
-        pointerEvents="none"
-        style={{
-            position: 'absolute',
-            top: 20,
-            left: 0,
-            right: 0,
-            alignItems: 'center',
-            zIndex: 10,
-            opacity: refreshing ? 1 : pullOpacity,
-            transform: [
-                { scale: refreshing ? refreshScale : pullScale },
-                { rotate: refreshing ? refreshRotation : pullRotation }
-            ]
-        }}
-    >
-        <Image
-            source={refreshing ? require("@/assets/images/logo.png") : require("@/assets/images/logo.png")}
-            style={{ width: 30, height: 30, resizeMode: 'contain' }}
-        />
-    </Animated.View>
-)
 
 type TodoListProps = {
     todos: Todo[]
@@ -74,68 +41,9 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const [isClearArchiveModalOpen, setIsClearArchiveModalOpen] = useState(false)
     const [isArchiveAllModalOpen, setIsArchiveAllModalOpen] = useState(false)
 
-    const scrollY = useRef(new Animated.Value(0)).current
-    const rotateAnim = useRef(new Animated.Value(0)).current
-    const pulseAnim = useRef(new Animated.Value(1)).current
     const [refreshing, setRefreshing] = useState(false)
 
-    useEffect(() => {
-        if (refreshing) {
-            // Pulse and Rotate sequence
-            Animated.parallel([
-                Animated.loop(
-                    Animated.timing(rotateAnim, {
-                        toValue: 1,
-                        duration: 800,
-                        easing: Easing.bezier(0.4, 0, 0.2, 1),
-                        useNativeDriver: true,
-                    })
-                ),
-                Animated.loop(
-                    Animated.sequence([
-                        Animated.timing(pulseAnim, {
-                            toValue: 1.2,
-                            duration: 400,
-                            useNativeDriver: true,
-                        }),
-                        Animated.timing(pulseAnim, {
-                            toValue: 0.9,
-                            duration: 400,
-                            useNativeDriver: true,
-                        })
-                    ])
-                )
-            ]).start()
-        } else {
-            rotateAnim.setValue(0)
-            pulseAnim.setValue(1)
-            rotateAnim.stopAnimation()
-            pulseAnim.stopAnimation()
-        }
-    }, [refreshing])
 
-    const refreshRotation = rotateAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ["0deg", "360deg"],
-    })
-
-    const pullRotation = scrollY.interpolate({
-        inputRange: [-100, 0],
-        outputRange: ["-360deg", "0deg"],
-        extrapolate: "clamp",
-    })
-
-    const pullScale = scrollY.interpolate({
-        inputRange: [-100, -20],
-        outputRange: [1.2, 0.5],
-        extrapolate: "clamp",
-    })
-
-    const pullOpacity = scrollY.interpolate({
-        inputRange: [-80, -20],
-        outputRange: [1, 0],
-        extrapolate: "clamp",
-    })
 
     const onRefresh = () => {
         setRefreshing(true);
@@ -180,31 +88,16 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     if (todos.length === 0 && archivedTodos.length === 0) {
         return (
-            <Animated.ScrollView
-                contentContainerStyle={{ flex: 1, justifyContent: 'center' }}
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: true }
-                )}
-                scrollEventThrottle={16}
+            <ScrollView
+                contentContainerStyle={[styles.scrollContent, { flex: 1, justifyContent: 'center' }]}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor="transparent"
-                        colors={["transparent"]}
-                        progressViewOffset={-5000} // Hide native spinner completely
+                        tintColor={colors.PRIMARY_TEXT}
                     />
                 }
             >
-                <MascotHeader
-                    refreshing={refreshing}
-                    pullOpacity={pullOpacity}
-                    pullScale={pullScale}
-                    pullRotation={pullRotation}
-                    refreshRotation={refreshRotation}
-                    refreshScale={pulseAnim}
-                />
                 <View style={styles.emptyContainer}>
                     <View style={{
                         width: 120,
@@ -252,39 +145,31 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         <StyledText style={{ color: colors.CHECKBOX_SUCCESS, fontSize: 16, fontWeight: 'bold' }}>{t("create_task")}</StyledText>
                     </TouchableOpacity>
                 </View>
-            </Animated.ScrollView>
+            </ScrollView>
         )
     }
 
     return (
         <View style={{ flex: 1 }}>
-            <MascotHeader
-                refreshing={refreshing}
-                pullOpacity={pullOpacity}
-                pullScale={pullScale}
-                pullRotation={pullRotation}
-                refreshRotation={refreshRotation}
-                refreshScale={pulseAnim}
-            />
-
-            <Animated.ScrollView
+            <ScrollView
                 style={styles.container}
-                contentContainerStyle={{ flexGrow: 1 }}
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                    { useNativeDriver: true }
-                )}
-                scrollEventThrottle={16}
+                contentContainerStyle={styles.scrollContent}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor="transparent"
-                        colors={["transparent"]}
-                        progressViewOffset={-5000} // Hide native spinner completely
+                        tintColor={colors.PRIMARY_TEXT}
                     />
                 }
             >
+                <View style={styles.header}>
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                        <StyledText style={styles.greeting}>
+                            {t("tab_todo")}
+                        </StyledText>
+                    </View>
+                </View>
+
                 {/* To Do Section */}
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
@@ -438,7 +323,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         />
                     ))}
                 </View>
-            </Animated.ScrollView>
+            </ScrollView>
 
             {onArchiveAll && (
                 <ArchiveAllModal

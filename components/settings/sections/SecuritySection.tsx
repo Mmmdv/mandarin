@@ -44,7 +44,7 @@ const SecuritySection: React.FC = () => {
         <View style={styles.section}>
             <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>{t("security")}</StyledText>
             <View style={styles.aboutContainer}>
-                <View style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0 }]}>
+                <View style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0, backgroundColor: colors.SECONDARY_BACKGROUND }]}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                         <Ionicons name="finger-print" size={20} color={biometricEnabled ? colors.CHECKBOX_SUCCESS : "#888"} />
                         <View style={{ flex: 1 }}>

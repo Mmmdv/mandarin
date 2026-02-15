@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 // import analytics from "@react-native-firebase/analytics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
-import { Dimensions, LayoutAnimation, Pressable, ScrollView, View } from "react-native";
+import { Dimensions, LayoutAnimation, Pressable, RefreshControl, ScrollView, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
 const { width } = Dimensions.get("window");
@@ -176,37 +176,55 @@ export default function Home() {
         );
     }, [handlePress, colors]);
 
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1500);
+    }, []);
+
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <View style={styles.header}>
-                <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <StyledText style={[styles.greeting, { color: colors.PRIMARY_TEXT, fontSize: 24, fontWeight: 'bold' }]}>
-                        {t("welcome")}{username ? `, ${username}` : ''}
-                    </StyledText>
-                </View>
-                <Pressable
-                    onPress={toggleViewMode}
-                    style={({ pressed }) => [
-                        styles.viewToggleButton,
-                        {
-                            backgroundColor: colors.SECONDARY_BACKGROUND,
-                            opacity: pressed ? 0.7 : 1,
-                        }
-                    ]}
-                    hitSlop={8}
-                >
-                    <Ionicons
-                        name={viewMode === "card" ? "list" : "grid"}
-                        size={22}
-                        color={colors.PRIMARY_TEXT}
-                    />
-                </Pressable>
-            </View>
-
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={colors.PRIMARY_TEXT}
+                        colors={[colors.PRIMARY_TEXT]}
+                        progressBackgroundColor={colors.SECONDARY_BACKGROUND}
+                    />
+                }
             >
+                <View style={styles.header}>
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                        <StyledText style={styles.greeting}>
+                            {t("welcome")}
+                        </StyledText>
+                    </View>
+                    <Pressable
+                        onPress={toggleViewMode}
+                        style={({ pressed }) => [
+                            styles.viewToggleButton,
+                            {
+                                backgroundColor: colors.SECONDARY_BACKGROUND,
+                                opacity: pressed ? 0.7 : 1,
+                            }
+                        ]}
+                        hitSlop={8}
+                    >
+                        <Ionicons
+                            name={viewMode === "card" ? "list" : "grid"}
+                            size={20}
+                            color={colors.PRIMARY_TEXT}
+                        />
+                    </Pressable>
+                </View>
+
                 {viewMode === "card" ? (
                     <>
                         {/* 1. Full Width - Dynamic Main Card */}

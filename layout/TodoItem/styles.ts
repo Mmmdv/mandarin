@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         marginVertical: 5,
-        marginHorizontal: 5,
+        marginHorizontal: 0,
         backgroundColor: COLORS.SECONDARY_BACKGROUND,
         borderRadius: 15,
         paddingHorizontal: 10,

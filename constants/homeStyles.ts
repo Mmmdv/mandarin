@@ -15,13 +15,15 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: PADDING,
+        paddingHorizontal: 0,
         paddingTop: 15,
-        paddingBottom: 15,
+        paddingBottom: 0,
     },
     greeting: {
-        fontSize: 16,
+        fontSize: 24,
         marginBottom: 4,
+        fontWeight: 'bold',
+        color: "#FFF"
     },
     scrollContent: {
         paddingHorizontal: PADDING,
@@ -82,8 +84,8 @@ export const styles = StyleSheet.create({
         zIndex: 1,
     },
     viewToggleButton: {
-        width: 40,
-        height: 40,
+        width: 32,
+        height: 32,
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',

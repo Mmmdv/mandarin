@@ -2,8 +2,25 @@ import { COLORS } from "@/constants/ui"
 import { StyleSheet } from "react-native"
 
 export const styles = StyleSheet.create({
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingTop: 15,
+        paddingBottom: 0,
+    },
+    greeting: {
+        fontSize: 24,
+        marginBottom: 4,
+        fontWeight: 'bold',
+        color: "#FFF"
+    },
     container: {
         flex: 1,
+    },
+    scrollContent: {
+        paddingHorizontal: 20,
+        paddingBottom: 100,
     },
     emptyContainer: {
         flex: 1,
@@ -12,13 +29,13 @@ export const styles = StyleSheet.create({
         paddingVertical: 50,
     },
     sectionContainer: {
-        marginTop: 10,
+        marginTop: 0,
     },
     sectionHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingHorizontal: 15,
+        paddingHorizontal: 0,
         paddingVertical: 12,
     },
     sectionTitleContainer: {
@@ -39,7 +56,7 @@ export const styles = StyleSheet.create({
     sectionDivider: {
         height: 0.5,
         backgroundColor: "#3a3f47",
-        marginHorizontal: 15,
+        marginHorizontal: 0,
         marginVertical: 10,
     },
 })

@@ -147,7 +147,7 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
             <View style={styles.section}>
                 <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>{t("notifications")}</StyledText>
                 <View style={styles.aboutContainer}>
-                    <View style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: notificationsEnabled ? 1 : 0 }]}>
+                    <View style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: notificationsEnabled ? 1 : 0, backgroundColor: colors.SECONDARY_BACKGROUND }]}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                             <Ionicons name="notifications" size={20} color={notificationsEnabled ? colors.CHECKBOX_SUCCESS : "#888"} />
                             <StyledText style={[styles.aboutLabel, { color: colors.PRIMARY_TEXT }]}>{t("enable_notifications")}</StyledText>
@@ -160,7 +160,7 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
 
                     {notificationsEnabled && (
                         <TouchableOpacity
-                            style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0 }]}
+                            style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0, backgroundColor: colors.SECONDARY_BACKGROUND }]}
                             onPress={() => setIsManageModalOpen(true)}
                         >
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -178,6 +178,7 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
                 <View style={[modalStyles.modalContainer, { width: '100%', paddingHorizontal: 0 }]}>
                     <View style={[modalStyles.iconContainer, {
                         backgroundColor: colors.SECONDARY_BACKGROUND,
+
                         shadowColor: colors.CHECKBOX_SUCCESS,
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: 0.3,
@@ -200,7 +201,8 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
                                     borderBottomWidth: index < subSwitches.length - 1 ? 1 : 0,
                                     borderColor: colors.PRIMARY_BORDER_DARK,
                                     paddingVertical: 14,
-                                    paddingHorizontal: 0
+                                    paddingHorizontal: 0,
+                                    backgroundColor: colors.SECONDARY_BACKGROUND
                                 }]}
                             >
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>

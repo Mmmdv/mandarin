@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     width: 32,
-    height: 32,
+    height: 30,
     justifyContent: "center",
     alignItems: "center",
   },

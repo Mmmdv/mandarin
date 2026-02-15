@@ -83,7 +83,7 @@ const ApplicationSection: React.FC = () => {
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                             <Image
                                 source={require("@/assets/images/logo.png")}
-                                style={{ width: 35, height: 35, borderRadius: 8 }}
+                                style={{ width: 35, height: 31, borderRadius: 8 }}
                             />
                             <View>
                                 <StyledText style={{ fontSize: 16, fontWeight: '600', color: colors.PRIMARY_TEXT }}>{t("version")}</StyledText>
