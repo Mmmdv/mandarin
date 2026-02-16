@@ -26,12 +26,14 @@ type TodoItemProps = Todo & {
     archiveTodo?: (id: Todo["id"]) => void
     categoryTitle?: string
     categoryIcon?: string
+    category?: 'todo' | 'done' | 'archive'
+    viewMode?: 'list' | 'card'
 }
 
 import { useTheme } from "@/hooks/useTheme"
 
-const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived, createdAt, completedAt, updatedAt, archivedAt, reminder, reminderCancelled, notificationId, checkTodo, deleteTodo, editTodo, archiveTodo, categoryTitle, categoryIcon }) => {
-    const { t, notificationsEnabled } = useTheme();
+const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived, createdAt, completedAt, updatedAt, archivedAt, reminder, reminderCancelled, notificationId, checkTodo, deleteTodo, editTodo, archiveTodo, categoryTitle, categoryIcon, category, viewMode = 'list' }) => {
+    const { t, colors, notificationsEnabled, lang } = useTheme();
 
     // Look up status from notification history centralized data
     const notification = useAppSelector(state => notificationId ? selectNotificationById(state, notificationId) : undefined);
@@ -101,17 +103,186 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
         outputRange: [COLORS.PRIMARY_BORDER_DARK, COLORS.SECONDARY_BACKGROUND],
     });
 
+    if (viewMode === 'card') {
+        return (
+            <Animated.View style={[
+                styles.cardContainer,
+                {
+                    opacity: fadeAnim,
+                    transform: [{ scale: scaleAnim }, { translateY: translateAnim }],
+                    backgroundColor: category === 'todo' ? 'rgba(79, 70, 229, 0.12)' :
+                        category === 'done' ? 'rgba(16, 185, 129, 0.09)' :
+                            category === 'archive' ? 'rgba(139, 92, 246, 0.12)' :
+                                colors.SECONDARY_BACKGROUND,
+                    borderColor: category === 'todo' ? 'rgba(79, 70, 229, 0.25)' :
+                        category === 'done' ? 'rgba(16, 185, 129, 0.12)' :
+                            category === 'archive' ? 'rgba(139, 92, 246, 0.25)' :
+                                colors.PRIMARY_BORDER_DARK,
+                }
+            ]}>
+                <View style={[styles.cardOverlay, {
+                    backgroundColor: category === 'todo' ? 'rgba(79, 70, 229, 0.05)' :
+                        category === 'done' ? 'rgba(16, 185, 129, 0.05)' :
+                            category === 'archive' ? 'rgba(139, 92, 246, 0.05)' :
+                                'transparent'
+                }]} />
+                <View style={styles.cardHeader}>
+                    {!isArchived && (
+                        <View style={styles.checkboxWrapper}>
+                            <StyledCheckBox checked={isCompleted} onCheck={handleCheckToken} />
+                            <CelebrationEffect
+                                animations={ideaAnimations}
+                                celebrationType={celebrationType}
+                                visible={showCelebrate}
+                            />
+                        </View>
+                    )}
+                    {isArchived && <Ionicons name="archive" size={18.5} color={colors.PLACEHOLDER} />}
+
+                    {reminder && (
+                        <View style={styles.cardMetadata}>
+                            <Ionicons
+                                name={reminderStatus === 'Ləğv olunub' || reminderCancelled ? "notifications-off" : "alarm-outline"}
+                                size={14}
+                                color={reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166"}
+                            />
+                            <View style={styles.cardTimeContainer}>
+                                <StyledText style={{ fontSize: 8.5, fontWeight: '600', color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166" }}>
+                                    {formatDate(reminder, lang).split(' ')[0]}
+                                </StyledText>
+                                <StyledText style={[styles.cardTimeSmall, { color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166" }]}>
+                                    {formatDate(reminder, lang).split(' ')[1]}
+                                </StyledText>
+                            </View>
+                        </View>
+                    )}
+                </View>
+
+                <TouchableOpacity
+                    style={styles.cardBody}
+                    onPress={() => setIsViewModalOpen(true)}
+                    activeOpacity={0.7}
+                >
+                    <StyledText
+                        style={[
+                            styles.cardTitle,
+                            {
+                                opacity: isArchived ? 0.9 : (isCompleted ? 0.6 : 1),
+                                textDecorationLine: (isCompleted && !isArchived) ? 'line-through' : 'none',
+                                color: (isCompleted && !isArchived) ? colors.PLACEHOLDER : colors.PRIMARY_TEXT,
+                            }
+                        ]}
+                        numberOfLines={3}
+                    >
+                        {title}
+                    </StyledText>
+                </TouchableOpacity>
+
+                <View style={styles.cardFooter}>
+                    <View style={styles.cardMetadata}>
+                        <Ionicons
+                            name={isCompleted ? "checkmark-done-circle" : (updatedAt ? "create-outline" : "add")}
+                            size={14}
+                            color={isCompleted ? colors.CHECKBOX_SUCCESS : (updatedAt ? "#5BC0EB" : "#D1D1D1")}
+                        />
+                        <View style={styles.cardTimeContainer}>
+                            <StyledText style={[styles.cardTime, { color: isCompleted ? colors.CHECKBOX_SUCCESS : (updatedAt ? "#5BC0EB" : "#D1D1D1") }]}>
+                                {formatDate(isCompleted ? (completedAt || updatedAt) : (updatedAt || createdAt), lang).split(' ')[0]}
+                            </StyledText>
+                            <StyledText style={[styles.cardTimeSmall, { color: isCompleted ? colors.CHECKBOX_SUCCESS : (updatedAt ? "#5BC0EB" : "#D1D1D1") }]}>
+                                {formatDate(isCompleted ? (completedAt || updatedAt) : (updatedAt || createdAt), lang).split(' ')[1]}
+                            </StyledText>
+                        </View>
+                    </View>
+
+                    <View style={styles.cardControls}>
+                        {!isCompleted && !isArchived && (
+                            <>
+                                <TouchableOpacity onPress={onPressEdit} activeOpacity={0.7} hitSlop={10}>
+                                    <Ionicons name="create-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={onPressDelete} activeOpacity={0.7} hitSlop={10}>
+                                    <Ionicons name="trash-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
+                                </TouchableOpacity>
+                            </>
+                        )}
+                        {isCompleted && !isArchived && archiveTodo && (
+                            <TouchableOpacity onPress={onPressArchive} activeOpacity={0.7} hitSlop={10}>
+                                <Ionicons name="archive-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
+                            </TouchableOpacity>
+                        )}
+                        {isArchived && (
+                            <TouchableOpacity onPress={() => setIsViewModalOpen(true)} activeOpacity={0.7} hitSlop={10}>
+                                <Ionicons name="information-circle-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                </View>
+
+                {/* Modals */}
+                <EditTodoModal
+                    title={title}
+                    isOpen={isEditModalOpen}
+                    onClose={() => setIsEditModalOpen(false)}
+                    onUpdate={(title, reminder, notificationId) => editTodo(id, title, reminder, notificationId)}
+                    reminder={reminder}
+                    reminderCancelled={reminderCancelled}
+                    notificationId={notificationId}
+                    categoryTitle={categoryTitle}
+                    categoryIcon={categoryIcon}
+                />
+                <DeleteTodoModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setIsDeleteModalOpen(false)}
+                    onDelete={() => deleteTodo(id)}
+                />
+                {archiveTodo && (
+                    <ArchiveTodoModal
+                        isOpen={isArchiveModalOpen}
+                        onClose={() => setIsArchiveModalOpen(false)}
+                        onArchive={() => archiveTodo(id)}
+                    />
+                )}
+                <ViewTodoModal
+                    isOpen={isViewModalOpen}
+                    onClose={() => setIsViewModalOpen(false)}
+                    title={title}
+                    createdAt={createdAt}
+                    updatedAt={updatedAt}
+                    completedAt={completedAt}
+                    reminder={reminder}
+                    reminderCancelled={reminderCancelled}
+                    notificationId={notificationId}
+                />
+            </Animated.View>
+        );
+    }
+
     return (
         <Animated.View style={[
             styles.container,
             {
                 opacity: fadeAnim,
                 transform: [{ scale: scaleAnim }, { translateY: translateAnim }],
-                backgroundColor,
+                backgroundColor: category === 'todo' ? 'rgba(79, 70, 229, 0.12)' :
+                    category === 'done' ? 'rgba(16, 185, 129, 0.09)' :
+                        category === 'archive' ? 'rgba(139, 92, 246, 0.12)' :
+                            colors.SECONDARY_BACKGROUND,
+                borderColor: category === 'todo' ? 'rgba(79, 70, 229, 0.25)' :
+                    category === 'done' ? 'rgba(16, 185, 129, 0.12)' :
+                        category === 'archive' ? 'rgba(139, 92, 246, 0.25)' :
+                            colors.PRIMARY_BORDER_DARK,
+                borderWidth: 1,
             }
         ]}>
+            <View style={[styles.cardOverlay, {
+                backgroundColor: category === 'todo' ? 'rgba(79, 70, 229, 0.05)' :
+                    category === 'done' ? 'rgba(16, 185, 129, 0.05)' :
+                        category === 'archive' ? 'rgba(139, 92, 246, 0.05)' :
+                            'transparent'
+            }]} />
             <View style={styles.checkTitleContainer}>
-                {!isArchived && (
+                {!isArchived ? (
                     <View style={styles.checkboxWrapper}>
                         <StyledCheckBox checked={isCompleted} onCheck={handleCheckToken} />
                         <CelebrationEffect
@@ -120,6 +291,8 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                             visible={showCelebrate}
                         />
                     </View>
+                ) : (
+                    <Ionicons name="archive" size={16.5} color={colors.PLACEHOLDER} />
                 )}
                 <TouchableOpacity
                     style={styles.textContainer}
@@ -130,35 +303,26 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     <View style={{ flex: 1 }}>
                         <StyledText
                             style={[{
-                                fontSize: 14,
+                                fontSize: 15.5,
+                                fontWeight: '600',
+                                lineHeight: 21,
+                                letterSpacing: 0.1,
                                 opacity: isArchived ? 0.9 : (isCompleted ? 0.6 : 1),
                                 textDecorationLine: (isCompleted && !isArchived) ? 'line-through' : 'none',
-                                color: (isCompleted && !isArchived) ? COLORS.PLACEHOLDER : COLORS.PRIMARY_TEXT,
+                                color: (isCompleted && !isArchived) ? colors.PLACEHOLDER : '#FFFFFF',
                             }]}>
                             {title}
                         </StyledText>
                     </View>
-                    {!isCompleted && createdAt && !updatedAt && (
+                    {(completedAt || updatedAt || createdAt) && (
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 4 }}>
-                            <Ionicons name="add" size={14} color="#50dce0ff" />
-                            <StyledText style={[styles.dateText, { fontSize: 11, marginTop: 0 }]}>
-                                {formatDate(createdAt)}
-                            </StyledText>
-                        </View>
-                    )}
-                    {!isCompleted && updatedAt && (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 4 }}>
-                            <Ionicons name="create-outline" size={14} color="#5BC0EB" />
-                            <StyledText style={[styles.dateText, { color: '#5BC0EB', fontSize: 11, marginTop: 0 }]}>
-                                {formatDate(updatedAt)}
-                            </StyledText>
-                        </View>
-                    )}
-                    {isCompleted && !isArchived && completedAt && (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 4 }}>
-                            <Ionicons name="checkmark-done-outline" size={14} color="#69c4dbe8" />
-                            <StyledText style={{ color: '#69c4dbe8', fontSize: 11 }}>
-                                {formatDate(completedAt)}
+                            <Ionicons
+                                name={isCompleted ? "checkmark-done-circle" : (updatedAt ? "create-outline" : "add")}
+                                size={14}
+                                color={isCompleted ? colors.CHECKBOX_SUCCESS : (updatedAt ? "#5BC0EB" : "#D1D1D1")}
+                            />
+                            <StyledText style={{ color: isCompleted ? colors.CHECKBOX_SUCCESS : (updatedAt ? "#5BC0EB" : "#D1D1D1"), fontSize: 9.5 }}>
+                                {formatDate(isCompleted ? (completedAt || updatedAt) : (updatedAt || createdAt), lang)}
                             </StyledText>
                         </View>
                     )}
@@ -172,10 +336,10 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                                 />
                                 <StyledText style={{
                                     color: "#FFD166",
-                                    fontSize: 11,
+                                    fontSize: 9.5,
                                     textDecorationLine: (reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled) ? 'line-through' : 'none'
                                 }}>
-                                    {formatDate(reminder)}
+                                    {formatDate(reminder, lang)}
                                 </StyledText>
                             </View>
 
@@ -198,7 +362,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 {!isCompleted && !isArchived && (
                     <>
                         <TouchableOpacity onPress={onPressEdit} activeOpacity={0.7}>
-                            <Ionicons name="create-outline" size={24} color={COLORS.PRIMARY_TEXT} />
+                            <Ionicons name="create-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
                         </TouchableOpacity>
                         <EditTodoModal
                             title={title}
@@ -212,7 +376,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                             categoryIcon={categoryIcon}
                         />
                         <TouchableOpacity onPress={onPressDelete} activeOpacity={0.7}>
-                            <Ionicons name="trash-outline" size={24} color={COLORS.PRIMARY_TEXT} />
+                            <Ionicons name="trash-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
                         </TouchableOpacity>
                         <DeleteTodoModal
                             isOpen={isDeleteModalOpen}
@@ -223,7 +387,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 )}
                 {isCompleted && !isArchived && archiveTodo && (
                     <TouchableOpacity onPress={onPressArchive} activeOpacity={0.7}>
-                        <Ionicons name="archive-outline" size={24} color={COLORS.PRIMARY_TEXT} />
+                        <Ionicons name="archive-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
                     </TouchableOpacity>
                 )}
                 {archiveTodo && (
@@ -235,7 +399,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 )}
                 {isArchived && (
                     <TouchableOpacity onPress={() => setIsViewModalOpen(true)} activeOpacity={0.7}>
-                        <Ionicons name="information-circle-outline" size={24} color={COLORS.PRIMARY_TEXT} />
+                        <Ionicons name="information-circle-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
                     </TouchableOpacity>
                 )}
                 <ViewTodoModal

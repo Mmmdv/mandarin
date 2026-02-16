@@ -187,6 +187,31 @@ export default function Home() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <StyledText style={styles.greeting}>
+                        {t("welcome")}
+                    </StyledText>
+                </View>
+                <Pressable
+                    onPress={toggleViewMode}
+                    style={({ pressed }) => [
+                        styles.viewToggleButton,
+                        {
+                            backgroundColor: colors.SECONDARY_BACKGROUND,
+                            opacity: pressed ? 0.7 : 1,
+                        }
+                    ]}
+                    hitSlop={8}
+                >
+                    <Ionicons
+                        name={viewMode === "card" ? "list" : "grid"}
+                        size={20}
+                        color={colors.PRIMARY_TEXT}
+                    />
+                </Pressable>
+            </View>
+
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
@@ -200,30 +225,7 @@ export default function Home() {
                     />
                 }
             >
-                <View style={styles.header}>
-                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                        <StyledText style={styles.greeting}>
-                            {t("welcome")}
-                        </StyledText>
-                    </View>
-                    <Pressable
-                        onPress={toggleViewMode}
-                        style={({ pressed }) => [
-                            styles.viewToggleButton,
-                            {
-                                backgroundColor: colors.SECONDARY_BACKGROUND,
-                                opacity: pressed ? 0.7 : 1,
-                            }
-                        ]}
-                        hitSlop={8}
-                    >
-                        <Ionicons
-                            name={viewMode === "card" ? "list" : "grid"}
-                            size={20}
-                            color={colors.PRIMARY_TEXT}
-                        />
-                    </Pressable>
-                </View>
+
 
                 {viewMode === "card" ? (
                     <>

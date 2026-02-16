@@ -40,6 +40,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const [archiveExpanded, setArchiveExpanded] = useState(false)
     const [isClearArchiveModalOpen, setIsClearArchiveModalOpen] = useState(false)
     const [isArchiveAllModalOpen, setIsArchiveAllModalOpen] = useState(false)
+    const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
 
     const [refreshing, setRefreshing] = useState(false)
 
@@ -84,6 +85,11 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const toggleSection = (setter: (fn: (prev: boolean) => boolean) => void) => {
         LayoutAnimation.configureNext(toggleAnimation);
         setter(prev => !prev);
+    }
+
+    const toggleViewMode = () => {
+        // LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setViewMode(prev => (prev === 'list' ? 'card' : 'list'));
     }
 
     if (todos.length === 0 && archivedTodos.length === 0) {
@@ -151,6 +157,30 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     return (
         <View style={{ flex: 1 }}>
+            <View style={styles.header}>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <StyledText style={styles.greeting}>
+                        {t("tab_todo")}
+                    </StyledText>
+                </View>
+                <TouchableOpacity
+                    onPress={toggleViewMode}
+                    style={[
+                        styles.viewToggleButton,
+                        {
+                            backgroundColor: colors.SECONDARY_BACKGROUND,
+                        }
+                    ]}
+                    hitSlop={8}
+                >
+                    <Ionicons
+                        name={viewMode === "card" ? "list" : "grid"}
+                        size={20}
+                        color={colors.PRIMARY_TEXT}
+                    />
+                </TouchableOpacity>
+            </View>
+
             <ScrollView
                 style={styles.container}
                 contentContainerStyle={styles.scrollContent}
@@ -162,166 +192,239 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     />
                 }
             >
-                <View style={styles.header}>
-                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                        <StyledText style={styles.greeting}>
-                            {t("tab_todo")}
-                        </StyledText>
-                    </View>
-                </View>
+
 
                 {/* To Do Section */}
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
-                        style={styles.sectionHeader}
+                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(79, 70, 229, 0.15)', borderWidth: 1, borderColor: 'rgba(79, 70, 229, 0.3)' }]}
                         onPress={() => toggleSection(setTodoExpanded)}
                         disabled={sortedPendingTodos.length === 0}
                     >
-                        <View style={[styles.sectionTitleContainer, sortedPendingTodos.length === 0 && { opacity: 0.5 }]}>
-                            <Ionicons name="list" size={24} color="#5BC0EB" />
-                            <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>
-                                {t("todo")} ({sortedPendingTodos.length})
+                        <View style={[styles.sectionTitleContainer, sortedPendingTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(79, 70, 229, 0.2)' }]}>
+                                <Ionicons name="list" size={16} color="#4F46E5" />
+                            </View>
+                            <StyledText style={[
+                                styles.sectionTitleCard,
+                                { color: '#4F46E5' }
+                            ]}>
+                                {t("todo")}
                             </StyledText>
+                            <View style={[styles.cardBadge, { backgroundColor: 'rgba(79, 70, 229, 0.2)' }]}>
+                                <StyledText style={[styles.cardBadgeText, { color: '#4F46E5' }]}>{sortedPendingTodos.length}</StyledText>
+                            </View>
                         </View>
-                        <View style={styles.sectionControls}>
-                            <TouchableOpacity
-                                onPress={onAddRequest}
-                                style={{ marginRight: 10 }}
-                                activeOpacity={0.7}
-                            >
-                                <Ionicons name="add" size={28} color={colors.CHECKBOX_SUCCESS} />
-                            </TouchableOpacity>
+                        <View style={[styles.sectionControls, { zIndex: 2 }]}>
+                            <View style={styles.actionZone}>
+                                {viewMode === 'list' && (
+                                    <TouchableOpacity
+                                        onPress={onAddRequest}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Ionicons name="add" size={24} color={colors.CHECKBOX_SUCCESS} />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
 
-                            {todoExpanded && sortedPendingTodos.length > 0 && (
-                                <SortControls
-                                    sortBy={todoSortBy}
-                                    sortOrder={todoSortOrder}
-                                    onToggleSortBy={() => setTodoSortBy(prev => prev === "date" ? "text" : "date")}
-                                    onToggleSortOrder={() => setTodoSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                            <View style={styles.sortZone}>
+                                {todoExpanded && sortedPendingTodos.length > 0 && (
+                                    <SortControls
+                                        sortBy={todoSortBy}
+                                        sortOrder={todoSortOrder}
+                                        onToggleSortBy={() => setTodoSortBy(prev => prev === "date" ? "text" : "date")}
+                                        onToggleSortOrder={() => setTodoSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                                    />
+                                )}
+                            </View>
+
+                            <View style={{ flex: 1 }} />
+
+                            <View style={styles.chevronZone}>
+                                <Ionicons
+                                    name={todoExpanded ? "chevron-down" : "chevron-forward"}
+                                    size={18}
+                                    color="#4F46E5"
+                                    style={[sortedPendingTodos.length === 0 && { opacity: 0.5 }]}
                                 />
-                            )}
-                            <Ionicons
-                                name={todoExpanded ? "chevron-down" : "chevron-forward"}
-                                size={20}
-                                color={colors.PRIMARY_TEXT}
-                                style={[sortedPendingTodos.length === 0 && { opacity: 0.5 }]}
-                            />
+                            </View>
                         </View>
+                        <View style={styles.decorativeCircle} />
                     </TouchableOpacity>
-                    {todoExpanded && sortedPendingTodos.map(item => (
-                        <TodoItem
-                            key={item.id}
-                            {...item}
-                            deleteTodo={onDeleteTodo}
-                            checkTodo={onCheckTodo}
-                            editTodo={onEditTodo}
-                            categoryTitle={categoryTitle}
-                            categoryIcon={categoryIcon}
-                        />
-                    ))}
+                    {todoExpanded && (
+                        <View style={viewMode === 'card' ? styles.gridContainer : {}}>
+                            {sortedPendingTodos.map(item => (
+                                <TodoItem
+                                    key={item.id}
+                                    {...item}
+                                    deleteTodo={onDeleteTodo}
+                                    checkTodo={onCheckTodo}
+                                    editTodo={onEditTodo}
+                                    categoryTitle={categoryTitle}
+                                    categoryIcon={categoryIcon}
+                                    category="todo"
+                                    viewMode={viewMode}
+                                />
+                            ))}
+                        </View>
+                    )}
                 </View>
 
-                <View style={[styles.sectionDivider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
+
 
                 {/* Done Section */}
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
-                        style={[styles.sectionHeader, sortedCompletedTodos.length === 0 && { opacity: 0.5 }]}
+                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' }]}
                         onPress={() => toggleSection(setDoneExpanded)}
                         disabled={sortedCompletedTodos.length === 0}
                     >
-                        <View style={styles.sectionTitleContainer}>
-                            <Ionicons name="checkbox" size={24} color={colors.CHECKBOX_SUCCESS} />
-                            <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>{t("done")} ({sortedCompletedTodos.length})</StyledText>
+                        <View style={[styles.sectionTitleContainer, sortedCompletedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
+                                <Ionicons name="checkmark-done-circle" size={16} color="rgba(16, 185, 129, 0.8)" />
+                            </View>
+                            <StyledText style={[
+                                styles.sectionTitleCard,
+                                { color: 'rgba(16, 185, 129, 0.8)' }
+                            ]}>
+                                {t("done")}
+                            </StyledText>
+                            <View style={[styles.cardBadge, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
+                                <StyledText style={[styles.cardBadgeText, { color: 'rgba(16, 185, 129, 0.8)' }]}>{sortedCompletedTodos.length}</StyledText>
+                            </View>
                         </View>
-                        <View style={styles.sectionControls}>
-                            {doneExpanded && sortedCompletedTodos.length > 0 && (
-                                <SortControls
-                                    sortBy={doneSortBy}
-                                    sortOrder={doneSortOrder}
-                                    onToggleSortBy={() => setDoneSortBy(prev => prev === "date" ? "text" : "date")}
-                                    onToggleSortOrder={() => setDoneSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                        <View style={[styles.sectionControls, { zIndex: 2 }]}>
+                            <View style={styles.actionZone}>
+                                {sortedCompletedTodos.length > 0 && onArchiveAll && (
+                                    <TouchableOpacity onPress={() => setIsArchiveAllModalOpen(true)} style={{ padding: 4 }}>
+                                        <Ionicons name="archive-outline" size={20} color={viewMode === 'card' ? '#FFF' : colors.PRIMARY_TEXT} />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+
+                            <View style={styles.sortZone}>
+                                {doneExpanded && sortedCompletedTodos.length > 0 && (
+                                    <SortControls
+                                        sortBy={doneSortBy}
+                                        sortOrder={doneSortOrder}
+                                        onToggleSortBy={() => setDoneSortBy(prev => prev === "date" ? "text" : "date")}
+                                        onToggleSortOrder={() => setDoneSortOrder(prev => prev === "asc" ? "desc" : "asc")}
+                                    />
+                                )}
+                            </View>
+
+                            <View style={{ flex: 1 }} />
+
+                            <View style={styles.chevronZone}>
+                                <Ionicons
+                                    name={doneExpanded ? "chevron-down" : "chevron-forward"}
+                                    size={18}
+                                    color="rgba(16, 185, 129, 0.7)"
                                 />
-                            )}
-                            {sortedCompletedTodos.length > 0 && onArchiveAll && (
-                                <TouchableOpacity onPress={() => setIsArchiveAllModalOpen(true)} style={{ padding: 4 }}>
-                                    <Ionicons name="archive-outline" size={20} color={colors.PRIMARY_TEXT} />
-                                </TouchableOpacity>
-                            )}
-                            <Ionicons
-                                name={doneExpanded ? "chevron-down" : "chevron-forward"}
-                                size={20}
-                                color={colors.PRIMARY_TEXT}
-                            />
+                            </View>
                         </View>
+                        <View style={styles.decorativeCircle} />
                     </TouchableOpacity>
 
-                    {doneExpanded && sortedCompletedTodos.map(item => (
-                        <TodoItem
-                            key={item.id}
-                            {...item}
-                            deleteTodo={onDeleteTodo}
-                            checkTodo={onCheckTodo}
-                            editTodo={onEditTodo}
-                            archiveTodo={onArchiveTodo}
-                            categoryTitle={categoryTitle}
-                            categoryIcon={categoryIcon}
-                        />
-                    ))}
+                    {
+                        doneExpanded && (
+                            <View style={viewMode === 'card' ? styles.gridContainer : {}}>
+                                {sortedCompletedTodos.map(item => (
+                                    <TodoItem
+                                        key={item.id}
+                                        {...item}
+                                        deleteTodo={onDeleteTodo}
+                                        checkTodo={onCheckTodo}
+                                        editTodo={onEditTodo}
+                                        archiveTodo={onArchiveTodo}
+                                        categoryTitle={categoryTitle}
+                                        categoryIcon={categoryIcon}
+                                        category="done"
+                                        viewMode={viewMode}
+                                    />
+                                ))}
+                            </View>
+                        )
+                    }
                 </View>
 
-                <View style={[styles.sectionDivider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
+
 
                 {/* Archive Section */}
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
-                        style={[styles.sectionHeader, sortedArchivedTodos.length === 0 && { opacity: 0.5 }]}
+                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.3)' }]}
                         onPress={() => toggleSection(setArchiveExpanded)}
-                        activeOpacity={0.7}
                         disabled={sortedArchivedTodos.length === 0}
                     >
-                        <View style={styles.sectionTitleContainer}>
-                            <Ionicons name="archive" size={24} color="#888" />
-                            <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>
-                                {t("archive")} ({archivedTodos.length})
+                        <View style={[styles.sectionTitleContainer, sortedArchivedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: 'rgba(139, 92, 246, 0.15)' }]}>
+                                <Ionicons name="archive" size={16} color="rgba(139, 92, 246, 0.8)" />
+                            </View>
+                            <StyledText style={[
+                                styles.sectionTitleCard,
+                                { color: 'rgba(139, 92, 246, 0.8)' }
+                            ]}>
+                                {t("archive")}
                             </StyledText>
+                            <View style={[styles.cardBadge, { backgroundColor: 'rgba(139, 92, 246, 0.15)' }]}>
+                                <StyledText style={[styles.cardBadgeText, { color: 'rgba(139, 92, 246, 0.8)' }]}>{sortedArchivedTodos.length}</StyledText>
+                            </View>
                         </View>
-                        <View style={styles.sectionControls}>
-                            {archiveExpanded && sortedArchivedTodos.length > 0 && (
-                                <SortControls
-                                    sortBy={archiveSortBy}
-                                    sortOrder={archiveSortOrder}
-                                    onToggleSortBy={() => setArchiveSortBy(archiveSortBy === "date" ? "text" : "date")}
-                                    onToggleSortOrder={() => setArchiveSortOrder(archiveSortOrder === "asc" ? "desc" : "asc")}
+                        <View style={[styles.sectionControls, { zIndex: 2 }]}>
+                            <View style={styles.actionZone}>
+                                {archivedTodos.length > 0 && (
+                                    <TouchableOpacity
+                                        onPress={() => setIsClearArchiveModalOpen(true)}
+                                        style={{ padding: 4 }}
+                                    >
+                                        <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+
+                            <View style={styles.sortZone}>
+                                {archiveExpanded && sortedArchivedTodos.length > 0 && (
+                                    <SortControls
+                                        sortBy={archiveSortBy}
+                                        sortOrder={archiveSortOrder}
+                                        onToggleSortBy={() => setArchiveSortBy(archiveSortBy === "date" ? "text" : "date")}
+                                        onToggleSortOrder={() => setArchiveSortOrder(archiveSortOrder === "asc" ? "desc" : "asc")}
+                                    />
+                                )}
+                            </View>
+
+                            <View style={{ flex: 1 }} />
+
+                            <View style={styles.chevronZone}>
+                                <Ionicons
+                                    name={archiveExpanded ? "chevron-down" : "chevron-forward"}
+                                    size={18}
+                                    color="rgba(139, 92, 246, 0.7)"
+                                    style={[sortedArchivedTodos.length === 0 && { opacity: 0.5 }]}
                                 />
-                            )}
-                            {archivedTodos.length > 0 && (
-                                <TouchableOpacity
-                                    onPress={() => setIsClearArchiveModalOpen(true)}
-                                    style={{ padding: 4 }}
-                                >
-                                    <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
-                                </TouchableOpacity>
-                            )}
-                            <Ionicons
-                                name={archiveExpanded ? "chevron-down" : "chevron-forward"}
-                                size={20}
-                                color={colors.PRIMARY_TEXT}
-                            />
+                            </View>
                         </View>
+                        <View style={styles.decorativeCircle} />
                     </TouchableOpacity>
-                    {archiveExpanded && sortedArchivedTodos.map(item => (
-                        <TodoItem
-                            key={item.id}
-                            {...item}
-                            deleteTodo={onDeleteTodo}
-                            checkTodo={onCheckTodo}
-                            editTodo={onEditTodo}
-                            archiveTodo={onArchiveTodo}
-                            categoryTitle={categoryTitle}
-                            categoryIcon={categoryIcon}
-                        />
-                    ))}
+                    {archiveExpanded && (
+                        <View style={viewMode === 'card' ? styles.gridContainer : {}}>
+                            {sortedArchivedTodos.map(item => (
+                                <TodoItem
+                                    key={item.id}
+                                    {...item}
+                                    deleteTodo={onDeleteTodo}
+                                    checkTodo={onCheckTodo}
+                                    editTodo={onEditTodo}
+                                    archiveTodo={onArchiveTodo}
+                                    categoryTitle={categoryTitle}
+                                    categoryIcon={categoryIcon}
+                                    category="archive"
+                                    viewMode={viewMode}
+                                />
+                            ))}
+                        </View>
+                    )}
                 </View>
             </ScrollView>
 

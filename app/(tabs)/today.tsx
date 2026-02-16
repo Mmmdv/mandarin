@@ -22,6 +22,16 @@ export default function Today() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <StyledText style={styles.greeting}>
+                        {t("tab_today")}
+                    </StyledText>
+                </View>
+                {/* Placeholder View for alignment consistency with other headers having icons */}
+                <View style={{ width: 40, height: 40 }} />
+            </View>
+
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
@@ -29,19 +39,12 @@ export default function Today() {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={colors.PRIMARY_TEXT} // For iOS
-                        colors={[colors.PRIMARY_TEXT]} // For Android
-                        progressBackgroundColor={colors.SECONDARY_BACKGROUND} // Android background
+                        tintColor={colors.PRIMARY_TEXT}
+                        colors={[colors.PRIMARY_TEXT]}
+                        progressBackgroundColor={colors.SECONDARY_BACKGROUND}
                     />
                 }
             >
-                <View style={styles.header}>
-                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                        <StyledText style={styles.greeting}>
-                            {t("tab_today")}
-                        </StyledText>
-                    </View>
-                </View>
                 <ImportantTasksToday />
                 <MoodTracker />
                 <WeightTracker />

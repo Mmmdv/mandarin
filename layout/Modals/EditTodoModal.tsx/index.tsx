@@ -80,6 +80,11 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
             return
         }
 
+        if (picker.reminderDate && picker.reminderDate < new Date() && picker.reminderDate.toISOString() !== reminder) {
+            picker.setShowPastDateAlert(true);
+            return;
+        }
+
         let newNotificationId = notificationId;
 
         if (notificationId && (picker.reminderDate?.toISOString() !== reminder)) {

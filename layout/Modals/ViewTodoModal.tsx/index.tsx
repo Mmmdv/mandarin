@@ -34,7 +34,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
     reminderCancelled,
     notificationId
 }) => {
-    const { t } = useTheme();
+    const { t, lang } = useTheme();
 
     const notification = useAppSelector(state => notificationId ? selectNotificationById(state, notificationId) : undefined);
     const reminderStatus: NotificationStatus | undefined = notification?.status;
@@ -66,11 +66,13 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
                 <View style={localStyles.tableContainer}>
                     <View style={localStyles.tableRow}>
                         <View style={localStyles.tableLabelColumn}>
-                            <Ionicons name="add" size={18} color="#50dce0ff" />
+                            <Ionicons name="add" size={18} color="#D1D1D1" />
                             <StyledText style={localStyles.tableLabelText}>{t("created")}</StyledText>
                         </View>
                         <View style={localStyles.tableValueColumn}>
-                            <StyledText style={localStyles.tableValueText}>{formatDate(createdAt)}</StyledText>
+                            <StyledText style={[localStyles.tableValueText, { color: '#D1D1D1' }]}>
+                                {formatDate(createdAt, lang)}
+                            </StyledText>
                         </View>
                     </View>
 
@@ -82,7 +84,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
                             </View>
                             <View style={localStyles.tableValueColumn}>
                                 <StyledText style={[localStyles.tableValueText, { color: '#5BC0EB' }]}>
-                                    {formatDate(updatedAt)}
+                                    {formatDate(updatedAt, lang)}
                                 </StyledText>
                             </View>
                         </View>
@@ -96,7 +98,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
                             </View>
                             <View style={localStyles.tableValueColumn}>
                                 <StyledText style={[localStyles.tableValueText, { color: '#4ECDC4' }]}>
-                                    {formatDate(completedAt)}
+                                    {formatDate(completedAt, lang)}
                                 </StyledText>
                             </View>
                         </View>
@@ -135,7 +137,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
                                         <Ionicons name="hourglass-outline" size={14} color="#FFB74D" />
                                     )}
                                     <StyledText style={[localStyles.tableValueText, { color: '#FFD166' }]}>
-                                        {formatDate(reminder)}
+                                        {formatDate(reminder, lang)}
                                     </StyledText>
                                 </View>
                             </View>

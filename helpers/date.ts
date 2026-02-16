@@ -6,11 +6,33 @@ export const getFullFormatDate = (date: Date) => {
     }).format(date)
 }
 
-export const formatDate = (dateString: string) => {
+export const formatDate = (dateString: string, lang: string = 'az') => {
     const date = new Date(dateString)
-    const dateStr = date.toLocaleDateString('az-AZ', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    const timeStr = date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
-    return `${dateStr} ${timeStr}`
+    const locale = lang === 'az' ? 'az-AZ' : lang === 'en' ? 'en-US' : 'ru-RU'
+
+    const day = date.toLocaleDateString(locale, { day: '2-digit' })
+    let month = date.toLocaleDateString(locale, { month: 'short' })
+    // Remove trailing dot if any (common in some locales like Russian)
+    month = month.replace('.', '')
+    // Capitalize first letter for consistency
+    month = month.charAt(0).toUpperCase() + month.slice(1)
+
+    const year = date.toLocaleDateString(locale, { year: '2-digit' })
+    const timeStr = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
+
+    return `${day}-${month}-${year} ${timeStr}`
+}
+
+export const getShortDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+
+    if (isToday) {
+        return date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    return date.toLocaleDateString('az-AZ', { day: '2-digit', month: 'short' });
 }
 
 export const formatDuration = (start: string, end: string, t: any) => {

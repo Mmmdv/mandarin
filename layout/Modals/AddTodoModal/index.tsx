@@ -4,15 +4,17 @@ import StyledText from "@/components/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { schedulePushNotification } from "@/constants/notifications";
 import { COLORS } from "@/constants/ui";
+import { analyzeAudio } from "@/helpers/gemini";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
+import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useEffect, useRef, useState } from "react";
-import { Animated, Keyboard, Platform, Pressable, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Alert, Animated, Keyboard, Platform, Pressable, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { localStyles } from "./styles";
 
 type AddTodoModalProps = {
@@ -25,7 +27,7 @@ type AddTodoModalProps = {
 
 const AddTodoModal: React.FC<AddTodoModalProps> = ({
     isOpen, onClose, onAdd, categoryTitle, categoryIcon }) => {
-    const { t, notificationsEnabled, todoNotifications } = useTheme();
+    const { t, theme, notificationsEnabled, todoNotifications } = useTheme();
     const dispatch = useAppDispatch();
 
     const [isFocused, setIsFocused] = useState(false)
@@ -35,12 +37,158 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     const inputRef = useRef<TextInput>(null);
     const scaleAnim = useRef(new Animated.Value(1)).current;
 
+    const { startRecording, stopRecording, isRecording } = useVoiceRecorder();
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [recordingTime, setRecordingTime] = useState(0);
+    const pulseAnim = useRef(new Animated.Value(1)).current;
+    const waveAnims = useRef([new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)]).current;
+    const progressAnim = useRef(new Animated.Value(0)).current;
+
+    // WhatsApp style visualizer bars
+    const barAnims = useRef(Array.from({ length: 15 }, () => new Animated.Value(0.2))).current;
+
+    const MAX_DURATION = 30;
+
+    useEffect(() => {
+        let timer: any;
+        let visualizerInterval: any;
+
+        if (isRecording) {
+            setRecordingTime(0);
+            progressAnim.setValue(0);
+
+            // Randomly animate bars to simulate voice activity
+            visualizerInterval = setInterval(() => {
+                barAnims.forEach(anim => {
+                    Animated.spring(anim, {
+                        toValue: Math.random() * 0.8 + 0.2, // Random height between 0.2 and 1.0
+                        useNativeDriver: true,
+                        friction: 3,
+                        tension: 40,
+                    }).start();
+                });
+            }, 100);
+
+            timer = setInterval(() => {
+                setRecordingTime(prev => {
+                    if (prev >= MAX_DURATION - 1) {
+                        handleVoiceInput(); // Auto stop
+                        return MAX_DURATION;
+                    }
+                    return prev + 1;
+                });
+            }, 1000);
+
+            Animated.timing(progressAnim, {
+                toValue: 1,
+                duration: MAX_DURATION * 1000,
+                useNativeDriver: false,
+            }).start();
+        } else {
+            setRecordingTime(0);
+            progressAnim.setValue(0);
+            // Reset bars
+            barAnims.forEach(anim => anim.setValue(0.2));
+        }
+        return () => {
+            clearInterval(timer);
+            clearInterval(visualizerInterval);
+        };
+    }, [isRecording]);
+
+    useEffect(() => {
+        let pulse: Animated.CompositeAnimation | null = null;
+        let waves: Animated.CompositeAnimation | null = null;
+
+        if (isRecording) {
+            pulse = Animated.loop(
+                Animated.sequence([
+                    Animated.timing(pulseAnim, {
+                        toValue: 1.2,
+                        duration: 500,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(pulseAnim, {
+                        toValue: 1,
+                        duration: 500,
+                        useNativeDriver: true,
+                    }),
+                ])
+            );
+            pulse.start();
+
+            waves = Animated.loop(
+                Animated.stagger(200, waveAnims.map(anim =>
+                    Animated.sequence([
+                        Animated.timing(anim, {
+                            toValue: 1,
+                            duration: 1000,
+                            useNativeDriver: true,
+                        }),
+                        Animated.timing(anim, {
+                            toValue: 0,
+                            duration: 0,
+                            useNativeDriver: true,
+                        }),
+                    ])
+                ))
+            );
+            waves.start();
+        } else {
+            pulseAnim.setValue(1);
+            waveAnims.forEach(anim => anim.setValue(0));
+        }
+
+        return () => {
+            pulse?.stop();
+            waves?.stop();
+        };
+    }, [isRecording]);
+
+    const handleVoiceInput = async () => {
+        if (isRecording) {
+            const uri = await stopRecording();
+            if (uri) {
+                setIsAnalyzing(true);
+                const result = await analyzeAudio(uri);
+                if (result && !result.error) {
+                    if (result.title) setTitle(result.title);
+                    if (result.date) {
+                        const date = new Date(result.date);
+                        if (!isNaN(date.getTime())) {
+                            picker.setReminderDate(date);
+                        }
+                    }
+                    setIsAnalyzing(false);
+                } else {
+                    setIsAnalyzing(false);
+                    const errorKey = result?.error === 'rate_limit' ? "error_rate_limit" :
+                        result?.error === 'network_error' ? "error_network" :
+                            result?.error === 'parse_error' ? "error_voice_parse" : "voice_error";
+
+                    Alert.alert(t("error"), t(errorKey as any));
+                }
+            }
+        } else {
+            const success = await startRecording();
+            if (!success) {
+                Alert.alert(t("attention"), t("mic_busy"));
+            }
+        }
+    };
+
     const onPressAdd = async (dateOverride?: Date) => {
         if (!title.trim()) {
             setInputError(true)
             return
         }
         const finalDate = dateOverride || picker.reminderDate;
+
+        if (finalDate && finalDate < new Date()) {
+            picker.setShowPastDateAlert(true);
+            return;
+        }
+
         let notificationId: string | undefined;
 
         if (finalDate && notificationsEnabled && todoNotifications) {
@@ -109,7 +257,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
                     <View style={modalStyles.divider} />
 
-                    <Pressable onPress={() => inputRef.current?.focus()} style={{ width: '100%', alignItems: 'center', zIndex: 10 }}>
+                    <Pressable onPress={() => inputRef.current?.focus()} style={{ width: '100%', alignItems: 'center', zIndex: 10 }} disabled={isRecording || isAnalyzing}>
                         <Animated.View style={[
                             localStyles.inputWrapper,
                             isFocused && localStyles.inputFocused,
@@ -144,8 +292,8 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                         </Animated.View>
                     </Pressable>
 
-                    {/* Reminder Section */}
-                    <View style={{ marginBottom: 10 }}>
+                    {/* Action Row: Reminder & Voice */}
+                    <View style={localStyles.actionRow}>
                         {!picker.reminderDate ? (
                             <TouchableOpacity
                                 style={localStyles.addReminderButton}
@@ -157,7 +305,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                 <Ionicons name="add-circle" size={20} color={COLORS.CHECKBOX_SUCCESS} style={{ marginLeft: 'auto' }} />
                             </TouchableOpacity>
                         ) : (
-                            <View style={localStyles.reminderChip}>
+                            <View style={[localStyles.reminderChip, { flex: 1 }]}>
                                 <TouchableOpacity
                                     style={localStyles.chipContent}
                                     onPress={picker.startReminderFlow}
@@ -176,7 +324,94 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                 </TouchableOpacity>
                             </View>
                         )}
+
+                        <TouchableOpacity
+                            style={[localStyles.voiceButton, isRecording && localStyles.voiceButtonActive]}
+                            onPress={handleVoiceInput}
+                            disabled={isAnalyzing}
+                        >
+                            <Ionicons
+                                name={isRecording ? "stop" : "mic"}
+                                size={24}
+                                color={isRecording ? "#ea4335" : "#fff"}
+                            />
+                        </TouchableOpacity>
                     </View>
+
+                    {/* Voice Interaction Modal */}
+                    <StyledModal isOpen={isRecording || isAnalyzing} onClose={() => { }}>
+                        <View style={[modalStyles.modalContainer, { minHeight: 280, paddingVertical: 30 }]}>
+                            <View style={localStyles.visualizerContainer}>
+                                {isRecording ? (
+                                    <View style={localStyles.barsRow}>
+                                        {barAnims.map((anim, i) => (
+                                            <Animated.View
+                                                key={i}
+                                                style={[
+                                                    localStyles.visualizerBar,
+                                                    {
+                                                        transform: [{ scaleY: anim }],
+                                                        opacity: anim.interpolate({
+                                                            inputRange: [0.2, 1],
+                                                            outputRange: [0.4, 1]
+                                                        })
+                                                    }
+                                                ]}
+                                            />
+                                        ))}
+                                    </View>
+                                ) : (
+                                    <View style={localStyles.analyzingLoader}>
+                                        <ActivityIndicator color={COLORS.CHECKBOX_SUCCESS} size="large" />
+                                    </View>
+                                )}
+                            </View>
+
+                            <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                                <View style={[localStyles.micCircle, isRecording && { borderColor: '#ea4335' }]}>
+                                    <Ionicons
+                                        name={isRecording ? "mic" : "cloud-upload"}
+                                        size={32}
+                                        color={isRecording ? "#ea4335" : COLORS.CHECKBOX_SUCCESS}
+                                    />
+                                </View>
+                                <StyledText style={localStyles.voiceModalStatusText}>
+                                    {isRecording ? t("listening") : t("processing")}
+                                </StyledText>
+                            </View>
+
+                            {isRecording && (
+                                <View style={localStyles.timerContainer}>
+                                    <View style={localStyles.progressBarBackground}>
+                                        <Animated.View
+                                            style={[
+                                                localStyles.progressBarFill,
+                                                {
+                                                    width: progressAnim.interpolate({
+                                                        inputRange: [0, 1],
+                                                        outputRange: ['0%', '100%']
+                                                    })
+                                                }
+                                            ]}
+                                        />
+                                    </View>
+                                    <StyledText style={localStyles.timerText}>
+                                        00:{recordingTime < 10 ? `0${recordingTime}` : recordingTime} / 00:30
+                                    </StyledText>
+                                </View>
+                            )}
+
+                            {isRecording && (
+                                <TouchableOpacity
+                                    onPress={handleVoiceInput}
+                                    style={localStyles.stopRecordingButton}
+                                >
+                                    <View style={localStyles.stopIcon} />
+                                    <StyledText style={localStyles.stopButtonText}>{t("close")}</StyledText>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </StyledModal>
 
                     {/* Android Pickers */}
                     {Platform.OS === 'android' && picker.showDatePicker && (
@@ -238,7 +473,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                         minimumDate={picker.showDatePicker ? new Date() : undefined}
                                         locale={picker.getLocale()}
                                         textColor={COLORS.PRIMARY_TEXT}
-                                        themeVariant={useTheme().theme}
+                                        themeVariant={theme}
                                         style={{ width: '100%', transform: [{ scale: 0.85 }] }}
                                     />
                                 </View>
@@ -271,6 +506,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                             label={t("add")}
                             onPress={() => onPressAdd()}
                             variant="dark_button"
+                            disabled={isRecording || isAnalyzing}
                         />
                     </View>
 

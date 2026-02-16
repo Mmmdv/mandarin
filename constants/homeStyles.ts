@@ -15,9 +15,10 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 0,
+        paddingHorizontal: PADDING,
         paddingTop: 15,
-        paddingBottom: 0,
+        paddingBottom: 15,
+        zIndex: 10,
     },
     greeting: {
         fontSize: 24,
@@ -84,8 +85,8 @@ export const styles = StyleSheet.create({
         zIndex: 1,
     },
     viewToggleButton: {
-        width: 32,
-        height: 32,
+        width: 40,
+        height: 40,
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',

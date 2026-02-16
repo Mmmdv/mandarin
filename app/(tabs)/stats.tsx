@@ -18,6 +18,16 @@ export default function Stats() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <StyledText style={styles.greeting}>
+                        {t("tab_stats")}
+                    </StyledText>
+                </View>
+                {/* Placeholder View for alignment consistency */}
+                <View style={{ width: 40, height: 40 }} />
+            </View>
+
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
@@ -31,13 +41,6 @@ export default function Stats() {
                     />
                 }
             >
-                <View style={[styles.header, { paddingHorizontal: 0, paddingTop: 0 }]}>
-                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                        <StyledText style={[styles.greeting, { color: colors.PRIMARY_TEXT, fontSize: 24, fontWeight: 'bold' }]}>
-                            {t("tab_stats")}
-                        </StyledText>
-                    </View>
-                </View>
                 <MonthlyStats />
             </ScrollView>
         </View>
