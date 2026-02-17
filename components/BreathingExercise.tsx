@@ -8,7 +8,7 @@ import StyledText from './StyledText';
 
 // Sound Assets (Using the local files you uploaded)
 const SOUNDS = {
-    whoosh: require('../assets/sounds/whoosh.mp3'),
+    whoosh: require('../assets/sounds/whoosh.wav'),
     sea: require('../assets/sounds/sea.mp3'),
 };
 
