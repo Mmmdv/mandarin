@@ -104,7 +104,10 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                     const currentRouteName = state.routes[state.index].name;
                     const isActive = state.routes[state.index].key === route.key;
                     const MAPPED_TO_HOME = ["todo", "movies", "birthday", "events", "expenses", "shopping"];
-                    const isFocused = isActive || (route.name === 'index' && MAPPED_TO_HOME.includes(currentRouteName));
+                    const MAPPED_TO_MORE = ["breathing"];
+                    const isFocused = isActive ||
+                        (route.name === 'index' && MAPPED_TO_HOME.includes(currentRouteName)) ||
+                        (route.name === 'more' && MAPPED_TO_MORE.includes(currentRouteName));
 
                     const iconName = getIconName(route.name, isFocused);
                     const label = getLabelName(route.name, t);
