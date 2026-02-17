@@ -40,7 +40,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const [archiveSortBy, setArchiveSortBy] = useState<SortBy>("date")
     const [archiveSortOrder, setArchiveSortOrder] = useState<SortOrder>("desc")
 
-    const [todoExpanded, setTodoExpanded] = useState(false)
+    const [todoExpanded, setTodoExpanded] = useState(true)
     const [doneExpanded, setDoneExpanded] = useState(false)
     const [archiveExpanded, setArchiveExpanded] = useState(false)
     const [isClearArchiveModalOpen, setIsClearArchiveModalOpen] = useState(false)
@@ -215,14 +215,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         </View>
                         <View style={[styles.sectionControls, { zIndex: 2 }]}>
                             <View style={styles.actionZone}>
-                                {viewMode === 'list' && (
-                                    <TouchableOpacity
-                                        onPress={onAddRequest}
-                                        activeOpacity={0.7}
-                                    >
-                                        <Ionicons name="add" size={24} color={colors.CHECKBOX_SUCCESS} />
-                                    </TouchableOpacity>
-                                )}
+                                {/* Add button removed */}
                             </View>
 
                             <View style={styles.sortZone}>

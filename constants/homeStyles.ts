@@ -9,7 +9,7 @@ export const COL_3_WIDTH = (width - (PADDING * 2) - (GAP * 2)) / 3;
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingBottom: 110,
+        paddingBottom: 0,
     },
     header: {
         flexDirection: 'row',

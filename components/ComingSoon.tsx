@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: 20,
-        paddingBottom: 110, // Account for TabBar height (70 + 20 bottom + 20 padding)
+        paddingBottom: 0, // Account for TabBar height (70 + 20 bottom + 20 padding)
     },
     content: {
         alignItems: "center",

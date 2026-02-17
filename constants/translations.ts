@@ -48,7 +48,7 @@ export const TRANSLATIONS = {
         select_theme: "İnterfeys seçimi",
         task_details: "Tapşırıq detalları",
         title: "Başlıq",
-        tab_home: "Ana səhifə",
+        tab_home: "Əsas",
         tab_todo: "Tapşırıqlar",
         tab_shopping: "Alış-veriş",
         tab_events: "Tədbirlər",
@@ -56,6 +56,8 @@ export const TRANSLATIONS = {
         tab_movies: "Filmlər",
         tab_today: "Bugün",
         tab_stats: "Statistika",
+        tab_more: "Daha çox",
+        tab_breathing_title: "Nəfəs al",
         tab_expenses: "Xərclərim",
 
         mood_q1: "Bu gün daxili dünyanda hava necədir?",
@@ -126,7 +128,7 @@ export const TRANSLATIONS = {
         home_plan_day: "Gününü planla, taskları yarat",
         home_movies_desc: "Sevimli filmləri əlavə et və izlə",
         home_birthdays_desc: "Özəl günləri unutma",
-        home_shopping_desc: "Nə almalı olduğunu əvvəlcədən planla",
+        home_shopping_desc: "Nə almalı olduğunu öncədən planla",
         home_events_desc: "Tədbirləri idarə et",
         home_expenses_desc: "Gündəlik xərclərinə nəzarət et",
         execution_time: "İcra vaxtı",
@@ -156,6 +158,9 @@ export const TRANSLATIONS = {
         days_short: "gün",
         hours_short: "saat",
         minutes_short: "dəq",
+        menu_add_task: "Tapşırıq",
+        menu_add_birthday: "Ad günü",
+        menu_add_movie: "Film",
 
 
 
@@ -223,6 +228,8 @@ export const TRANSLATIONS = {
 
         tab_today: "Today",
         tab_stats: "Statistics",
+        tab_more: "More",
+        tab_breathing_title: "Breathing",
 
         mood_q1: "How's the weather in your inner world today?",
         mood_q2: "How do your soul's colors look today?",
@@ -323,6 +330,9 @@ export const TRANSLATIONS = {
         days_short: "d",
         hours_short: "h",
         minutes_short: "m",
+        menu_add_task: "Task",
+        menu_add_birthday: "Birthday",
+        menu_add_movie: "Movie",
 
 
 
@@ -390,6 +400,8 @@ export const TRANSLATIONS = {
 
         tab_today: "Сегодня",
         tab_stats: "Статистика",
+        tab_more: "Еще",
+        tab_breathing_title: "Дыхание",
 
         mood_q1: "Какая сегодня погода в твоем внутреннем мире?",
         mood_q2: "Как сегодня выглядят цвета твоей души?",
@@ -490,6 +502,9 @@ export const TRANSLATIONS = {
         days_short: "дн",
         hours_short: "ч",
         minutes_short: "мин",
+        menu_add_task: "Задача",
+        menu_add_birthday: "День рождения",
+        menu_add_movie: "Фильм",
 
 
 

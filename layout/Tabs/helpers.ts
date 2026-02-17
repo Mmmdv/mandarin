@@ -2,15 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 
 export const getIconName = (routeName: string, isFocused: boolean): keyof typeof Ionicons.glyphMap => {
     switch (routeName) {
-        case "index": return isFocused ? "home" : "home-outline";
+        case "index": return isFocused ? "grid" : "grid-outline";
         case "todo": return isFocused ? "list" : "list-outline";
         case "birthday": return isFocused ? "gift" : "gift-outline";
         case "shopping": return isFocused ? "cart" : "cart-outline";
         case "events": return isFocused ? "ticket" : "ticket-outline";
         case "movies": return isFocused ? "film" : "film-outline";
         case "expenses": return isFocused ? "wallet" : "wallet-outline";
-        case "today": return isFocused ? "today" : "today-outline";
+        case "today": return isFocused ? "calendar" : "calendar-outline";
         case "stats": return isFocused ? "stats-chart" : "stats-chart-outline";
+        case "more": return isFocused ? "apps" : "apps-outline";
         default: return "ellipse-outline";
     }
 };
@@ -26,6 +27,7 @@ export const getLabelName = (routeName: string, t: (key: any) => string): string
         case "expenses": return t("tab_expenses");
         case "today": return t("tab_today");
         case "stats": return t("tab_stats");
+        case "more": return t("tab_more");
         default: return "";
     }
 };
