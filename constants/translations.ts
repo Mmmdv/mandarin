@@ -14,10 +14,10 @@ export const TRANSLATIONS = {
         edit: "Düzəliş et",
         archive: "Arxiv",
         archive_button: "Arxivlə",
-        unarchive: "Arxivdən çıxart",
+
         completed: "Tamamlanıb",
         pending: "Gözlənilir",
-        empty_list: "Siyahı boşdur",
+
         share_message: "Taskify — gününüzü planlaşdırmaq üçün gözəl tətbiq! 🚀",
         archive_confirm_title: "Arxivləşdirmək istəyirsiniz?",
         archive_confirm_message: "Bu tapşırığı arxivə göndərmək istədiyinizə əminsiniz?",
@@ -31,13 +31,13 @@ export const TRANSLATIONS = {
         done: "Bitmiş işlər",
         created: "Yaradılıb",
         edited: "Düzəliş olunub",
-        finished: "Bitdi",
+
         close: "Bağla",
-        search: "Axtarış...",
+
         no_results: "Nəticə tapılmadı",
         back: "Geri",
-        general: "Ümumi",
-        appearance: "Görünüş",
+
+
         select_language: "Dil seçimi",
         select_theme: "İnterfeys seçimi",
         task_details: "Tapşırıq detalları",
@@ -48,10 +48,10 @@ export const TRANSLATIONS = {
         tab_events: "Tədbirlər",
         tab_birthday: "Ad günləri",
         tab_movies: "Filmlər",
-        tab_today: "Bugünüm",
+        tab_today: "Bugün",
         tab_stats: "Statistika",
         tab_expenses: "Xərclərim",
-        today_mood: "Bu gün daxili dünyanda hava necədir?",
+
         mood_q1: "Bu gün daxili dünyanda hava necədir?",
         mood_q2: "Bu gün ruhunun rəngləri necə görünür?",
         mood_q3: "Bu gün daxili enerjin özünü necə büruzə verir?",
@@ -71,10 +71,10 @@ export const TRANSLATIONS = {
         mood_unlock_time: "Nəticə saat 21:00-da açıqlanacaq",
         today_weight: "Bu gün tərəzi sənə nə dedi?",
         today_rating: "Bugün üçün özünü qiymətləndir",
-        weight_placeholder: "Çəkinizi daxil edin...",
-        currency_rates: "Valyuta məzənnələri",
-        weather_baku: "Bakı havası",
-        weather_current: "Hava proqnozu",
+
+
+
+
         monthly_stats: "Aylıq statistika",
         date: "Tarix",
         time: "Saat",
@@ -90,7 +90,7 @@ export const TRANSLATIONS = {
         enable: "Aktiv et",
         retry: "Yenidən yoxla",
         confirm_delete: "Silinməni təsdiqləyin",
-        confirm_delete_message: "Bütün bildirişləri silmək istədiyinizə əminsiniz?",
+
         notifications_todo: "Tapşırıqlar",
         notifications_birthday: "Ad günləri",
         notifications_movie: "Filmlər",
@@ -107,14 +107,14 @@ export const TRANSLATIONS = {
         success: "Uğurlu",
         error: "Xəta",
         reset_success_message: "Tətbiq sıfırlandı. Zəhmət olmasa tətbiqi yenidən başladın.",
-        reset_error_message: "Məlumatları silmək mümkün olmadı.",
-        canceled: "Ləğv edildi",
-        sent: "Göndərilib",
+
+
+
         past_reminder_error: "Keçmiş zamana xatırlatma təyin etmək olmur",
         attention: "Diqqət",
         next: "Növbəti",
-        updated_status: "Yeniləndi",
-        changed_status: "Dəyişdirildi",
+
+
         disable_notifications_confirm: "Bütün aktiv bildirişləri dayandırmaq istədiyinizə əminsiniz?",
         clear_history_confirm: "Bütün bildiriş tarixçəsini silmək istədiyinizə əminsiniz?",
         home_plan_day: "Gününü planla, taskları yarat",
@@ -125,14 +125,14 @@ export const TRANSLATIONS = {
         home_expenses_desc: "Gündəlik xərclərinə nəzarət et",
         execution_time: "İcra vaxtı",
         time_elapsed: "Keçən vaxt",
-        minutes_short: "dəq",
-        hours_short: "saat",
-        days_short: "gün",
+
+
+
         security: "Təhlükəsizlik",
-        location_error: "Məkan məlumatı əldə edilə bilmədi",
-        location_services: "Məkan xidmətləri",
-        location_services_desc: "Hava proqnozu üçün məkanınızdan istifadə edilməlidir, ayarlardan icazə verin.",
-        current_location: "Mövcud məkan",
+
+
+
+
         enable_biometrics: "Biometrik kilid",
         biometrics_desc: "Tətbiqə giriş üçün Face ID / Barmaq izi tələb olunacaq.",
         biometrics_not_available: "Biometrik doğrulama cihazınızda dəstəklənmir.",
@@ -143,17 +143,17 @@ export const TRANSLATIONS = {
         avg_mood: "Mood Ort.",
         avg_rating: "Reytinq Ort.",
         days_tracked: "İzlənilən gün",
-        weather_unavailable: "Hava məlumatı əlçatan deyil",
+
         test_reset: "Test: Sıfırla",
-        today_tasks_header: "Bugün üçün",
-        voice_input: "Səsli daxil etmə",
-        listening: "Dinləyirəm...",
-        processing: "Emal edilir...",
-        voice_error: "Səsi anlamaq mümkün olmadı",
-        mic_busy: "Mikrofon hal-hazırda başqa bir proqram və ya zəng tərəfindən istifadə edilir",
-        error_rate_limit: "Çox sayda sorğu göndərilib. Zəhmət olmasa bir az gözləyin.",
-        error_network: "Şəbəkə xətası baş verdi. İnternet bağlantınızı yoxlayın.",
-        error_voice_parse: "Səs anlaşıldı, lakin məlumat emal edilə bilmədi.",
+        today_tasks_header: "Bugün üçün xatırlatmalar",
+
+
+
+
+
+
+
+
     },
     en: {
         welcome: "Welcome",
@@ -170,10 +170,10 @@ export const TRANSLATIONS = {
         edit: "Edit",
         archive: "Archive",
         archive_button: "Archive",
-        unarchive: "Unarchive",
+
         completed: "Completed",
         pending: "Pending",
-        empty_list: "List is empty",
+
         share_message: "Check out Taskify — a beautiful to-do app to organize your day! 🚀",
         archive_confirm_title: "Archive Task?",
         archive_confirm_message: "Are you sure you want to archive this task?",
@@ -187,13 +187,13 @@ export const TRANSLATIONS = {
         done: "Done",
         created: "Created",
         edited: "Edited",
-        finished: "Finished",
+
         close: "Close",
-        search: "Search...",
+
         no_results: "No results found",
         back: "Back",
-        general: "General",
-        appearance: "Appearance",
+
+
         select_language: "Select Language",
         select_theme: "Select Theme",
         task_details: "Task Details",
@@ -204,10 +204,10 @@ export const TRANSLATIONS = {
         tab_events: "Events",
         tab_birthday: "Birthdays",
         tab_movies: "Movies",
-        tab_utilities: "Utilities",
-        tab_today: "My Today",
+
+        tab_today: "Today",
         tab_stats: "Statistics",
-        today_mood: "How's the weather in your inner world today?",
+
         mood_q1: "How's the weather in your inner world today?",
         mood_q2: "How do your soul's colors look today?",
         mood_q3: "How is your inner energy manifesting itself today?",
@@ -227,10 +227,10 @@ export const TRANSLATIONS = {
         mood_unlock_time: "Results will open at 21:00",
         today_weight: "What's the number on the scale today?",
         today_rating: "Rate yourself for today",
-        weight_placeholder: "Enter weight...",
-        currency_rates: "Currency Rates",
-        weather_baku: "Baku Weather",
-        weather_current: "Weather Forecast",
+
+
+
+
         monthly_stats: "Monthly Statistics",
         date: "Date",
         time: "Time",
@@ -246,7 +246,7 @@ export const TRANSLATIONS = {
         enable: "Enable",
         retry: "Try again",
         confirm_delete: "Confirm Deletion",
-        confirm_delete_message: "Are you sure you want to delete all notifications?",
+
         notifications_todo: "To-Do Items",
         notifications_birthday: "Birthdays",
         notifications_movie: "Movies",
@@ -263,14 +263,14 @@ export const TRANSLATIONS = {
         success: "Success",
         error: "Error",
         reset_success_message: "App reset. Please restart the application.",
-        reset_error_message: "Failed to reset data.",
-        canceled: "Canceled",
-        sent: "Sent",
+
+
+
         past_reminder_error: "Reminder time cannot be in the past",
         attention: "Attention",
         next: "Next",
-        updated_status: "Updated",
-        changed_status: "Changed",
+
+
         disable_notifications_confirm: "Are you sure you want to stop all active notifications?",
         clear_history_confirm: "Are you sure you want to delete the entire notification history?",
         home_plan_day: "Plan your day, create tasks",
@@ -282,14 +282,14 @@ export const TRANSLATIONS = {
         tab_expenses: "Expenses",
         execution_time: "Execution time",
         time_elapsed: "Time elapsed",
-        minutes_short: "min",
-        hours_short: "h",
-        days_short: "d",
+
+
+
         security: "Security",
-        location_error: "Location information could not be retrieved",
-        location_services: "Location services",
-        location_services_desc: "Location access is required for weather forecast, please enable it in settings.",
-        current_location: "Current location",
+
+
+
+
         enable_biometrics: "Biometric Lock",
         biometrics_desc: "Require Face ID/Fingerprint to open the app.",
         biometrics_not_available: "Biometric authentication is not available on your device.",
@@ -300,17 +300,17 @@ export const TRANSLATIONS = {
         avg_mood: "Mood Avg",
         avg_rating: "Rating Avg",
         days_tracked: "Days tracked",
-        weather_unavailable: "Weather info unavailable",
+
         test_reset: "Test: Reset",
-        today_tasks_header: "For today",
-        voice_input: "Voice Input",
-        listening: "Listening...",
-        processing: "Processing...",
-        voice_error: "Could not understand audio",
-        mic_busy: "The microphone is currently in use by another app or call",
-        error_rate_limit: "Too many requests. Please wait a moment.",
-        error_network: "Network error occurred. Check your connection.",
-        error_voice_parse: "Audio understood, but data could not be processed.",
+        today_tasks_header: "Reminders for today",
+
+
+
+
+
+
+
+
     },
     ru: {
         welcome: "Добро пожаловать",
@@ -327,10 +327,10 @@ export const TRANSLATIONS = {
         edit: "Изменить",
         archive: "Архив",
         archive_button: "Архивировать",
-        unarchive: "Разархивировать",
+
         completed: "Завершено",
         pending: "Ожидается",
-        empty_list: "Список пуст",
+
         share_message: "Попробуй Taskify — красивое приложение для планирования дня! 🚀",
         archive_confirm_title: "Архивировать задачу?",
         archive_confirm_message: "Вы уверены, что хотите архивировать эту задачу?",
@@ -344,13 +344,13 @@ export const TRANSLATIONS = {
         done: "Сделано",
         created: "Создано",
         edited: "Изменено",
-        finished: "Завершено",
+
         close: "Закрыть",
-        search: "Поиск...",
+
         no_results: "Ничего не найдено",
         back: "Назад",
-        general: "Общее",
-        appearance: "Внешний вид",
+
+
         select_language: "Выбор языка",
         select_theme: "Выбор интерфейса",
         task_details: "Детали задачи",
@@ -361,10 +361,10 @@ export const TRANSLATIONS = {
         tab_events: "События",
         tab_birthday: "Дни рождения",
         tab_movies: "Фильмы",
-        tab_utilities: "Коммуналка",
-        tab_today: "Мой день",
+
+        tab_today: "Сегодня",
         tab_stats: "Статистика",
-        today_mood: "Какая сегодня погода в твоем внутреннем мире?",
+
         mood_q1: "Какая сегодня погода в твоем внутреннем мире?",
         mood_q2: "Как сегодня выглядят цвета твоей души?",
         mood_q3: "Как проявляется твоя внутренняя энергия сегодня?",
@@ -384,10 +384,10 @@ export const TRANSLATIONS = {
         mood_unlock_time: "Результаты откроются в 21:00",
         today_weight: "Какую цифру показывают весы сегодня?",
         today_rating: "Оцени себя сегодня",
-        weight_placeholder: "Введите вес...",
-        currency_rates: "Курсы валют",
-        weather_baku: "Погода в Баку",
-        weather_current: "Прогноз погоды",
+
+
+
+
         monthly_stats: "Ежемесячная статистика",
         date: "Дата",
         time: "Время",
@@ -403,7 +403,7 @@ export const TRANSLATIONS = {
         enable: "Включить",
         retry: "Попробовать снова",
         confirm_delete: "Подтвердить удаление",
-        confirm_delete_message: "Вы уверены, что хотите удалить все уведомления?",
+
         notifications_todo: "Задачи",
         notifications_birthday: "Дни рождения",
         notifications_movie: "Фильмы",
@@ -420,14 +420,14 @@ export const TRANSLATIONS = {
         success: "Успешно",
         error: "Ошибка",
         reset_success_message: "Приложение сброшено. Пожалуйста, перезапустите приложение.",
-        reset_error_message: "Не удалось удалить данные.",
-        canceled: "Отменено",
-        sent: "Отправлено",
+
+
+
         past_reminder_error: "Время напоминания не может быть в прошлом",
         attention: "Внимание",
         next: "Далее",
-        updated_status: "Обновлено",
-        changed_status: "Изменено",
+
+
         disable_notifications_confirm: "Вы уверены, что хотите остановить все активные уведомления?",
         clear_history_confirm: "Вы уверены, что хотите удалить всю историю уведомлений?",
         home_plan_day: "Планируй свой день, создавай задачи",
@@ -439,14 +439,14 @@ export const TRANSLATIONS = {
         tab_expenses: "Расходы",
         execution_time: "Время выполнения",
         time_elapsed: "Прошло времени",
-        minutes_short: "мин",
-        hours_short: "ч",
-        days_short: "д",
+
+
+
         security: "Безопасность",
-        location_error: "Не удалось получить данные о местоположении",
-        location_services: "Службы геолокации",
-        location_services_desc: "Для прогноза погоды требуется доступ к местоположению, разрешите в настройках.",
-        current_location: "Текущее местоположение",
+
+
+
+
         enable_biometrics: "Биометрический замок",
         biometrics_desc: "Требовать Face ID / Отпечаток пальца для входа.",
         biometrics_not_available: "Биометрическая аутентификация недоступна на вашем устройстве.",
@@ -457,17 +457,17 @@ export const TRANSLATIONS = {
         avg_mood: "Ср. Настроение",
         avg_rating: "Ср. Рейтинг",
         days_tracked: "Дней отслежено",
-        weather_unavailable: "Информация о погоде недоступна",
+
         test_reset: "Тест: Сбросить",
-        today_tasks_header: "На сегодня",
-        voice_input: "Голосовой ввод",
-        listening: "Слушаю...",
-        processing: "Обработка...",
-        voice_error: "Не удалось распознавать голос",
-        mic_busy: "Микрофон в данный момент используется другим приложением или вызовом",
-        error_rate_limit: "Слишком много запросов. Пожалуйста, подождите немного.",
-        error_network: "Произошла ошибка сети. Проверьте соединение.",
-        error_voice_parse: "Голос распознан, но данные не удалось обработать.",
+        today_tasks_header: "Напоминания на сегодня",
+
+
+
+
+
+
+
+
     },
 };
 

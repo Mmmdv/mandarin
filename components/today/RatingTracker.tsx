@@ -3,7 +3,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { resetRating, selectDayData, setRating } from '@/store/slices/todaySlice';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import StyledText from '../StyledText';
@@ -18,6 +18,8 @@ export default function RatingTracker() {
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const shakeAnim = useRef(new Animated.Value(0)).current;
+
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const triggerHaptics = async (rating: number) => {
         try {
@@ -80,14 +82,19 @@ export default function RatingTracker() {
 
     const theme = currentRating ? getRatingTheme(currentRating) : null;
 
+    const containerColor = theme?.color || '#F59E0B';
+
     return (
-        <View style={[homeStyles.card, { backgroundColor: colors.SECONDARY_BACKGROUND, padding: 16, minHeight: 140 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, zIndex: 10 }}>
-                <View style={[styles.iconContainer, { backgroundColor: theme?.color || '#F59E0B' }]}>
-                    <Ionicons name={(theme?.icon as any) || "star"} size={17} color="#FFF" />
+        <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 140 : undefined }]}>
+            <Pressable
+                onPress={() => setIsExpanded(!isExpanded)}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, zIndex: 10 }}
+            >
+                <View style={[styles.iconContainer, { backgroundColor: `${theme?.color || '#F59E0B'}55` }]}>
+                    <Ionicons name={(theme?.icon as any) || "star"} size={17} color={colors.SECTION_TEXT} />
                 </View>
                 <StyledText
-                    style={[homeStyles.cardTitle, { color: colors.PRIMARY_TEXT, fontSize: 14, flex: 1, marginBottom: 0 }]}
+                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0 }]}
                     adjustsFontSizeToFit={true}
                     minimumFontScale={0.8}
                 >
@@ -104,59 +111,66 @@ export default function RatingTracker() {
                         <Ionicons name="refresh" size={16} color={colors.PLACEHOLDER} />
                     </Pressable>
                 )}
-            </View>
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto' }}>
+                    <Ionicons name={isExpanded ? "chevron-down" : "chevron-forward"} size={14} color={colors.SECTION_TEXT} />
+                </View>
+            </Pressable>
 
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-                {!currentRating ? (
-                    <View style={styles.ratingRow}>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                            <Pressable
-                                key={num}
-                                onPress={() => handleSelect(num)}
-                                style={({ pressed }) => [
-                                    styles.ratingButton,
+            {isExpanded && (
+                <>
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                        {!currentRating ? (
+                            <View style={styles.ratingRow}>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                                    <Pressable
+                                        key={num}
+                                        onPress={() => handleSelect(num)}
+                                        style={({ pressed }) => [
+                                            styles.ratingButton,
+                                            {
+                                                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                                                borderColor: 'rgba(255, 255, 255, 0.15)',
+                                                opacity: pressed ? 0.7 : 1
+                                            }
+                                        ]}
+                                    >
+                                        <StyledText style={{
+                                            color: colors.PRIMARY_TEXT,
+                                            fontWeight: 'bold',
+                                            fontSize: 12
+                                        }}>
+                                            {num}
+                                        </StyledText>
+                                    </Pressable>
+                                ))}
+                            </View>
+                        ) : (
+                            <Animated.View
+                                style={[
+                                    styles.selectedContainer,
                                     {
-                                        backgroundColor: colors.PRIMARY_BACKGROUND,
-                                        borderColor: colors.PRIMARY_BORDER,
-                                        opacity: pressed ? 0.7 : 1
+                                        transform: [
+                                            { scale: scaleAnim },
+                                            { translateX: shakeAnim }
+                                        ],
+                                        opacity: currentRating ? 1 : 0
                                     }
                                 ]}
                             >
-                                <StyledText style={{
-                                    color: colors.PRIMARY_TEXT,
-                                    fontWeight: 'bold',
-                                    fontSize: 12
-                                }}>
-                                    {num}
-                                </StyledText>
-                            </Pressable>
-                        ))}
+                                <View style={styles.selectionMain}>
+                                    <StyledText style={[styles.selectedValue, { color: theme?.color || colors.PRIMARY_TEXT }]}>
+                                        {currentRating}
+                                    </StyledText>
+                                    <StyledText style={[styles.maxRating, { color: colors.PLACEHOLDER }]}>/ 10</StyledText>
+                                </View>
+                            </Animated.View>
+                        )}
                     </View>
-                ) : (
-                    <Animated.View
-                        style={[
-                            styles.selectedContainer,
-                            {
-                                transform: [
-                                    { scale: scaleAnim },
-                                    { translateX: shakeAnim }
-                                ],
-                                opacity: currentRating ? 1 : 0
-                            }
-                        ]}
-                    >
-                        <View style={styles.selectionMain}>
-                            <StyledText style={[styles.selectedValue, { color: theme?.color || colors.PRIMARY_TEXT }]}>
-                                {currentRating}
-                            </StyledText>
-                            <StyledText style={[styles.maxRating, { color: colors.PLACEHOLDER }]}>/ 10</StyledText>
-                        </View>
-                    </Animated.View>
-                )}
-            </View>
 
+                </>
+            )}
             <View
-                style={[homeStyles.decorativeCircle, { backgroundColor: theme?.color ? `${theme.color}20` : 'rgba(245, 158, 11, 0.1)' }]}
+                style={[homeStyles.decorativeCircle, { backgroundColor: theme?.color ? `${theme.color}3A` : 'rgba(245, 158, 11, 0.25)', width: 80, height: 80, borderRadius: 40 }]}
                 pointerEvents="none"
             />
         </View>
@@ -180,8 +194,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     iconContainer: {
-        width: 26,
-        height: 26,
+        width: 30,
+        height: 30,
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',

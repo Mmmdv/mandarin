@@ -187,7 +187,7 @@ export default function Home() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 10 }]}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("welcome")}
@@ -230,7 +230,7 @@ export default function Home() {
                 {viewMode === "card" ? (
                     <>
                         {/* 1. Full Width - Dynamic Main Card */}
-                        <View style={styles.row}>
+                        <View style={[styles.row, { marginTop: 6 }]}>
                             {renderCard(dynamicFeatures[0], width - (PADDING * 2), 160, true)}
                         </View>
 
@@ -252,7 +252,7 @@ export default function Home() {
                         </View>
                     </>
                 ) : (
-                    <View style={styles.listContainer}>
+                    <View style={[styles.listContainer, { marginTop: 6 }]}>
                         {dynamicFeatures.map(item => renderListItem(item))}
                     </View>
                 )}

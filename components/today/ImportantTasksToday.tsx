@@ -15,6 +15,7 @@ export default function ImportantTasksToday() {
     const todos = useSelector(selectTodos);
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(true);
 
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
@@ -59,94 +60,109 @@ export default function ImportantTasksToday() {
     };
 
     return (
-        <View style={[homeStyles.card, { backgroundColor: colors.SECONDARY_BACKGROUND, padding: 16, minHeight: 140 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 16, zIndex: 10 }}>
-                <View style={[styles.iconContainer, { backgroundColor: '#3B82F6' }]}>
-                    <Ionicons name="notifications" size={17} color="#FFF" />
+        <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 140 : undefined }]}>
+            <Pressable
+                onPress={() => setIsExpanded(!isExpanded)}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: isExpanded ? 16 : 0, zIndex: 10 }}
+            >
+                <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.55)' }]}>
+                    <Ionicons name="notifications" size={17} color={colors.SECTION_TEXT} />
                 </View>
                 <StyledText
-                    style={[homeStyles.cardTitle, { color: colors.PRIMARY_TEXT, fontSize: 14, flex: 1, marginBottom: 0 }]}
+                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, marginBottom: 0 }]}
                 >
                     {t('today_tasks_header')}
                 </StyledText>
                 {todayTasks.length > 0 && (
-                    <View style={[styles.badge, { backgroundColor: '#3B82F6' }]}>
-                        <StyledText style={styles.badgeText}>{todayTasks.length}</StyledText>
+                    <View style={[styles.badge, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+                        <StyledText style={[styles.badgeText, { color: colors.SECTION_TEXT }]}>{todayTasks.length}</StyledText>
                     </View>
                 )}
-            </View>
-
-            {todayTasks.length === 0 ? (
-                <View style={styles.emptyContainer}>
-                    <View style={[styles.emptyIconContainer, { backgroundColor: colors.PRIMARY_BORDER }]}>
-                        <Ionicons name="checkmark-done-circle" size={40} color="#fefeffff" />
-                    </View>
-                    <StyledText style={[styles.emptyText, { color: colors.PRIMARY_BORDER }]}>
-                        {t('today_no_tasks')}
-                    </StyledText>
-                    <StyledText style={[styles.emptySubtext, { color: colors.PRIMARY_BORDER }]}>
-                        {t('today_have_nice_day')}
-                    </StyledText>
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto' }}>
+                    <Ionicons
+                        name={isExpanded ? "chevron-down" : "chevron-forward"}
+                        size={14}
+                        color={colors.SECTION_TEXT}
+                    />
                 </View>
-            ) : (
-                <View style={styles.tasksContainer}>
-                    {todayTasks.slice(0, 2).map((task, index) => (
-                        <Pressable
-                            key={task.id}
-                            style={({ pressed }) => [
-                                styles.taskItem,
-                                {
-                                    backgroundColor: '#0c1018ff',
-                                    opacity: pressed ? 0.7 : 1,
-                                    transform: [{ scale: pressed ? 0.98 : 1 }]
-                                }
-                            ]}
-                            onPress={handleTaskPress}
-                        >
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                                <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(task, index) }]} />
-                                <View style={[styles.taskContent, { flex: 1 }]}>
-                                    <StyledText
-                                        style={[styles.taskTitle, { color: colors.PRIMARY_TEXT }]}
-                                        numberOfLines={1}
-                                    >
-                                        {task.title}
-                                    </StyledText>
-                                    <View style={styles.taskFooter}>
-                                        <View style={styles.timeContainer}>
-                                            <Ionicons name="time-outline" size={11} color={colors.PLACEHOLDER} />
-                                            <StyledText style={[styles.timeText, { color: colors.PLACEHOLDER }]}>
-                                                {getTimeFromReminder(task.reminder!)}
-                                            </StyledText>
-                                        </View>
-                                    </View>
-                                </View>
-                                <Ionicons name="chevron-forward" size={14} color={colors.PLACEHOLDER} style={{ marginLeft: 8 }} />
+            </Pressable>
+
+            {isExpanded && (
+                <>
+                    {todayTasks.length === 0 ? (
+                        <View style={styles.emptyContainer}>
+                            <View style={[styles.emptyIconContainer, { backgroundColor: colors.PRIMARY_BORDER }]}>
+                                <Ionicons name="checkmark-done-circle" size={40} color="#fefeffff" />
                             </View>
-                        </Pressable>
-                    ))}
-                    {todayTasks.length > 2 && (
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.viewAllButton,
-                                {
-                                    backgroundColor: '#3B82F6',
-                                    opacity: pressed ? 0.9 : 1,
-                                    transform: [{ scale: pressed ? 0.98 : 1 }]
-                                }
-                            ]}
-                            onPress={handleViewAll}
-                        >
-                            <StyledText style={styles.viewAllText}>
-                                {t('today_view_more')} ({todayTasks.length - 2})
+                            <StyledText style={[styles.emptyText, { color: colors.PRIMARY_BORDER }]}>
+                                {t('today_no_tasks')}
                             </StyledText>
-                            <Ionicons name="arrow-forward" size={14} color="#FFF" />
-                        </Pressable>
+                            <StyledText style={[styles.emptySubtext, { color: colors.PRIMARY_BORDER }]}>
+                                {t('today_have_nice_day')}
+                            </StyledText>
+                        </View>
+                    ) : (
+                        <View style={styles.tasksContainer}>
+                            {todayTasks.slice(0, 2).map((task, index) => (
+                                <Pressable
+                                    key={task.id}
+                                    style={({ pressed }) => [
+                                        styles.taskItem,
+                                        {
+                                            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                                            borderWidth: 1,
+                                            borderColor: 'rgba(59, 130, 246, 0.1)',
+                                            opacity: pressed ? 0.7 : 1,
+                                            transform: [{ scale: pressed ? 0.98 : 1 }]
+                                        }
+                                    ]}
+                                    onPress={handleTaskPress}
+                                >
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                                        <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(task, index) }]} />
+                                        <View style={[styles.taskContent, { flex: 1 }]}>
+                                            <StyledText
+                                                style={[styles.taskTitle, { color: colors.PRIMARY_TEXT }]}
+                                                numberOfLines={1}
+                                            >
+                                                {task.title}
+                                            </StyledText>
+                                            <View style={styles.taskFooter}>
+                                                <View style={styles.timeContainer}>
+                                                    <Ionicons name="notifications-outline" size={13} color="rgba(59, 130, 246, 0.8)" />
+                                                    <StyledText style={[styles.timeText, { color: "rgba(59, 130, 246, 0.8)" }]}>
+                                                        {getTimeFromReminder(task.reminder!)}
+                                                    </StyledText>
+                                                </View>
+                                            </View>
+                                        </View>
+                                        <Ionicons name="chevron-forward" size={14} color="rgba(59, 130, 246, 0.5)" style={{ marginLeft: 8 }} />
+                                    </View>
+                                </Pressable>
+                            ))}
+                            {todayTasks.length > 2 && (
+                                <Pressable
+                                    style={({ pressed }) => [
+                                        styles.viewAllButton,
+                                        {
+                                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                            opacity: pressed ? 0.7 : 1,
+                                            transform: [{ scale: pressed ? 0.98 : 1 }]
+                                        }
+                                    ]}
+                                    onPress={handleViewAll}
+                                >
+                                    <StyledText style={[styles.viewAllText, { color: '#3B82F6' }]}>
+                                        {t('today_view_more')} ({todayTasks.length - 2})
+                                    </StyledText>
+                                    <Ionicons name="arrow-forward" size={14} color="#3B82F6" />
+                                </Pressable>
+                            )}
+                        </View>
                     )}
-                </View>
+                </>
             )}
-
-            <View style={[homeStyles.decorativeCircle, { backgroundColor: 'rgba(20, 184, 166, 0.1)' }]} />
+            <View style={[homeStyles.decorativeCircle, { backgroundColor: 'rgba(59, 130, 246, 0.3)', width: 80, height: 80, borderRadius: 40 }]} />
 
             <TodayTasksModal
                 isOpen={isModalOpen}
@@ -237,7 +253,7 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     timeText: {
-        fontSize: 9, // Increased from 9
+        fontSize: 11, // Increased from 9
         fontWeight: '500',
     },
     viewAllButton: {
@@ -261,8 +277,8 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     iconContainer: {
-        width: 26,
-        height: 26,
+        width: 30,
+        height: 30,
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',

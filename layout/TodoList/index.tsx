@@ -197,22 +197,22 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 {/* To Do Section */}
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
-                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(79, 70, 229, 0.15)', borderWidth: 1, borderColor: 'rgba(79, 70, 229, 0.3)' }]}
+                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(79, 70, 229, 0.15)', borderWidth: 0.2, borderColor: 'rgba(79, 70, 229, 0.3)' }]}
                         onPress={() => toggleSection(setTodoExpanded)}
                         disabled={sortedPendingTodos.length === 0}
                     >
                         <View style={[styles.sectionTitleContainer, sortedPendingTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
                             <View style={[styles.iconContainer, { backgroundColor: 'rgba(79, 70, 229, 0.2)' }]}>
-                                <Ionicons name="list" size={16} color="#4F46E5" />
+                                <Ionicons name="list" size={16} color={colors.SECTION_TEXT} />
                             </View>
                             <StyledText style={[
                                 styles.sectionTitleCard,
-                                { color: '#4F46E5' }
+                                { color: colors.SECTION_TEXT }
                             ]}>
                                 {t("todo")}
                             </StyledText>
                             <View style={[styles.cardBadge, { backgroundColor: 'rgba(79, 70, 229, 0.2)' }]}>
-                                <StyledText style={[styles.cardBadgeText, { color: '#4F46E5' }]}>{sortedPendingTodos.length}</StyledText>
+                                <StyledText style={[styles.cardBadgeText, { color: colors.SECTION_TEXT }]}>{sortedPendingTodos.length}</StyledText>
                             </View>
                         </View>
                         <View style={[styles.sectionControls, { zIndex: 2 }]}>
@@ -243,8 +243,8 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             <View style={styles.chevronZone}>
                                 <Ionicons
                                     name={todoExpanded ? "chevron-down" : "chevron-forward"}
-                                    size={18}
-                                    color="#4F46E5"
+                                    size={14}
+                                    color={colors.SECTION_TEXT}
                                     style={[sortedPendingTodos.length === 0 && { opacity: 0.5 }]}
                                 />
                             </View>
@@ -275,22 +275,22 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 {/* Done Section */}
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
-                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' }]}
+                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 0.2, borderColor: 'rgba(16, 185, 129, 0.3)' }]}
                         onPress={() => toggleSection(setDoneExpanded)}
                         disabled={sortedCompletedTodos.length === 0}
                     >
                         <View style={[styles.sectionTitleContainer, sortedCompletedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
                             <View style={[styles.iconContainer, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                                <Ionicons name="checkmark-done-circle" size={16} color="rgba(16, 185, 129, 0.8)" />
+                                <Ionicons name="checkmark-done-circle" size={16} color={colors.SECTION_TEXT} />
                             </View>
                             <StyledText style={[
                                 styles.sectionTitleCard,
-                                { color: 'rgba(16, 185, 129, 0.8)' }
+                                { color: colors.SECTION_TEXT }
                             ]}>
                                 {t("done")}
                             </StyledText>
                             <View style={[styles.cardBadge, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
-                                <StyledText style={[styles.cardBadgeText, { color: 'rgba(16, 185, 129, 0.8)' }]}>{sortedCompletedTodos.length}</StyledText>
+                                <StyledText style={[styles.cardBadgeText, { color: colors.SECTION_TEXT }]}>{sortedCompletedTodos.length}</StyledText>
                             </View>
                         </View>
                         <View style={[styles.sectionControls, { zIndex: 2 }]}>
@@ -318,8 +318,8 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             <View style={styles.chevronZone}>
                                 <Ionicons
                                     name={doneExpanded ? "chevron-down" : "chevron-forward"}
-                                    size={18}
-                                    color="rgba(16, 185, 129, 0.7)"
+                                    size={14}
+                                    color={colors.SECTION_TEXT}
                                 />
                             </View>
                         </View>
@@ -353,22 +353,22 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 {/* Archive Section */}
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
-                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderWidth: 1, borderColor: 'rgba(139, 92, 246, 0.3)' }]}
+                        style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderWidth: 0.2, borderColor: 'rgba(139, 92, 246, 0.3)' }]}
                         onPress={() => toggleSection(setArchiveExpanded)}
                         disabled={sortedArchivedTodos.length === 0}
                     >
                         <View style={[styles.sectionTitleContainer, sortedArchivedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
                             <View style={[styles.iconContainer, { backgroundColor: 'rgba(139, 92, 246, 0.15)' }]}>
-                                <Ionicons name="archive" size={16} color="rgba(139, 92, 246, 0.8)" />
+                                <Ionicons name="archive" size={16} color={colors.SECTION_TEXT} />
                             </View>
                             <StyledText style={[
                                 styles.sectionTitleCard,
-                                { color: 'rgba(139, 92, 246, 0.8)' }
+                                { color: colors.SECTION_TEXT }
                             ]}>
                                 {t("archive")}
                             </StyledText>
                             <View style={[styles.cardBadge, { backgroundColor: 'rgba(139, 92, 246, 0.15)' }]}>
-                                <StyledText style={[styles.cardBadgeText, { color: 'rgba(139, 92, 246, 0.8)' }]}>{sortedArchivedTodos.length}</StyledText>
+                                <StyledText style={[styles.cardBadgeText, { color: colors.SECTION_TEXT }]}>{sortedArchivedTodos.length}</StyledText>
                             </View>
                         </View>
                         <View style={[styles.sectionControls, { zIndex: 2 }]}>
@@ -399,8 +399,8 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             <View style={styles.chevronZone}>
                                 <Ionicons
                                     name={archiveExpanded ? "chevron-down" : "chevron-forward"}
-                                    size={18}
-                                    color="rgba(139, 92, 246, 0.7)"
+                                    size={14}
+                                    color={colors.SECTION_TEXT}
                                     style={[sortedArchivedTodos.length === 0 && { opacity: 0.5 }]}
                                 />
                             </View>

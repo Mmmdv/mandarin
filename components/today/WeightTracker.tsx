@@ -32,6 +32,7 @@ export default function WeightTracker() {
     const initialWeight = lastWeight || 70;
     const [localWeight, setLocalWeight] = useState<number>(dayData?.weight || initialWeight);
     const [containerWidth, setContainerWidth] = useState(0);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const currentWeight = dayData?.weight;
 
@@ -75,10 +76,10 @@ export default function WeightTracker() {
     };
 
     useEffect(() => {
-        if (!currentWeight && containerWidth > 0) {
+        if (!currentWeight && containerWidth > 0 && isExpanded) {
             scrollToWeight(localWeight, false);
         }
-    }, [containerWidth, currentWeight]);
+    }, [containerWidth, currentWeight, isExpanded]);
 
     const startSelectedAnimation = () => {
         fadeAnim.setValue(0);
@@ -141,14 +142,19 @@ export default function WeightTracker() {
 
     const comp = getWeightComparison();
 
+    const containerColor = comp?.color || '#10B981';
+
     return (
-        <View style={[homeStyles.card, { backgroundColor: colors.SECONDARY_BACKGROUND, padding: 16, minHeight: 160 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, zIndex: 10 }}>
-                <View style={[styles.iconContainer, { backgroundColor: comp?.color || '#10B981' }]}>
-                    <Ionicons name="barbell" size={17} color="#FFF" />
+        <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 160 : undefined }]}>
+            <Pressable
+                onPress={() => setIsExpanded(!isExpanded)}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, zIndex: 10 }}
+            >
+                <View style={[styles.iconContainer, { backgroundColor: `${comp?.color || '#10B981'}55` }]}>
+                    <Ionicons name="barbell" size={17} color={colors.SECTION_TEXT} />
                 </View>
                 <StyledText
-                    style={[homeStyles.cardTitle, { color: colors.PRIMARY_TEXT, fontSize: 14, flex: 1, marginBottom: 0 }]}
+                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0 }]}
                     adjustsFontSizeToFit={true}
                     minimumFontScale={0.8}
                 >
@@ -159,97 +165,104 @@ export default function WeightTracker() {
                         <Ionicons name="refresh" size={18} color={colors.PLACEHOLDER} />
                     </Pressable>
                 )}
-            </View>
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto' }}>
+                    <Ionicons name={isExpanded ? "chevron-down" : "chevron-forward"} size={14} color={colors.SECTION_TEXT} />
+                </View>
+            </Pressable>
 
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-                {!currentWeight ? (
-                    <View style={styles.contentContainer}>
-                        <View
-                            style={styles.rulerContainer}
-                            onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
-                        >
-                            <View style={[styles.pointer, { backgroundColor: '#10B981' }]} />
-                            <FlatList
-                                ref={flatListRef}
-                                data={WEIGHT_DATA}
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                snapToInterval={ITEM_WIDTH}
-                                decelerationRate="fast"
-                                onScroll={handleScroll}
-                                scrollEventThrottle={16}
-                                getItemLayout={(_, index) => ({
-                                    length: ITEM_WIDTH,
-                                    offset: ITEM_WIDTH * index,
-                                    index,
-                                })}
-                                contentContainerStyle={{
-                                    paddingHorizontal: containerWidth / 2,
-                                }}
-                                keyExtractor={(item) => item.value.toString()}
-                                renderItem={({ item }) => (
-                                    <View style={[styles.tickContainer, { width: ITEM_WIDTH }]}>
-                                        <View
-                                            style={[
-                                                styles.tick,
-                                                {
-                                                    backgroundColor: colors.PRIMARY_BORDER,
-                                                    height: item.isMajor ? 32 : item.isMedium ? 22 : 14,
-                                                    width: item.isMajor ? 2.5 : 1.5,
-                                                    opacity: item.isMajor ? 1 : 0.4
-                                                }
-                                            ]}
-                                        />
-                                        {item.isMajor && (
-                                            <StyledText style={[styles.tickLabel, { color: colors.PLACEHOLDER }]}>
-                                                {item.value}
-                                            </StyledText>
+            {isExpanded && (
+                <>
+                    <View style={{ flex: 1, justifyContent: 'center', marginTop: 10 }}>
+                        {!currentWeight ? (
+                            <View style={styles.contentContainer}>
+                                <View
+                                    style={styles.rulerContainer}
+                                    onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+                                >
+                                    <View style={[styles.pointer, { backgroundColor: '#10B981' }]} />
+                                    <FlatList
+                                        ref={flatListRef}
+                                        data={WEIGHT_DATA}
+                                        horizontal
+                                        showsHorizontalScrollIndicator={false}
+                                        snapToInterval={ITEM_WIDTH}
+                                        decelerationRate="fast"
+                                        onScroll={handleScroll}
+                                        scrollEventThrottle={16}
+                                        getItemLayout={(_, index) => ({
+                                            length: ITEM_WIDTH,
+                                            offset: ITEM_WIDTH * index,
+                                            index,
+                                        })}
+                                        contentContainerStyle={{
+                                            paddingHorizontal: containerWidth / 2,
+                                        }}
+                                        keyExtractor={(item) => item.value.toString()}
+                                        renderItem={({ item }) => (
+                                            <View style={[styles.tickContainer, { width: ITEM_WIDTH }]}>
+                                                <View
+                                                    style={[
+                                                        styles.tick,
+                                                        {
+                                                            backgroundColor: colors.PRIMARY_BORDER,
+                                                            height: item.isMajor ? 32 : item.isMedium ? 22 : 14,
+                                                            width: item.isMajor ? 2.5 : 1.5,
+                                                            opacity: item.isMajor ? 1 : 0.4
+                                                        }
+                                                    ]}
+                                                />
+                                                {item.isMajor && (
+                                                    <StyledText style={[styles.tickLabel, { color: colors.PLACEHOLDER }]}>
+                                                        {item.value}
+                                                    </StyledText>
+                                                )}
+                                            </View>
                                         )}
+                                    />
+                                </View>
+
+                                <Pressable
+                                    style={({ pressed }) => [
+                                        styles.confirmButton,
+                                        {
+                                            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                            transform: [{ scale: pressed ? 0.96 : 1 }],
+                                            opacity: pressed ? 0.9 : 1
+                                        }
+                                    ]}
+                                    onPress={handleConfirm}
+                                >
+                                    <StyledText style={[styles.buttonText, { color: '#10B981' }]}>
+                                        {localWeight.toFixed(1)} <StyledText style={[styles.buttonUnit, { color: '#10B981', opacity: 0.8 }]}>kg</StyledText>
+                                    </StyledText>
+                                    <Ionicons name="checkmark-circle" size={20} color="#10B981" style={{ marginLeft: 8 }} />
+                                </Pressable>
+                            </View>
+                        ) : (
+                            <Animated.View style={[styles.selectedContainer, { transform: [{ scale: scaleAnim }], opacity: fadeAnim }]}>
+                                <View style={styles.weightValueRow}>
+                                    <StyledText style={[styles.selectedValue, { color: comp?.color || colors.PRIMARY_TEXT }]}>
+                                        {currentWeight}
+                                    </StyledText>
+                                    <StyledText style={[styles.unit, { color: colors.PLACEHOLDER }]}>kg</StyledText>
+                                </View>
+
+                                {comp && (
+                                    <View style={[styles.feedbackBadge, { backgroundColor: `${comp.color}15` }]}>
+                                        <Ionicons name={comp.icon} size={14} color={comp.color} />
+                                        <StyledText style={[styles.diffText, { color: comp.color }]}>
+                                            {comp.diff} kg
+                                        </StyledText>
                                     </View>
                                 )}
-                            />
-                        </View>
-
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.confirmButton,
-                                {
-                                    backgroundColor: '#10B981',
-                                    transform: [{ scale: pressed ? 0.96 : 1 }],
-                                    opacity: pressed ? 0.9 : 1
-                                }
-                            ]}
-                            onPress={handleConfirm}
-                        >
-                            <StyledText style={styles.buttonText}>
-                                {localWeight.toFixed(1)} <StyledText style={styles.buttonUnit}>kg</StyledText>
-                            </StyledText>
-                            <Ionicons name="checkmark-circle" size={20} color="#FFF" style={{ marginLeft: 8 }} />
-                        </Pressable>
-                    </View>
-                ) : (
-                    <Animated.View style={[styles.selectedContainer, { transform: [{ scale: scaleAnim }], opacity: fadeAnim }]}>
-                        <View style={styles.weightValueRow}>
-                            <StyledText style={[styles.selectedValue, { color: comp?.color || colors.PRIMARY_TEXT }]}>
-                                {currentWeight}
-                            </StyledText>
-                            <StyledText style={[styles.unit, { color: colors.PLACEHOLDER }]}>kg</StyledText>
-                        </View>
-
-                        {comp && (
-                            <View style={[styles.feedbackBadge, { backgroundColor: `${comp.color}15` }]}>
-                                <Ionicons name={comp.icon} size={14} color={comp.color} />
-                                <StyledText style={[styles.diffText, { color: comp.color }]}>
-                                    {comp.diff} kg
-                                </StyledText>
-                            </View>
+                            </Animated.View>
                         )}
-                    </Animated.View>
-                )}
-            </View>
+                    </View>
 
+                </>
+            )}
             <View
-                style={[homeStyles.decorativeCircle, { backgroundColor: comp?.color ? `${comp.color}20` : 'rgba(16, 185, 129, 0.1)' }]}
+                style={[homeStyles.decorativeCircle, { backgroundColor: comp?.color ? `${comp.color}3A` : 'rgba(16, 185, 129, 0.25)', width: 80, height: 80, borderRadius: 40 }]}
                 pointerEvents="none"
             />
         </View>
@@ -348,8 +361,8 @@ const styles = StyleSheet.create({
         padding: 6,
     },
     iconContainer: {
-        width: 26,
-        height: 26,
+        width: 30,
+        height: 30,
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',

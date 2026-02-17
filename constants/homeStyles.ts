@@ -97,7 +97,7 @@ export const styles = StyleSheet.create({
     listItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 16,
+        borderRadius: 24,
         padding: 14,
         gap: 14,
         shadowColor: "#000",

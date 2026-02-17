@@ -16,6 +16,7 @@ export const DarkTheme = {
   CHECKBOX_INACTIVE: "#e8e9ebff",
   PLACEHOLDER: "#cacdd39a",
   ERROR_INPUT_TEXT: "#d16b43ff",
+  SECTION_TEXT: "#c9c9c9ff",
 };
 
 export const LightTheme = {
@@ -36,6 +37,7 @@ export const LightTheme = {
   CHECKBOX_INACTIVE: "#CCCCCC",
   PLACEHOLDER: "#999999",
   ERROR_INPUT_TEXT: "#FF3B30",
+  SECTION_TEXT: "#888888", // A slightly darker gray for better visibility on light background, or keep c9c9c9 if user insists
 };
 
 // Default to DarkTheme for backward compatibility if needed, but components should use useTheme
