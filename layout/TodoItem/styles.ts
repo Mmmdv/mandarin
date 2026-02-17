@@ -40,14 +40,16 @@ export const styles = StyleSheet.create({
     },
     cardBody: {
         flex: 1,
-        justifyContent: 'flex-start',
-        paddingVertical: 5, // More space for the title
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        paddingVertical: 5,
     },
     cardTitle: {
-        fontSize: 15.5,
+        fontSize: 14,
         fontWeight: '600',
-        lineHeight: 22,
+        lineHeight: 20,
         letterSpacing: 0.1,
+        textAlign: 'left',
     },
     cardOverlay: {
         position: 'absolute',
@@ -73,7 +75,7 @@ export const styles = StyleSheet.create({
         gap: 6,
     },
     cardTime: {
-        fontSize: 8.5,
+        fontSize: 7.5,
         color: COLORS.PLACEHOLDER,
         fontWeight: '600',
     },
@@ -82,14 +84,14 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     cardTimeSmall: {
-        fontSize: 8.5,
+        fontSize: 7.5,
         fontWeight: '500',
         marginTop: 1,
         opacity: 0.8,
     },
     cardControls: {
         flexDirection: 'row',
-        gap: 10,
+        gap: 6,
     },
     customCheckbox: {
         width: 22,

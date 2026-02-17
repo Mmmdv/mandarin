@@ -1,5 +1,7 @@
+import { schedulePushNotification } from "@/constants/notifications"; // Added
 import { useAppDispatch, useAppSelector } from "@/store";
-import { updateNotificationStatus } from "@/store/slices/notificationSlice";
+import { selectAppSettings } from "@/store/slices/appSlice"; // Added
+import { addNotification, updateNotificationStatus } from "@/store/slices/notificationSlice";
 import { addTodo, archiveAllTodos, archiveTodo, checkTodo, clearArchive, deleteTodo, editTodo, selectTodos } from "@/store/slices/todoSlice";
 import { Todo } from "@/types/todo";
 import * as Notifications from 'expo-notifications';
@@ -12,6 +14,7 @@ const generateId = (): string => {
 const useTodo = () => {
     const todos = useAppSelector(selectTodos);
     const dispatch = useAppDispatch();
+    const settings = useAppSelector(selectAppSettings); // Added
 
     const notifications = useAppSelector(state => state.notification.notifications);
 
@@ -24,6 +27,57 @@ const useTodo = () => {
             reminder,
             notificationId
         }))
+    }
+
+    const onRetryTodo = async (id: Todo["id"], delayType: 'hour' | 'day' | 'week' | 'month', categoryTitle?: string, categoryIcon?: string) => {
+        const todo = todos.find(t => t.id === id);
+        if (!todo) return;
+
+        let newReminder: string | undefined;
+        let newNotificationId: string | undefined;
+
+        const baseDate = todo.reminder ? new Date(todo.reminder) : new Date();
+        const newDate = new Date(baseDate);
+
+        switch (delayType) {
+            case 'hour':
+                newDate.setHours(newDate.getHours() + 1);
+                break;
+            case 'day':
+                newDate.setDate(newDate.getDate() + 1);
+                break;
+            case 'week':
+                newDate.setDate(newDate.getDate() + 7);
+                break;
+            case 'month':
+                newDate.setMonth(newDate.getMonth() + 1);
+                break;
+        }
+
+        newReminder = newDate.toISOString();
+
+        if (newDate > new Date() && settings.notificationsEnabled && settings.todoNotifications) {
+            const displayTitle = categoryTitle || "Tapşırıqlar";
+            newNotificationId = await schedulePushNotification(displayTitle, todo.title, newDate, categoryIcon);
+            if (newNotificationId) {
+                dispatch(addNotification({
+                    id: newNotificationId,
+                    title: displayTitle,
+                    body: todo.title,
+                    date: newDate.toISOString(),
+                    categoryIcon,
+                }));
+            }
+        }
+
+        dispatch(addTodo({
+            id: generateId(),
+            title: todo.title,
+            isCompleted: false,
+            createdAt: new Date().toISOString(),
+            reminder: newReminder,
+            notificationId: newNotificationId
+        }));
     }
 
     const onDeleteTodo = async (id: Todo["id"]) => {
@@ -108,6 +162,7 @@ const useTodo = () => {
 
     return {
         onAddTodo,
+        onRetryTodo, // Added
         onDeleteTodo,
         onEditTodo,
         onCheckTodo,

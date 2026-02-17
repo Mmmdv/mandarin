@@ -19,6 +19,12 @@ export const TRANSLATIONS = {
         pending: "Gözlənilir",
 
         share_message: "Taskify — gününüzü planlaşdırmaq üçün gözəl tətbiq! 🚀",
+        retry_confirm_title: "Təkrarla",
+        retry_confirm_message: "Bu tapşırığı nə vaxt təkrarlamaq istəyirsiniz?",
+        retry_1_hour: "+ 1 saat",
+        retry_1_day: "+ 1 gün",
+        retry_1_week: "+ 1 həftə",
+        retry_1_month: "+ 1 ay",
         archive_confirm_title: "Arxivləşdirmək istəyirsiniz?",
         archive_confirm_message: "Bu tapşırığı arxivə göndərmək istədiyinizə əminsiniz?",
         delete_confirm_title: "Silmək istəyirsiniz?",
@@ -147,6 +153,10 @@ export const TRANSLATIONS = {
         test_reset: "Test: Sıfırla",
         today_tasks_header: "Bugün üçün xatırlatmalar",
 
+        days_short: "gün",
+        hours_short: "saat",
+        minutes_short: "dəq",
+
 
 
 
@@ -175,6 +185,12 @@ export const TRANSLATIONS = {
         pending: "Pending",
 
         share_message: "Check out Taskify — a beautiful to-do app to organize your day! 🚀",
+        retry_confirm_title: "Retry",
+        retry_confirm_message: "When would you like to retry this task?",
+        retry_1_hour: "+ 1 hour",
+        retry_1_day: "+ 1 day",
+        retry_1_week: "+ 1 week",
+        retry_1_month: "+ 1 month",
         archive_confirm_title: "Archive Task?",
         archive_confirm_message: "Are you sure you want to archive this task?",
         delete_confirm_title: "Delete Task?",
@@ -304,6 +320,10 @@ export const TRANSLATIONS = {
         test_reset: "Test: Reset",
         today_tasks_header: "Reminders for today",
 
+        days_short: "d",
+        hours_short: "h",
+        minutes_short: "m",
+
 
 
 
@@ -332,6 +352,12 @@ export const TRANSLATIONS = {
         pending: "Ожидается",
 
         share_message: "Попробуй Taskify — красивое приложение для планирования дня! 🚀",
+        retry_confirm_title: "Повторить",
+        retry_confirm_message: "На какое время вы хотите отложить задачу?",
+        retry_1_hour: "+ 1 час",
+        retry_1_day: "+ 1 день",
+        retry_1_week: "+ 1 неделя",
+        retry_1_month: "+ 1 месяц",
         archive_confirm_title: "Архивировать задачу?",
         archive_confirm_message: "Вы уверены, что хотите архивировать эту задачу?",
         delete_confirm_title: "Удалить задачу?",
@@ -460,6 +486,10 @@ export const TRANSLATIONS = {
 
         test_reset: "Тест: Сбросить",
         today_tasks_header: "Напоминания на сегодня",
+
+        days_short: "дн",
+        hours_short: "ч",
+        minutes_short: "мин",
 
 
 

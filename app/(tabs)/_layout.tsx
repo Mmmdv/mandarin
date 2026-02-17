@@ -5,6 +5,7 @@ export default function TabsLayout() {
     return (
         <Tabs
             tabBar={(props) => <CustomTabBar {...props} />}
+            backBehavior="history"
             screenOptions={{
                 headerShown: false,
             }}

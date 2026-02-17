@@ -27,6 +27,7 @@ export default function Index() {
     onEditTodo,
     onCheckTodo,
     onArchiveTodo,
+    onRetryTodo,
     onArchiveAll,
     onClearArchive,
   } = useTodo();
@@ -45,6 +46,7 @@ export default function Index() {
           onCheckTodo={onCheckTodo}
           onEditTodo={onEditTodo}
           onArchiveTodo={onArchiveTodo}
+          onRetryTodo={onRetryTodo}
           onArchiveAll={onArchiveAll}
           onClearArchive={onClearArchive}
           archivedTodos={archivedTodos}

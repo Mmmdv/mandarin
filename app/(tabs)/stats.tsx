@@ -2,11 +2,14 @@ import StyledText from "@/components/StyledText";
 import MonthlyStats from "@/components/today/MonthlyStats";
 import { styles } from "@/constants/homeStyles";
 import { useTheme } from "@/hooks/useTheme";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, View } from "react-native";
 
 export default function Stats() {
     const { colors, t } = useTheme();
+    const router = useRouter();
     const [refreshing, setRefreshing] = useState(false);
 
     const onRefresh = useCallback(() => {
@@ -19,6 +22,9 @@ export default function Stats() {
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
             <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+                <Pressable onPress={() => router.back()} style={{ justifyContent: 'center', paddingRight: 10 }}>
+                    <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
+                </Pressable>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("tab_stats")}

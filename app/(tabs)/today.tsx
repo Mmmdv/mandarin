@@ -1,28 +1,28 @@
+import StyledRefreshControl from "@/components/StyledRefreshControl";
 import StyledText from "@/components/StyledText";
 import ImportantTasksToday from "@/components/today/ImportantTasksToday";
 import MoodTracker from "@/components/today/MoodTracker";
 import RatingTracker from "@/components/today/RatingTracker";
 import WeightTracker from "@/components/today/WeightTracker";
 import { styles } from "@/constants/homeStyles";
+import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 export default function Today() {
     const { colors, t } = useTheme();
-    const [refreshing, setRefreshing] = React.useState(false);
-
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        // Simulate a network request or data refresh
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 2000);
-    }, []);
+    const router = useRouter();
+    const { refreshing, onRefresh } = useRefresh();
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
             <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 10 }]}>
+                <Pressable onPress={() => router.back()} style={{ justifyContent: 'center', paddingRight: 10 }}>
+                    <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
+                </Pressable>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("tab_today")}
@@ -33,15 +33,12 @@ export default function Today() {
             </View>
 
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
-                    <RefreshControl
+                    <StyledRefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={colors.PRIMARY_TEXT}
-                        colors={[colors.PRIMARY_TEXT]}
-                        progressBackgroundColor={colors.SECONDARY_BACKGROUND}
                     />
                 }
             >

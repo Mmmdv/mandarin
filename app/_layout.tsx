@@ -1,5 +1,6 @@
 import { AppStatusBar } from "@/components/AppStatusBar";
 import BiometricGuard from "@/components/BiometricGuard";
+// Force reload comment 1
 import { registerForLocalNotificationsAsync } from '@/constants/notifications';
 import Header from "@/layout/Header";
 import store, { persistor } from "@/store";

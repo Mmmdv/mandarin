@@ -1,11 +1,14 @@
+import StyledRefreshControl from "@/components/StyledRefreshControl"
 import StyledText from "@/components/StyledText"
 import { toggleAnimation } from "@/constants/animations"
 import { sortTodos } from "@/helpers/sort"
+import useRefresh from "@/hooks/useRefresh"
 import { useTheme } from "@/hooks/useTheme"
 import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
+import { useRouter } from "expo-router"
 import { useEffect, useRef, useState } from "react"
-import { LayoutAnimation, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native"
+import { LayoutAnimation, ScrollView, TouchableOpacity, View } from "react-native"
 import ArchiveAllModal from "../Modals/ArchiveAllModal.tsx"
 import ClearArchiveModal from "../Modals/ClearArchiveModal.tsx"
 import TodoItem from "../TodoItem"
@@ -18,6 +21,7 @@ type TodoListProps = {
     onCheckTodo: (id: Todo["id"]) => void
     onEditTodo: (id: Todo["id"], title: Todo["title"], reminder?: string, notificationId?: string) => void
     onArchiveTodo: (id: Todo["id"]) => void
+    onRetryTodo: (id: Todo["id"], delayType: 'hour' | 'day' | 'week' | 'month', categoryTitle?: string, categoryIcon?: string) => void
     onArchiveAll?: () => void
     onClearArchive: () => void
     archivedTodos: Todo[]
@@ -26,8 +30,9 @@ type TodoListProps = {
     categoryIcon?: string
 }
 
-const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo, onArchiveTodo, onClearArchive, archivedTodos, onArchiveAll, onAddRequest, categoryTitle, categoryIcon }) => {
+const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo, onArchiveTodo, onRetryTodo, onClearArchive, archivedTodos, onArchiveAll, onAddRequest, categoryTitle, categoryIcon }) => {
     const { colors, t } = useTheme()
+    const router = useRouter();
     const [todoSortBy, setTodoSortBy] = useState<SortBy>("date")
     const [todoSortOrder, setTodoSortOrder] = useState<SortOrder>("desc")
     const [doneSortBy, setDoneSortBy] = useState<SortBy>("date")
@@ -42,16 +47,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const [isArchiveAllModalOpen, setIsArchiveAllModalOpen] = useState(false)
     const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
 
-    const [refreshing, setRefreshing] = useState(false)
-
-
-
-    const onRefresh = () => {
-        setRefreshing(true);
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1500);
-    };
+    const { refreshing, onRefresh } = useRefresh();
 
     const pendingTodos = todos.filter(todo => !todo.isCompleted && !todo.isArchived)
     const completedTodos = todos.filter(todo => todo.isCompleted && !todo.isArchived)
@@ -95,12 +91,12 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     if (todos.length === 0 && archivedTodos.length === 0) {
         return (
             <ScrollView
-                contentContainerStyle={[styles.scrollContent, { flex: 1, justifyContent: 'center' }]}
+                style={{ flex: 1 }}
+                contentContainerStyle={[styles.scrollContent, { flexGrow: 1, justifyContent: 'center' }]}
                 refreshControl={
-                    <RefreshControl
+                    <StyledRefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={colors.PRIMARY_TEXT}
                     />
                 }
             >
@@ -151,13 +147,16 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         <StyledText style={{ color: colors.CHECKBOX_SUCCESS, fontSize: 16, fontWeight: 'bold' }}>{t("create_task")}</StyledText>
                     </TouchableOpacity>
                 </View>
-            </ScrollView>
+            </ScrollView >
         )
     }
 
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 10 }}>
+                    <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
+                </TouchableOpacity>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("tab_todo")}
@@ -183,12 +182,11 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
             <ScrollView
                 style={styles.container}
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
                 refreshControl={
-                    <RefreshControl
+                    <StyledRefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={colors.PRIMARY_TEXT}
                     />
                 }
             >
@@ -260,6 +258,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                     deleteTodo={onDeleteTodo}
                                     checkTodo={onCheckTodo}
                                     editTodo={onEditTodo}
+                                    retryTodo={onRetryTodo}
                                     categoryTitle={categoryTitle}
                                     categoryIcon={categoryIcon}
                                     category="todo"
@@ -337,6 +336,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                         checkTodo={onCheckTodo}
                                         editTodo={onEditTodo}
                                         archiveTodo={onArchiveTodo}
+                                        retryTodo={onRetryTodo}
                                         categoryTitle={categoryTitle}
                                         categoryIcon={categoryIcon}
                                         category="done"
@@ -417,6 +417,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                     checkTodo={onCheckTodo}
                                     editTodo={onEditTodo}
                                     archiveTodo={onArchiveTodo}
+                                    retryTodo={onRetryTodo}
                                     categoryTitle={categoryTitle}
                                     categoryIcon={categoryIcon}
                                     category="archive"

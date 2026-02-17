@@ -33,7 +33,7 @@ export default function MoodTracker() {
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const shakeAnim = useRef(new Animated.Value(0)).current;
 
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(true);
 
     useEffect(() => {
         if (selectedMoodId) {

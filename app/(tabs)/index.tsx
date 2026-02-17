@@ -4,9 +4,11 @@ import { useTheme } from "@/hooks/useTheme";
 import { incrementUsage, selectUsageStats } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
 // import analytics from "@react-native-firebase/analytics";
+import StyledRefreshControl from "@/components/StyledRefreshControl";
+import useRefresh from "@/hooks/useRefresh";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
-import { Dimensions, LayoutAnimation, Pressable, RefreshControl, ScrollView, View } from "react-native";
+import { Dimensions, LayoutAnimation, Pressable, ScrollView, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
 const { width } = Dimensions.get("window");
@@ -176,14 +178,7 @@ export default function Home() {
         );
     }, [handlePress, colors]);
 
-    const [refreshing, setRefreshing] = useState(false);
-
-    const onRefresh = useCallback(() => {
-        setRefreshing(true);
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1500);
-    }, []);
+    const { refreshing, onRefresh } = useRefresh();
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
@@ -213,15 +208,12 @@ export default function Home() {
             </View>
 
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
-                    <RefreshControl
+                    <StyledRefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        tintColor={colors.PRIMARY_TEXT}
-                        colors={[colors.PRIMARY_TEXT]}
-                        progressBackgroundColor={colors.SECONDARY_BACKGROUND}
                     />
                 }
             >
