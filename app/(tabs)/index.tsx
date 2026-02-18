@@ -3,6 +3,7 @@ import { COL_2_WIDTH, GAP, PADDING, styles } from "@/constants/homeStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { incrementUsage, selectUsageStats } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 // import analytics from "@react-native-firebase/analytics";
 import StyledRefreshControl from "@/components/StyledRefreshControl";
 import useRefresh from "@/hooks/useRefresh";
@@ -34,8 +35,10 @@ export default function Home() {
             description: t("home_plan_day"),
             icon: "checkbox" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/todo",
-            color: "#4F46E5",
-            iconColor: "#FFF"
+            color: "#322D92",
+            iconColor: "#FFF",
+            backgroundImage: require("@/assets/images/MainPage/tasksBackground.png"),
+            imageOpacity: 0.05
         },
         {
             id: 'movies',
@@ -43,8 +46,10 @@ export default function Home() {
             description: t("home_movies_desc"),
             icon: "film" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/movies",
-            color: "#E11D48",
-            iconColor: "#FFF"
+            color: "#90122E",
+            iconColor: "#FFF",
+            backgroundImage: require("@/assets/images/MainPage/filmsBackground.png"),
+            imageOpacity: 0.12
         },
         {
             id: 'birthday',
@@ -52,8 +57,10 @@ export default function Home() {
             description: t("home_birthdays_desc"),
             icon: "gift" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/birthday",
-            color: "#F59E0B",
-            iconColor: "#FFF"
+            color: "#9D6506",
+            iconColor: "#FFF",
+            backgroundImage: require("@/assets/images/MainPage/birthdayBackground.png"),
+            imageOpacity: 0.12
         },
         {
             id: 'shopping',
@@ -61,8 +68,10 @@ export default function Home() {
             description: t("home_shopping_desc"),
             icon: "cart" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/shopping",
-            color: "#06B6D4",
-            iconColor: "#FFF"
+            color: "#037487",
+            iconColor: "#FFF",
+            backgroundImage: require("@/assets/images/MainPage/shoppingBackground.png"),
+            imageOpacity: 0.12
         },
         {
             id: 'events',
@@ -70,8 +79,10 @@ export default function Home() {
             description: t("home_events_desc"),
             icon: "calendar" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/events",
-            color: "#8B5CF6",
-            iconColor: "#FFF"
+            color: "#593A9D",
+            iconColor: "#FFF",
+            backgroundImage: require("@/assets/images/MainPage/eventsBackground.png"),
+            imageOpacity: 0.12
         },
         {
             id: 'expenses',
@@ -79,8 +90,10 @@ export default function Home() {
             description: t("home_expenses_desc"),
             icon: "wallet" as keyof typeof Ionicons.glyphMap,
             route: "/(tabs)/expenses",
-            color: "#10B981",
-            iconColor: "#FFF"
+            color: "#0A7652",
+            iconColor: "#FFF",
+            backgroundImage: require("@/assets/images/MainPage/expensesBackground.png"),
+            imageOpacity: 0.12
         }
     ], [t]);
 
@@ -148,6 +161,22 @@ export default function Home() {
                 </View>
 
                 <View style={[styles.decorativeCircle, { backgroundColor: 'rgba(255,255,255,0.1)' }]} />
+                {item.backgroundImage && (
+                    <Image
+                        source={item.backgroundImage}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            opacity: item.imageOpacity || 0.15,
+                            zIndex: 0
+                        }}
+                        contentFit="cover"
+                        transition={600}
+                    />
+                )}
             </Pressable>
         );
     }, [handlePress]);
