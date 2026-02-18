@@ -1,34 +1,66 @@
+import { toggleAnimation } from '@/constants/animations';
 import { styles as homeStyles } from '@/constants/homeStyles';
+import { formatDate } from '@/helpers/date';
 import { useTheme } from '@/hooks/useTheme';
 import TodayTasksModal from '@/layout/Modals/TodayTasksModal';
 import { selectTodos } from '@/store/slices/todoSlice';
 import { Todo } from '@/types/todo';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useMemo, useRef, useState } from 'react';
+import { Animated, LayoutAnimation, Pressable, StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import StyledText from '../StyledText';
 
 export default function ImportantTasksToday() {
-    const { colors, t } = useTheme();
+    const { colors, t, lang } = useTheme();
     const todos = useSelector(selectTodos);
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(true);
+    const expandAnim = useRef(new Animated.Value(1)).current;
+
+    const toggleExpanded = () => {
+        setIsExpanded(prev => {
+            const newValue = !prev;
+            Animated.timing(expandAnim, {
+                toValue: newValue ? 1 : 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+            LayoutAnimation.configureNext(toggleAnimation);
+            return newValue;
+        });
+    };
+
+    const getRotation = () => expandAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '90deg']
+    });
+
+    const getCircleTransform = () => ({
+        transform: [
+            { translateX: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -20] }) },
+            { translateY: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -20] }) },
+            { scale: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.8] }) }
+        ],
+        opacity: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.4] })
+    });
 
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
 
-    // Filter tasks with reminder set for today
+    // Filter tasks with reminder set for today and sort by time
     const todayTasks = useMemo(() => {
-        return todos.filter((todo: Todo) => {
-            if (!todo.reminder || todo.isCompleted || todo.isArchived) {
-                return false;
-            }
-            const reminderDate = todo.reminder.split('T')[0];
-            return reminderDate === today;
-        });
+        return todos
+            .filter((todo: Todo) => {
+                if (!todo.reminder || todo.isCompleted || todo.isArchived) {
+                    return false;
+                }
+                const reminderDate = todo.reminder.split('T')[0];
+                return reminderDate === today;
+            })
+            .sort((a, b) => new Date(a.reminder!).getTime() - new Date(b.reminder!).getTime());
     }, [todos, today]);
 
     const handleTaskPress = () => {
@@ -41,8 +73,7 @@ export default function ImportantTasksToday() {
     };
 
     const getTimeFromReminder = (reminder: string) => {
-        const date = new Date(reminder);
-        return date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
+        return formatDate(reminder, lang).split(' ')[1];
     };
 
     const getPriorityColor = (task: Todo, index: number) => {
@@ -62,29 +93,61 @@ export default function ImportantTasksToday() {
     return (
         <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 140 : undefined }]}>
             <Pressable
-                onPress={() => setIsExpanded(!isExpanded)}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: isExpanded ? 16 : 0, zIndex: 10 }}
+                onPress={toggleExpanded}
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginBottom: isExpanded ? 16 : -13,
+                    zIndex: 10,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    marginLeft: -10,
+                    marginRight: -20,
+                    marginTop: -13,
+                    paddingLeft: 10,
+                    paddingRight: 20,
+                    paddingVertical: 13,
+                    borderRadius: 20
+                }}
             >
-                <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.55)' }]}>
+                <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.55)', zIndex: 2 }]}>
                     <Ionicons name="notifications" size={17} color={colors.SECTION_TEXT} />
                 </View>
                 <StyledText
-                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, marginBottom: 0 }]}
+                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, marginBottom: 0, zIndex: 2 }]}
                 >
                     {t('today_tasks_header')}
                 </StyledText>
                 {todayTasks.length > 0 && (
-                    <View style={[styles.badge, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+                    <View style={[styles.badge, { backgroundColor: 'rgba(59, 130, 246, 0.15)', zIndex: 2 }]}>
                         <StyledText style={[styles.badgeText, { color: colors.SECTION_TEXT }]}>{todayTasks.length}</StyledText>
                     </View>
                 )}
-                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto' }}>
-                    <Ionicons
-                        name={isExpanded ? "chevron-down" : "chevron-forward"}
-                        size={14}
-                        color={colors.SECTION_TEXT}
-                    />
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto', zIndex: 2 }}>
+                    <Animated.View style={{ transform: [{ rotate: getRotation() }] }}>
+                        <Ionicons
+                            name="chevron-forward"
+                            size={14}
+                            color={colors.SECTION_TEXT}
+                        />
+                    </Animated.View>
                 </View>
+                <Animated.View
+                    style={[
+                        homeStyles.decorativeCircle,
+                        {
+                            backgroundColor: 'rgba(59, 130, 246, 0.3)',
+                            width: 80,
+                            height: 80,
+                            borderRadius: 40,
+                            bottom: -20,
+                            right: -20
+                        },
+                        getCircleTransform()
+                    ]}
+                    pointerEvents="none"
+                />
             </Pressable>
 
             {isExpanded && (
@@ -162,7 +225,7 @@ export default function ImportantTasksToday() {
                     )}
                 </>
             )}
-            <View style={[homeStyles.decorativeCircle, { backgroundColor: 'rgba(59, 130, 246, 0.3)', width: 80, height: 80, borderRadius: 40 }]} />
+
 
             <TodayTasksModal
                 isOpen={isModalOpen}

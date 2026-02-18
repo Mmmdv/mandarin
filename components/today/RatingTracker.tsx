@@ -1,10 +1,11 @@
+import { toggleAnimation } from '@/constants/animations';
 import { styles as homeStyles } from '@/constants/homeStyles';
 import { useTheme } from '@/hooks/useTheme';
 import { resetRating, selectDayData, setRating } from '@/store/slices/todaySlice';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import React, { useRef, useState } from 'react';
-import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Easing, LayoutAnimation, Pressable, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import StyledText from '../StyledText';
 
@@ -20,6 +21,34 @@ export default function RatingTracker() {
     const shakeAnim = useRef(new Animated.Value(0)).current;
 
     const [isExpanded, setIsExpanded] = useState(false);
+    const expandAnim = useRef(new Animated.Value(0)).current;
+
+    const toggleExpanded = () => {
+        setIsExpanded(prev => {
+            const newValue = !prev;
+            Animated.timing(expandAnim, {
+                toValue: newValue ? 1 : 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+            LayoutAnimation.configureNext(toggleAnimation);
+            return newValue;
+        });
+    };
+
+    const getRotation = () => expandAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '90deg']
+    });
+
+    const getCircleTransform = () => ({
+        transform: [
+            { translateX: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -20] }) },
+            { translateY: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -20] }) },
+            { scale: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.8] }) }
+        ],
+        opacity: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.4] })
+    });
 
     const triggerHaptics = async (rating: number) => {
         try {
@@ -87,14 +116,29 @@ export default function RatingTracker() {
     return (
         <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 140 : undefined }]}>
             <Pressable
-                onPress={() => setIsExpanded(!isExpanded)}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, zIndex: 10 }}
+                onPress={toggleExpanded}
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginBottom: isExpanded ? 0 : -13,
+                    zIndex: 10,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    marginLeft: -10,
+                    marginRight: -20,
+                    marginTop: -13,
+                    paddingLeft: 10,
+                    paddingRight: 20,
+                    paddingVertical: 13,
+                    borderRadius: 20
+                }}
             >
-                <View style={[styles.iconContainer, { backgroundColor: `${theme?.color || '#F59E0B'}55` }]}>
+                <View style={[styles.iconContainer, { backgroundColor: `${theme?.color || '#F59E0B'}55`, zIndex: 2 }]}>
                     <Ionicons name={(theme?.icon as any) || "star"} size={17} color={colors.SECTION_TEXT} />
                 </View>
                 <StyledText
-                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0 }]}
+                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0, zIndex: 2 }]}
                     adjustsFontSizeToFit={true}
                     minimumFontScale={0.8}
                 >
@@ -106,43 +150,64 @@ export default function RatingTracker() {
                             dispatch(resetRating({ date: today }));
                             fadeAnim.setValue(0);
                         }}
-                        style={styles.headerButton}
+                        style={[styles.headerButton, { zIndex: 2 }]}
                     >
                         <Ionicons name="refresh" size={16} color={colors.PLACEHOLDER} />
                     </Pressable>
                 )}
-                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto' }}>
-                    <Ionicons name={isExpanded ? "chevron-down" : "chevron-forward"} size={14} color={colors.SECTION_TEXT} />
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto', zIndex: 2 }}>
+                    <Animated.View style={{ transform: [{ rotate: getRotation() }] }}>
+                        <Ionicons name="chevron-forward" size={14} color={colors.SECTION_TEXT} />
+                    </Animated.View>
                 </View>
+                <Animated.View
+                    style={[
+                        homeStyles.decorativeCircle,
+                        {
+                            backgroundColor: theme?.color ? `${theme.color}3A` : 'rgba(245, 158, 11, 0.25)',
+                            width: 80,
+                            height: 80,
+                            borderRadius: 40,
+                            bottom: -20,
+                            right: -20
+                        },
+                        getCircleTransform()
+                    ]}
+                    pointerEvents="none"
+                />
             </Pressable>
 
             {isExpanded && (
                 <>
                     <View style={{ flex: 1, justifyContent: 'center' }}>
                         {!currentRating ? (
-                            <View style={styles.ratingRow}>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                    <Pressable
-                                        key={num}
-                                        onPress={() => handleSelect(num)}
-                                        style={({ pressed }) => [
-                                            styles.ratingButton,
-                                            {
-                                                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                                                borderColor: 'rgba(255, 255, 255, 0.15)',
-                                                opacity: pressed ? 0.7 : 1
-                                            }
-                                        ]}
-                                    >
-                                        <StyledText style={{
-                                            color: colors.PRIMARY_TEXT,
-                                            fontWeight: 'bold',
-                                            fontSize: 12
-                                        }}>
-                                            {num}
-                                        </StyledText>
-                                    </Pressable>
-                                ))}
+                            <View style={styles.ratingGrid}>
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
+                                    const buttonTheme = getRatingTheme(num);
+                                    return (
+                                        <Pressable
+                                            key={num}
+                                            onPress={() => handleSelect(num)}
+                                            style={({ pressed }) => [
+                                                styles.ratingButton,
+                                                {
+                                                    backgroundColor: `${buttonTheme.color}15`,
+                                                    borderColor: `${buttonTheme.color}30`,
+                                                    opacity: pressed ? 0.7 : 1,
+                                                    transform: [{ scale: pressed ? 0.9 : 1 }]
+                                                }
+                                            ]}
+                                        >
+                                            <StyledText style={{
+                                                color: buttonTheme.color,
+                                                fontWeight: '900',
+                                                fontSize: 16
+                                            }}>
+                                                {num}
+                                            </StyledText>
+                                        </Pressable>
+                                    );
+                                })}
                             </View>
                         ) : (
                             <Animated.View
@@ -169,27 +234,25 @@ export default function RatingTracker() {
 
                 </>
             )}
-            <View
-                style={[homeStyles.decorativeCircle, { backgroundColor: theme?.color ? `${theme.color}3A` : 'rgba(245, 158, 11, 0.25)', width: 80, height: 80, borderRadius: 40 }]}
-                pointerEvents="none"
-            />
+
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    ratingRow: {
+    ratingGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: 10,
+        gap: 8,
         marginTop: 15,
+        paddingHorizontal: 5,
     },
     ratingButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        borderWidth: 0.5,
+        width: 44,
+        height: 44,
+        borderRadius: 15, // More of a rounded square look for premium feel
+        borderWidth: 1.5,
         justifyContent: 'center',
         alignItems: 'center',
     },

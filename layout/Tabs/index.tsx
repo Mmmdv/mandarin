@@ -5,11 +5,13 @@ import { Ionicons } from "@expo/vector-icons";
 import useTodo from "@/hooks/useTodo";
 import AddMenuModal from "@/layout/Modals/AddMenuModal";
 import AddTodoModal from "@/layout/Modals/AddTodoModal";
+import TaskSuccessModal from "@/layout/Modals/TaskSuccessModal";
+import { selectIsBreathingActive } from "@/store/slices/appSlice";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getIconName, getLabelName } from "./helpers";
 import { styles } from "./styles";
 
@@ -21,7 +23,9 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const { onAddTodo } = useTodo();
+    const isBreathingActive = useSelector(selectIsBreathingActive);
 
     const VISIBLE_ROUTES = ["index", "today", "stats", "more"];
     const visibleRoutes = state.routes.filter(r => VISIBLE_ROUTES.includes(r.name));
@@ -46,9 +50,19 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
     const handleAddTodo = (title: string, reminder?: string, notificationId?: string) => {
         onAddTodo(title, reminder, notificationId);
+
+        // Only show success modal if NOT on the todo tab
+        const currentRouteName = state.routes[state.index].name;
+        if (currentRouteName !== 'todo') {
+            setTimeout(() => {
+                setIsSuccessModalOpen(true);
+            }, 500);
+        }
     }
 
     const onTabPress = (renderIndex: number, route: any, isFocused: boolean) => {
+        if (isBreathingActive) return;
+
         const event = navigation.emit({
             type: "tabPress",
             target: route.key,
@@ -75,9 +89,12 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                         return (
                             <TouchableOpacity
                                 key="ADD_BUTTON"
-                                onPress={() => setIsAddMenuOpen(true)}
+                                onPress={() => {
+                                    if (isBreathingActive) return;
+                                    setIsAddMenuOpen(true);
+                                }}
                                 activeOpacity={0.8}
-                                style={[styles.tabButton, { flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 0 }]}
+                                style={[styles.tabButton, { flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 0, opacity: isBreathingActive ? 0.3 : 1 }]}
                             >
                                 <View style={{
                                     width: 56,
@@ -117,7 +134,8 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                             key={route.key}
                             onPress={() => onTabPress(index, route, isFocused)}
                             activeOpacity={0.7}
-                            style={[styles.tabButton, { flex: 1, alignItems: 'center', justifyContent: 'center' }]}
+                            style={[styles.tabButton, { flex: 1, alignItems: 'center', justifyContent: 'center', opacity: isBreathingActive ? 0.3 : 1 }]}
+                            disabled={isBreathingActive}
                         >
                             <View style={styles.tabItemContainer}>
                                 <View style={styles.tabItemContent}>
@@ -182,6 +200,11 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 }}
                 onAddBirthday={() => { }}
                 onAddMovie={() => { }}
+            />
+
+            <TaskSuccessModal
+                isOpen={isSuccessModalOpen}
+                onClose={() => setIsSuccessModalOpen(false)}
             />
         </View>
     );

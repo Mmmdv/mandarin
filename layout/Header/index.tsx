@@ -8,12 +8,15 @@ import { Image, Share, StyleSheet, TouchableOpacity, View } from "react-native";
 
 import NotificationsModal from "@/layout/Modals/NotificationsModal";
 import { useAppSelector } from "@/store";
+import { selectIsBreathingActive } from "@/store/slices/appSlice";
 import { selectUnreadCount } from "@/store/slices/notificationSlice";
+import { useSelector } from "react-redux";
 
 const Header: React.FC = () => {
   const { colors, t, isDark } = useTheme();
   const router = useRouter();
   const unreadCount = useAppSelector(selectUnreadCount);
+  const isBreathingActive = useSelector(selectIsBreathingActive);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
 
   let [fontsLoaded] = useFonts({
@@ -43,10 +46,20 @@ const Header: React.FC = () => {
         <StyledText style={[styles.appName, { color: isDark ? '#E5E7EB' : '#1F2937' }]}>Mandarin</StyledText>
       </View>
       <View style={styles.rightSection}>
-        <TouchableOpacity onPress={onShare} activeOpacity={0.7} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={onShare}
+          activeOpacity={0.7}
+          style={[styles.iconButton, { opacity: isBreathingActive ? 0.3 : 1 }]}
+          disabled={isBreathingActive}
+        >
           <Ionicons name="share-outline" size={22} color={colors.PRIMARY_TEXT} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setNotificationsVisible(true)} activeOpacity={0.7} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={() => setNotificationsVisible(true)}
+          activeOpacity={0.7}
+          style={[styles.iconButton, { opacity: isBreathingActive ? 0.3 : 1 }]}
+          disabled={isBreathingActive}
+        >
           <View>
             <Ionicons name="notifications-outline" size={22} color={colors.PRIMARY_TEXT} />
             {unreadCount > 0 && (
@@ -76,7 +89,12 @@ const Header: React.FC = () => {
             )}
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/settings")} activeOpacity={0.7} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={() => router.push("/settings")}
+          activeOpacity={0.7}
+          style={[styles.iconButton, { opacity: isBreathingActive ? 0.3 : 1 }]}
+          disabled={isBreathingActive}
+        >
           <Ionicons name="settings-outline" size={22} color={colors.PRIMARY_TEXT} />
         </TouchableOpacity>
       </View>

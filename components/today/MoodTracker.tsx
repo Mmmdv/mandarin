@@ -1,10 +1,11 @@
+import { toggleAnimation } from '@/constants/animations';
 import { styles as homeStyles } from '@/constants/homeStyles';
 import { useTheme } from '@/hooks/useTheme';
 import { resetMood, selectDayData, setMood } from '@/store/slices/todaySlice';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Animated, LayoutAnimation, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import StyledText from '../StyledText';
 
@@ -34,6 +35,34 @@ export default function MoodTracker() {
     const shakeAnim = useRef(new Animated.Value(0)).current;
 
     const [isExpanded, setIsExpanded] = useState(true);
+    const expandAnim = useRef(new Animated.Value(1)).current;
+
+    const toggleExpanded = () => {
+        setIsExpanded(prev => {
+            const newValue = !prev;
+            Animated.timing(expandAnim, {
+                toValue: newValue ? 1 : 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+            LayoutAnimation.configureNext(toggleAnimation);
+            return newValue;
+        });
+    };
+
+    const getRotation = () => expandAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '90deg']
+    });
+
+    const getCircleTransform = () => ({
+        transform: [
+            { translateX: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -20] }) },
+            { translateY: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -20] }) },
+            { scale: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.8] }) }
+        ],
+        opacity: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.4] })
+    });
 
     useEffect(() => {
         if (selectedMoodId) {
@@ -112,18 +141,50 @@ export default function MoodTracker() {
     return (
         <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 140 : undefined }]}>
             <Pressable
-                onPress={() => setIsExpanded(!isExpanded)}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: isExpanded ? 8 : 0, zIndex: 10 }}
+                onPress={toggleExpanded}
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginBottom: isExpanded ? 8 : -13,
+                    zIndex: 10,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    marginLeft: -10,
+                    marginRight: -20,
+                    marginTop: -13,
+                    paddingLeft: 10,
+                    paddingRight: 20,
+                    paddingVertical: 13,
+                    borderRadius: 20
+                }}
             >
-                <View style={[styles.iconContainer, { backgroundColor: `${currentThemeColor}55` }]}>
+                <View style={[styles.iconContainer, { backgroundColor: `${currentThemeColor}55`, zIndex: 2 }]}>
                     <Ionicons name={selectedMoodDisplay ? (selectedMoodDisplay.icon as any) : "pulse"} size={17} color={colors.SECTION_TEXT} />
                 </View>
-                <StyledText style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0 }]}>
+                <StyledText style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0, zIndex: 2 }]}>
                     {t(questionKey)}
                 </StyledText>
-                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto' }}>
-                    <Ionicons name={isExpanded ? "chevron-down" : "chevron-forward"} size={14} color={colors.SECTION_TEXT} />
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto', zIndex: 2 }}>
+                    <Animated.View style={{ transform: [{ rotate: getRotation() }] }}>
+                        <Ionicons name="chevron-forward" size={14} color={colors.SECTION_TEXT} />
+                    </Animated.View>
                 </View>
+                <Animated.View
+                    style={[
+                        homeStyles.decorativeCircle,
+                        {
+                            backgroundColor: `${currentThemeColor}3A`,
+                            width: 80,
+                            height: 80,
+                            borderRadius: 40,
+                            bottom: -20,
+                            right: -20
+                        },
+                        getCircleTransform()
+                    ]}
+                    pointerEvents="none"
+                />
             </Pressable>
 
             {isExpanded && (
@@ -186,10 +247,7 @@ export default function MoodTracker() {
                     )}
                 </>
             )}
-            <View
-                style={[homeStyles.decorativeCircle, { backgroundColor: `${currentThemeColor}3A`, width: 80, height: 80, borderRadius: 40 }]}
-                pointerEvents="none"
-            />
+
         </View>
     );
 }

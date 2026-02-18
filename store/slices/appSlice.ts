@@ -25,6 +25,7 @@ export interface AppState {
     biometricEnabled: boolean
     locationEnabled: boolean
     usageStats: Record<string, number>
+    isBreathingActive: boolean
 }
 
 const initialState: AppState = {
@@ -47,7 +48,8 @@ const initialState: AppState = {
         shopping: 0,
         events: 0,
         expenses: 0
-    }
+    },
+    isBreathingActive: false
 }
 
 export interface UpdateAppSettingsPayload {
@@ -87,6 +89,9 @@ export const appSlice = createSlice({
             if (biometricEnabled !== undefined) state.biometricEnabled = biometricEnabled
             if (locationEnabled !== undefined) state.locationEnabled = locationEnabled
         },
+        setBreathingActive: (state, action: PayloadAction<boolean>) => {
+            state.isBreathingActive = action.payload;
+        },
         incrementUsage: (state, action: PayloadAction<string>) => {
             if (!state.usageStats) {
                 state.usageStats = {
@@ -107,9 +112,10 @@ export const appSlice = createSlice({
     },
 })
 
-export const { updateAppSetting, incrementUsage } = appSlice.actions
+export const { updateAppSetting, incrementUsage, setBreathingActive } = appSlice.actions
 
 export const selectAppSettings = (state: { app: AppState }): AppState => state.app
 export const selectUsageStats = (state: { app: AppState }) => state.app.usageStats
+export const selectIsBreathingActive = (state: { app: AppState }) => state.app.isBreathingActive
 
 export default appSlice.reducer 

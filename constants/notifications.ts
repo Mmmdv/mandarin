@@ -33,7 +33,10 @@ const ICON_MAP: Record<string, string> = {
     'calendar': '🎫',
     'ticket': '🎫',
     'wallet': '💰',
-    'checkbox': '✅'
+    'checkbox': '✅',
+    'wind': '🌬️',
+    'weather-windy': '🌬️',
+    'air': '🌬️',
 };
 
 export async function schedulePushNotification(title: string, body: string, triggerDate: Date, categoryIcon?: string) {

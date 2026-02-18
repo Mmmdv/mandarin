@@ -129,7 +129,6 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
                 dispatch(cancelAllReminders());
                 dispatch(cancelAllNotifications(t("tab_todo")));
             }
-            // Add other categories here if needed
         }
     };
 
@@ -178,7 +177,6 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
                 <View style={[modalStyles.modalContainer, { width: '100%', paddingHorizontal: 0 }]}>
                     <View style={[modalStyles.iconContainer, {
                         backgroundColor: colors.SECONDARY_BACKGROUND,
-
                         shadowColor: colors.CHECKBOX_SUCCESS,
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: 0.3,

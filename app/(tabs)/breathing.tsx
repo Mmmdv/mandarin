@@ -4,20 +4,53 @@ import StyledText from "@/components/StyledText";
 import { styles } from "@/constants/homeStyles";
 import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";
+import { selectIsBreathingActive } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
 
 export default function BreathingScreen() {
     const { colors, t } = useTheme();
     const router = useRouter();
     const { refreshing, onRefresh } = useRefresh();
+    const isBreathingActive = useSelector(selectIsBreathingActive);
+    const navigation = useNavigation();
+
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+            if (!isBreathingActive) {
+                return;
+            }
+
+            // Prevent default behavior of leaving the screen
+            e.preventDefault();
+
+            // Prompt the user before leaving (optional, but requested to disable navigation)
+            // The user said "disable navigation", so we just block it.
+        });
+
+        return unsubscribe;
+    }, [navigation, isBreathingActive]);
+
+    const handleBackPress = () => {
+        if (isBreathingActive) {
+            // Block back press
+            return;
+        }
+        router.back();
+    };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
             <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 10 }]}>
-                <TouchableOpacity onPress={() => router.back()} style={{ justifyContent: 'center', paddingRight: 10 }}>
+                <TouchableOpacity
+                    onPress={handleBackPress}
+                    style={{ justifyContent: 'center', paddingRight: 10, opacity: isBreathingActive ? 0.3 : 1 }}
+                    disabled={isBreathingActive}
+                >
                     <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -55,6 +88,6 @@ const exerciseStyles = {
         marginTop: 15,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.05)',
-        overflow: 'hidden',
+        overflow: 'hidden' as const,
     },
 };

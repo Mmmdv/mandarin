@@ -1,5 +1,6 @@
 import StyledText from "@/components/StyledText"
 import { COLORS } from "@/constants/ui"
+import { useTheme } from "@/hooks/useTheme"
 import { Ionicons } from "@expo/vector-icons"
 import React from "react"
 import { StyleSheet, TouchableOpacity, View } from "react-native"
@@ -19,40 +20,44 @@ const SortControls: React.FC<SortControlsProps> = ({
     sortOrder,
     onToggleSortBy,
     onToggleSortOrder,
-}) => (
-    <View style={sortStyles.sortContainer}>
-        <TouchableOpacity style={sortStyles.sortButton} onPress={onToggleSortBy}>
-            <Ionicons
-                name={sortBy === "date" ? "calendar" : "text"}
-                size={14}
-                color={COLORS.PRIMARY_TEXT}
-            />
-            <StyledText style={sortStyles.sortText}>
-                {sortBy === "date" ? "Tarix" : "Text"}
-            </StyledText>
-        </TouchableOpacity>
-        <TouchableOpacity style={sortStyles.sortButton} onPress={onToggleSortOrder}>
-            <Ionicons
-                name={sortOrder === "asc" ? "arrow-up" : "arrow-down"}
-                size={14}
-                color={COLORS.PRIMARY_TEXT}
-            />
-        </TouchableOpacity>
-    </View>
-)
+}) => {
+    const { t } = useTheme()
+
+    return (
+        <View style={sortStyles.sortContainer}>
+            <TouchableOpacity style={sortStyles.sortButton} onPress={onToggleSortBy}>
+                <Ionicons
+                    name={sortBy === "date" ? "calendar" : "text"}
+                    size={14}
+                    color={COLORS.PRIMARY_TEXT}
+                />
+                <StyledText style={sortStyles.sortText}>
+                    {sortBy === "date" ? t("sort_date") : t("sort_text")}
+                </StyledText>
+            </TouchableOpacity>
+            <TouchableOpacity style={sortStyles.sortButton} onPress={onToggleSortOrder}>
+                <Ionicons
+                    name={sortOrder === "asc" ? "arrow-up" : "arrow-down"}
+                    size={14}
+                    color={COLORS.PRIMARY_TEXT}
+                />
+            </TouchableOpacity>
+        </View>
+    )
+}
 
 const sortStyles = StyleSheet.create({
     sortContainer: {
         flexDirection: "row",
         gap: 5,
-        marginRight: 10,
+        marginRight: 0,
     },
     sortButton: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: "#2a2f37",
         paddingHorizontal: 8,
-        paddingVertical: 4,
+        paddingVertical: 6,
         borderRadius: 12,
         gap: 3,
     },

@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         position: 'absolute',
-        width: 120,
+        width: 150,
         borderRadius: 25,
         borderWidth: 0.5,
         shadowColor: "#000",
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     menuLabel: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: '600',
         flex: 1,
     }

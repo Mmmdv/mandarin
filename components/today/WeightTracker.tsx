@@ -1,10 +1,11 @@
+import { toggleAnimation } from '@/constants/animations';
 import { styles as homeStyles } from '@/constants/homeStyles';
 import { useTheme } from '@/hooks/useTheme';
 import { resetWeight, selectDayData, selectLastWeight, selectPreviousWeight, setWeight } from '@/store/slices/todaySlice';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, FlatList, NativeScrollEvent, NativeSyntheticEvent, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, FlatList, LayoutAnimation, NativeScrollEvent, NativeSyntheticEvent, Pressable, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import StyledText from '../StyledText';
 
@@ -33,6 +34,34 @@ export default function WeightTracker() {
     const [localWeight, setLocalWeight] = useState<number>(dayData?.weight || initialWeight);
     const [containerWidth, setContainerWidth] = useState(0);
     const [isExpanded, setIsExpanded] = useState(false);
+    const expandAnim = useRef(new Animated.Value(0)).current;
+
+    const toggleExpanded = () => {
+        setIsExpanded(prev => {
+            const newValue = !prev;
+            Animated.timing(expandAnim, {
+                toValue: newValue ? 1 : 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+            LayoutAnimation.configureNext(toggleAnimation);
+            return newValue;
+        });
+    };
+
+    const getRotation = () => expandAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '90deg']
+    });
+
+    const getCircleTransform = () => ({
+        transform: [
+            { translateX: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -20] }) },
+            { translateY: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -20] }) },
+            { scale: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.8] }) }
+        ],
+        opacity: expandAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.4] })
+    });
 
     const currentWeight = dayData?.weight;
 
@@ -147,27 +176,59 @@ export default function WeightTracker() {
     return (
         <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 160 : undefined }]}>
             <Pressable
-                onPress={() => setIsExpanded(!isExpanded)}
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, zIndex: 10 }}
+                onPress={toggleExpanded}
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginBottom: isExpanded ? 0 : -13,
+                    zIndex: 10,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    marginLeft: -10,
+                    marginRight: -20,
+                    marginTop: -13,
+                    paddingLeft: 10,
+                    paddingRight: 20,
+                    paddingVertical: 13,
+                    borderRadius: 20
+                }}
             >
-                <View style={[styles.iconContainer, { backgroundColor: `${comp?.color || '#10B981'}55` }]}>
+                <View style={[styles.iconContainer, { backgroundColor: `${comp?.color || '#10B981'}55`, zIndex: 2 }]}>
                     <Ionicons name="barbell" size={17} color={colors.SECTION_TEXT} />
                 </View>
                 <StyledText
-                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0 }]}
+                    style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0, zIndex: 2 }]}
                     adjustsFontSizeToFit={true}
                     minimumFontScale={0.8}
                 >
                     {t('today_weight')}
                 </StyledText>
                 {currentWeight && (
-                    <Pressable onPress={handleReset} style={styles.headerButton}>
+                    <Pressable onPress={handleReset} style={[styles.headerButton, { zIndex: 2 }]}>
                         <Ionicons name="refresh" size={18} color={colors.PLACEHOLDER} />
                     </Pressable>
                 )}
-                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto' }}>
-                    <Ionicons name={isExpanded ? "chevron-down" : "chevron-forward"} size={14} color={colors.SECTION_TEXT} />
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto', zIndex: 2 }}>
+                    <Animated.View style={{ transform: [{ rotate: getRotation() }] }}>
+                        <Ionicons name="chevron-forward" size={14} color={colors.SECTION_TEXT} />
+                    </Animated.View>
                 </View>
+                <Animated.View
+                    style={[
+                        homeStyles.decorativeCircle,
+                        {
+                            backgroundColor: comp?.color ? `${comp.color}3A` : 'rgba(16, 185, 129, 0.25)',
+                            width: 80,
+                            height: 80,
+                            borderRadius: 40,
+                            bottom: -20,
+                            right: -20
+                        },
+                        getCircleTransform()
+                    ]}
+                    pointerEvents="none"
+                />
             </Pressable>
 
             {isExpanded && (
@@ -261,10 +322,7 @@ export default function WeightTracker() {
 
                 </>
             )}
-            <View
-                style={[homeStyles.decorativeCircle, { backgroundColor: comp?.color ? `${comp.color}3A` : 'rgba(16, 185, 129, 0.25)', width: 80, height: 80, borderRadius: 40 }]}
-                pointerEvents="none"
-            />
+
         </View>
     );
 }

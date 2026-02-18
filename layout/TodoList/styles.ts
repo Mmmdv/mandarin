@@ -63,10 +63,10 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     sortZone: {
-        width: 76,
+        width: 80,
         alignItems: 'center',
         justifyContent: 'center',
-        marginLeft: 12,
+        marginLeft: 20,
     },
     chevronZone: {
         width: 24,

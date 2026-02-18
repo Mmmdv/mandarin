@@ -8,12 +8,16 @@ import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
 import { useRouter } from "expo-router"
 import { useEffect, useRef, useState } from "react"
-import { LayoutAnimation, ScrollView, TouchableOpacity, View } from "react-native"
+import { Animated, LayoutAnimation, Platform, ScrollView, TouchableOpacity, UIManager, View } from "react-native"
 import ArchiveAllModal from "../Modals/ArchiveAllModal.tsx"
 import ClearArchiveModal from "../Modals/ClearArchiveModal.tsx"
 import TodoItem from "../TodoItem"
 import SortControls, { SortBy, SortOrder } from "./SortControls"
 import { styles } from "./styles"
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 type TodoListProps = {
     todos: Todo[]
@@ -31,7 +35,7 @@ type TodoListProps = {
 }
 
 const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo, onArchiveTodo, onRetryTodo, onClearArchive, archivedTodos, onArchiveAll, onAddRequest, categoryTitle, categoryIcon }) => {
-    const { colors, t } = useTheme()
+    const { colors, t, lang } = useTheme()
     const router = useRouter();
     const [todoSortBy, setTodoSortBy] = useState<SortBy>("date")
     const [todoSortOrder, setTodoSortOrder] = useState<SortOrder>("desc")
@@ -43,6 +47,12 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const [todoExpanded, setTodoExpanded] = useState(true)
     const [doneExpanded, setDoneExpanded] = useState(false)
     const [archiveExpanded, setArchiveExpanded] = useState(false)
+
+    // Animated values for chevron rotation
+    const todoAnimation = useRef(new Animated.Value(1)).current
+    const doneAnimation = useRef(new Animated.Value(0)).current
+    const archiveAnimation = useRef(new Animated.Value(0)).current
+
     const [isClearArchiveModalOpen, setIsClearArchiveModalOpen] = useState(false)
     const [isArchiveAllModalOpen, setIsArchiveAllModalOpen] = useState(false)
     const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
@@ -57,35 +67,98 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const prevArchivedCount = useRef(archivedTodos.length)
 
     useEffect(() => {
-        if (pendingTodos.length === 0) setTodoExpanded(false)
-        else if (pendingTodos.length > prevPendingCount.current) setTodoExpanded(true)
+        if (pendingTodos.length === 0) {
+            setTodoExpanded(false)
+            Animated.timing(todoAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
+        } else if (pendingTodos.length > prevPendingCount.current) {
+            setTodoExpanded(true)
+            Animated.timing(todoAnimation, { toValue: 1, duration: 300, useNativeDriver: true }).start()
+        }
         prevPendingCount.current = pendingTodos.length
     }, [pendingTodos.length])
 
     useEffect(() => {
-        if (completedTodos.length === 0) setDoneExpanded(false)
-        else if (completedTodos.length > prevCompletedCount.current) setDoneExpanded(true)
+        if (completedTodos.length === 0) {
+            setDoneExpanded(false)
+            Animated.timing(doneAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
+        } else if (completedTodos.length > prevCompletedCount.current) {
+            setDoneExpanded(true)
+            Animated.timing(doneAnimation, { toValue: 1, duration: 300, useNativeDriver: true }).start()
+        }
         prevCompletedCount.current = completedTodos.length
     }, [completedTodos.length])
 
     useEffect(() => {
-        if (archivedTodos.length === 0) setArchiveExpanded(false)
-        else if (archivedTodos.length > prevArchivedCount.current) setArchiveExpanded(true)
+        if (archivedTodos.length === 0) {
+            setArchiveExpanded(false)
+            Animated.timing(archiveAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
+        } else if (archivedTodos.length > prevArchivedCount.current) {
+            setArchiveExpanded(true)
+            Animated.timing(archiveAnimation, { toValue: 1, duration: 300, useNativeDriver: true }).start()
+        }
         prevArchivedCount.current = archivedTodos.length
     }, [archivedTodos.length])
 
-    const sortedPendingTodos = sortTodos(pendingTodos, todoSortBy, todoSortOrder, "createdAt")
-    const sortedCompletedTodos = sortTodos(completedTodos, doneSortBy, doneSortOrder, "completedAt")
-    const sortedArchivedTodos = sortTodos(archivedTodos, archiveSortBy, archiveSortOrder, "archivedAt")
-
-    const toggleSection = (setter: (fn: (prev: boolean) => boolean) => void) => {
+    // Trigger LayoutAnimation whenever sort settings change
+    useEffect(() => {
         LayoutAnimation.configureNext(toggleAnimation);
-        setter(prev => !prev);
+    }, [todoSortBy, todoSortOrder, doneSortBy, doneSortOrder, archiveSortBy, archiveSortOrder, viewMode]);
+
+    const sortedPendingTodos = sortTodos(pendingTodos, todoSortBy, todoSortOrder, lang, "createdAt")
+    const sortedCompletedTodos = sortTodos(completedTodos, doneSortBy, doneSortOrder, lang, "completedAt")
+    const sortedArchivedTodos = sortTodos(archivedTodos, archiveSortBy, archiveSortOrder, lang, "archivedAt")
+
+    const toggleSection = (setter: React.Dispatch<React.SetStateAction<boolean>>, anim: any) => {
+        setter(prev => {
+            const newValue = !prev
+            Animated.timing(anim, {
+                toValue: newValue ? 1 : 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start()
+            LayoutAnimation.configureNext(toggleAnimation);
+            return newValue
+        });
     }
 
     const toggleViewMode = () => {
-        // LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setViewMode(prev => (prev === 'list' ? 'card' : 'list'));
+    }
+
+    const getRotation = (anim: any) => {
+        return anim.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['0deg', '90deg']
+        })
+    }
+
+    const getCircleTransform = (anim: any) => {
+        return {
+            transform: [
+                {
+                    translateX: anim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -20]
+                    })
+                },
+                {
+                    translateY: anim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [0, -20]
+                    })
+                },
+                {
+                    scale: anim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.8]
+                    })
+                }
+            ],
+            opacity: anim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0.4]
+            })
+        }
     }
 
     if (todos.length === 0 && archivedTodos.length === 0) {
@@ -196,7 +269,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
                         style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(79, 70, 229, 0.15)', borderWidth: 0.2, borderColor: 'rgba(79, 70, 229, 0.3)' }]}
-                        onPress={() => toggleSection(setTodoExpanded)}
+                        onPress={() => toggleSection(setTodoExpanded, todoAnimation)}
                         disabled={sortedPendingTodos.length === 0}
                     >
                         <View style={[styles.sectionTitleContainer, sortedPendingTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
@@ -232,15 +305,17 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             <View style={{ flex: 1 }} />
 
                             <View style={styles.chevronZone}>
-                                <Ionicons
-                                    name={todoExpanded ? "chevron-down" : "chevron-forward"}
-                                    size={14}
-                                    color={colors.SECTION_TEXT}
-                                    style={[sortedPendingTodos.length === 0 && { opacity: 0.5 }]}
-                                />
+                                <Animated.View style={{ transform: [{ rotate: getRotation(todoAnimation) }] }}>
+                                    <Ionicons
+                                        name="chevron-forward"
+                                        size={14}
+                                        color={colors.SECTION_TEXT}
+                                        style={[sortedPendingTodos.length === 0 && { opacity: 0.5 }]}
+                                    />
+                                </Animated.View>
                             </View>
                         </View>
-                        <View style={styles.decorativeCircle} />
+                        <Animated.View style={[styles.decorativeCircle, getCircleTransform(todoAnimation)]} />
                     </TouchableOpacity>
                     {todoExpanded && (
                         <View style={viewMode === 'card' ? styles.gridContainer : {}}>
@@ -268,7 +343,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
                         style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 0.2, borderColor: 'rgba(16, 185, 129, 0.3)' }]}
-                        onPress={() => toggleSection(setDoneExpanded)}
+                        onPress={() => toggleSection(setDoneExpanded, doneAnimation)}
                         disabled={sortedCompletedTodos.length === 0}
                     >
                         <View style={[styles.sectionTitleContainer, sortedCompletedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
@@ -308,14 +383,16 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             <View style={{ flex: 1 }} />
 
                             <View style={styles.chevronZone}>
-                                <Ionicons
-                                    name={doneExpanded ? "chevron-down" : "chevron-forward"}
-                                    size={14}
-                                    color={colors.SECTION_TEXT}
-                                />
+                                <Animated.View style={{ transform: [{ rotate: getRotation(doneAnimation) }] }}>
+                                    <Ionicons
+                                        name="chevron-forward"
+                                        size={14}
+                                        color={colors.SECTION_TEXT}
+                                    />
+                                </Animated.View>
                             </View>
                         </View>
-                        <View style={styles.decorativeCircle} />
+                        <Animated.View style={[styles.decorativeCircle, getCircleTransform(doneAnimation)]} />
                     </TouchableOpacity>
 
                     {
@@ -347,7 +424,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 <View style={styles.sectionContainer}>
                     <TouchableOpacity
                         style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderWidth: 0.2, borderColor: 'rgba(139, 92, 246, 0.3)' }]}
-                        onPress={() => toggleSection(setArchiveExpanded)}
+                        onPress={() => toggleSection(setArchiveExpanded, archiveAnimation)}
                         disabled={sortedArchivedTodos.length === 0}
                     >
                         <View style={[styles.sectionTitleContainer, sortedArchivedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
@@ -381,8 +458,8 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                     <SortControls
                                         sortBy={archiveSortBy}
                                         sortOrder={archiveSortOrder}
-                                        onToggleSortBy={() => setArchiveSortBy(archiveSortBy === "date" ? "text" : "date")}
-                                        onToggleSortOrder={() => setArchiveSortOrder(archiveSortOrder === "asc" ? "desc" : "asc")}
+                                        onToggleSortBy={() => setArchiveSortBy(prev => prev === "date" ? "text" : "date")}
+                                        onToggleSortOrder={() => setArchiveSortOrder(prev => prev === "asc" ? "desc" : "asc")}
                                     />
                                 )}
                             </View>
@@ -390,15 +467,17 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             <View style={{ flex: 1 }} />
 
                             <View style={styles.chevronZone}>
-                                <Ionicons
-                                    name={archiveExpanded ? "chevron-down" : "chevron-forward"}
-                                    size={14}
-                                    color={colors.SECTION_TEXT}
-                                    style={[sortedArchivedTodos.length === 0 && { opacity: 0.5 }]}
-                                />
+                                <Animated.View style={{ transform: [{ rotate: getRotation(archiveAnimation) }] }}>
+                                    <Ionicons
+                                        name="chevron-forward"
+                                        size={14}
+                                        color={colors.SECTION_TEXT}
+                                        style={[sortedArchivedTodos.length === 0 && { opacity: 0.5 }]}
+                                    />
+                                </Animated.View>
                             </View>
                         </View>
-                        <View style={styles.decorativeCircle} />
+                        <Animated.View style={[styles.decorativeCircle, getCircleTransform(archiveAnimation)]} />
                     </TouchableOpacity>
                     {archiveExpanded && (
                         <View style={viewMode === 'card' ? styles.gridContainer : {}}>

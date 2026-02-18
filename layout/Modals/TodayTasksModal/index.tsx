@@ -1,4 +1,5 @@
 import StyledText from "@/components/StyledText";
+import { formatDate } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { selectNotifications } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
@@ -20,7 +21,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
     onClose,
     tasks
 }) => {
-    const { colors, t } = useTheme();
+    const { colors, t, lang } = useTheme();
     const insets = useSafeAreaInsets();
     const notifications = useSelector(selectNotifications);
     const router = useRouter();
@@ -47,8 +48,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
     };
 
     const getTimeFromReminder = (reminder: string) => {
-        const date = new Date(reminder);
-        return date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
+        return formatDate(reminder, lang).split(' ')[1];
     };
 
     const isOverdue = (reminder: string) => {
@@ -69,7 +69,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
         const baseColor = palette[index % palette.length];
         const statusColor = itemIsOverdue ? '#eb637aff' : baseColor; // Aesthetic Rose Red for overdue
         const statusIcon = itemIsOverdue ? "alert-circle-outline" : "time-outline";
-        const statusLabel = itemIsOverdue ? "Vaxtı keçib" : "Gözlənilir";
+        const statusLabel = itemIsOverdue ? t("status_overdue") : t("status_pending");
 
         return (
             <TouchableOpacity
@@ -172,7 +172,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
                     ListEmptyComponent={
                         <View style={localStyles.emptyContainer}>
                             <Ionicons name="calendar-outline" size={64} color={colors.PLACEHOLDER} style={{ marginBottom: 16 }} />
-                            <StyledText style={{ color: colors.PLACEHOLDER, fontSize: 16 }}>Hal-hazırda heç bir tapşırıq yoxdur</StyledText>
+                            <StyledText style={{ color: colors.PLACEHOLDER, fontSize: 16 }}>{t("no_results")}</StyledText>
                         </View>
                     }
                 />

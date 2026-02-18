@@ -2,6 +2,7 @@ import StyledButton from "@/components/StyledButton";
 import StyledModal from "@/components/StyledModal";
 import StyledText from "@/components/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
+import { formatDate, translateReminderStatus } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { clearNotifications, markAllAsRead, markAsRead, selectNotifications } from "@/store/slices/notificationSlice";
@@ -17,7 +18,7 @@ interface NotificationsModalProps {
 }
 
 const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClose }) => {
-    const { colors, t } = useTheme();
+    const { colors, t, lang } = useTheme();
     const dispatch = useAppDispatch();
     const notifications = useAppSelector(selectNotifications);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -47,7 +48,8 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
     const renderItem = useCallback(({ item }: { item: any }) => {
         let statusColor = "#FFB74D";
         let statusIcon: any = "hourglass-outline";
-        let statusLabel = item.status || 'Gözlənilir';
+        let statusLabelRaw = item.status || 'Gözlənilir';
+        let statusLabel = translateReminderStatus(statusLabelRaw, t);
 
         if (item.status === 'Ləğv olunub' || item.status === 'Dəyişdirilib və ləğv olunub') {
             statusColor = colors.ERROR_INPUT_TEXT;
@@ -81,7 +83,11 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                 ]}
             >
                 <View style={{ width: 32, alignItems: 'center' }}>
-                    <Ionicons name={(item.categoryIcon as any) || "notifications-outline"} size={26} color={statusColor} />
+                    {item.categoryIcon && !Ionicons.glyphMap[item.categoryIcon as keyof typeof Ionicons.glyphMap] ? (
+                        <StyledText style={{ fontSize: 24 }}>{item.categoryIcon}</StyledText>
+                    ) : (
+                        <Ionicons name={(item.categoryIcon as any) || "notifications-outline"} size={26} color={statusColor} />
+                    )}
                 </View>
                 <View style={styles.contentContainer}>
                     <StyledText style={[
@@ -95,7 +101,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                         ellipsizeMode="tail"
                     >{item.body}</StyledText>
                     <StyledText style={styles.itemDate}>
-                        {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatDate(item.date, lang)}
                     </StyledText>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>

@@ -14,10 +14,8 @@ export const TRANSLATIONS = {
         edit: "Düzəliş et",
         archive: "Arxiv",
         archive_button: "Arxivlə",
-
         completed: "Tamamlanıb",
         pending: "Gözlənilir",
-
         share_message: "Taskify — gününüzü planlaşdırmaq üçün gözəl tətbiq! 🚀",
         retry_confirm_title: "Təkrarla",
         retry_confirm_message: "Bu tapşırığı nə vaxt təkrarlamaq istəyirsiniz?",
@@ -37,13 +35,9 @@ export const TRANSLATIONS = {
         done: "Bitmiş işlər",
         created: "Yaradılıb",
         edited: "Düzəliş olunub",
-
         close: "Bağla",
-
         no_results: "Nəticə tapılmadı",
         back: "Geri",
-
-
         select_language: "Dil seçimi",
         select_theme: "İnterfeys seçimi",
         task_details: "Tapşırıq detalları",
@@ -59,7 +53,6 @@ export const TRANSLATIONS = {
         tab_more: "Daha çox",
         tab_breathing_title: "Nəfəs al",
         tab_expenses: "Xərclərim",
-
         mood_q1: "Bu gün daxili dünyanda hava necədir?",
         mood_q2: "Bu gün ruhunun rəngləri necə görünür?",
         mood_q3: "Bu gün daxili enerjin özünü necə büruzə verir?",
@@ -79,10 +72,6 @@ export const TRANSLATIONS = {
         mood_unlock_time: "Nəticə saat 21:00-da açıqlanacaq",
         today_weight: "Bu gün tərəzi sənə nə dedi?",
         today_rating: "Bugün üçün özünü qiymətləndir",
-
-
-
-
         monthly_stats: "Aylıq statistika",
         date: "Tarix",
         time: "Saat",
@@ -98,7 +87,6 @@ export const TRANSLATIONS = {
         enable: "Aktiv et",
         retry: "Yenidən yoxla",
         confirm_delete: "Silinməni təsdiqləyin",
-
         notifications_todo: "Tapşırıqlar",
         notifications_birthday: "Ad günləri",
         notifications_movie: "Filmlər",
@@ -115,14 +103,10 @@ export const TRANSLATIONS = {
         success: "Uğurlu",
         error: "Xəta",
         reset_success_message: "Tətbiq sıfırlandı. Zəhmət olmasa tətbiqi yenidən başladın.",
-
-
-
+        task_added_success: "Tapşırıq uğurla əlavə edildi!",
         past_reminder_error: "Keçmiş zamana xatırlatma təyin etmək olmur",
         attention: "Diqqət",
         next: "Növbəti",
-
-
         disable_notifications_confirm: "Bütün aktiv bildirişləri dayandırmaq istədiyinizə əminsiniz?",
         clear_history_confirm: "Bütün bildiriş tarixçəsini silmək istədiyinizə əminsiniz?",
         home_plan_day: "Gününü planla, taskları yarat",
@@ -133,14 +117,7 @@ export const TRANSLATIONS = {
         home_expenses_desc: "Gündəlik xərclərinə nəzarət et",
         execution_time: "İcra vaxtı",
         time_elapsed: "Keçən vaxt",
-
-
-
         security: "Təhlükəsizlik",
-
-
-
-
         enable_biometrics: "Biometrik kilid",
         biometrics_desc: "Tətbiqə giriş üçün Face ID / Barmaq izi tələb olunacaq.",
         biometrics_not_available: "Biometrik doğrulama cihazınızda dəstəklənmir.",
@@ -151,24 +128,45 @@ export const TRANSLATIONS = {
         avg_mood: "Mood Ort.",
         avg_rating: "Reytinq Ort.",
         days_tracked: "İzlənilən gün",
-
         test_reset: "Test: Sıfırla",
         today_tasks_header: "Bugün üçün xatırlatmalar",
-
         days_short: "gün",
         hours_short: "saat",
         minutes_short: "dəq",
         menu_add_task: "Tapşırıq",
         menu_add_birthday: "Ad günü",
         menu_add_movie: "Film",
-
-
-
-
-
-
-
-
+        breathing_inhale: "Nəfəs al",
+        breathing_hold: "Saxla",
+        breathing_exhale: "Nəfəs ver",
+        breathing_ready: "Hazırsan?",
+        breathing_get_ready: "Hazır ol",
+        breathing_completed_title: "Bir az daha yaxşıdır?",
+        breathing_completed_subtitle: "Davam etməyə hazırsan",
+        breathing_button_start: "Başla",
+        breathing_button_stop: "Dayandır",
+        breathing_button_restart: "Yenidən",
+        breathing_duration_sec: "saniyə",
+        breathing_duration_min: "dəqiqə",
+        breathing_msg_1: "Sadəcə nəfəsinə fokuslan",
+        breathing_msg_2: "Hər şeyi kənara qoy",
+        breathing_msg_3: "Dərindən nəfəs al",
+        breathing_msg_4: "Rahatla və dincəl",
+        breathing_msg_5: "Zehnini sakitləşdir",
+        breathing_msg_6: "Hər nəfəsdə daha da rahatla",
+        breathing_msg_7: "Anı hiss et",
+        breathing_reminder_scheduled: "Xatırlatma sabah üçün quruldu!",
+        breathing_button_remind: "Məni sabah xatırlat",
+        breathing_reminder_title: "Nəfəs alma vaxtıdır",
+        notifications_breathing: "Nəfəs al",
+        status_pending: "Gözlənilir",
+        status_replaced_cancelled: "Dəyişdirilib və ləğv olunub",
+        status_sent: "Göndərilib",
+        status_cancelled: "Ləğv olunub",
+        status_overdue: "Vaxtı keçib",
+        status_scheduled: "Təyin olunub",
+        sort_date: "Tarix",
+        sort_text: "Mətn",
     },
     en: {
         welcome: "Welcome",
@@ -185,10 +183,8 @@ export const TRANSLATIONS = {
         edit: "Edit",
         archive: "Archive",
         archive_button: "Archive",
-
         completed: "Completed",
         pending: "Pending",
-
         share_message: "Check out Taskify — a beautiful to-do app to organize your day! 🚀",
         retry_confirm_title: "Retry",
         retry_confirm_message: "When would you like to retry this task?",
@@ -208,13 +204,9 @@ export const TRANSLATIONS = {
         done: "Done",
         created: "Created",
         edited: "Edited",
-
         close: "Close",
-
         no_results: "No results found",
         back: "Back",
-
-
         select_language: "Select Language",
         select_theme: "Select Theme",
         task_details: "Task Details",
@@ -225,12 +217,10 @@ export const TRANSLATIONS = {
         tab_events: "Events",
         tab_birthday: "Birthdays",
         tab_movies: "Movies",
-
         tab_today: "Today",
         tab_stats: "Statistics",
         tab_more: "More",
         tab_breathing_title: "Breathing",
-
         mood_q1: "How's the weather in your inner world today?",
         mood_q2: "How do your soul's colors look today?",
         mood_q3: "How is your inner energy manifesting itself today?",
@@ -250,10 +240,6 @@ export const TRANSLATIONS = {
         mood_unlock_time: "Results will open at 21:00",
         today_weight: "What's the number on the scale today?",
         today_rating: "Rate yourself for today",
-
-
-
-
         monthly_stats: "Monthly Statistics",
         date: "Date",
         time: "Time",
@@ -269,7 +255,6 @@ export const TRANSLATIONS = {
         enable: "Enable",
         retry: "Try again",
         confirm_delete: "Confirm Deletion",
-
         notifications_todo: "To-Do Items",
         notifications_birthday: "Birthdays",
         notifications_movie: "Movies",
@@ -286,14 +271,10 @@ export const TRANSLATIONS = {
         success: "Success",
         error: "Error",
         reset_success_message: "App reset. Please restart the application.",
-
-
-
+        task_added_success: "Task added successfully!",
         past_reminder_error: "Reminder time cannot be in the past",
         attention: "Attention",
         next: "Next",
-
-
         disable_notifications_confirm: "Are you sure you want to stop all active notifications?",
         clear_history_confirm: "Are you sure you want to delete the entire notification history?",
         home_plan_day: "Plan your day, create tasks",
@@ -305,14 +286,7 @@ export const TRANSLATIONS = {
         tab_expenses: "Expenses",
         execution_time: "Execution time",
         time_elapsed: "Time elapsed",
-
-
-
         security: "Security",
-
-
-
-
         enable_biometrics: "Biometric Lock",
         biometrics_desc: "Require Face ID/Fingerprint to open the app.",
         biometrics_not_available: "Biometric authentication is not available on your device.",
@@ -323,24 +297,45 @@ export const TRANSLATIONS = {
         avg_mood: "Mood Avg",
         avg_rating: "Rating Avg",
         days_tracked: "Days tracked",
-
         test_reset: "Test: Reset",
         today_tasks_header: "Reminders for today",
-
         days_short: "d",
         hours_short: "h",
         minutes_short: "m",
         menu_add_task: "Task",
         menu_add_birthday: "Birthday",
         menu_add_movie: "Movie",
-
-
-
-
-
-
-
-
+        breathing_inhale: "Inhale",
+        breathing_hold: "Hold",
+        breathing_exhale: "Exhale",
+        breathing_ready: "Ready?",
+        breathing_get_ready: "Get ready",
+        breathing_completed_title: "Feeling a bit better?",
+        breathing_completed_subtitle: "You are ready to continue",
+        breathing_button_start: "Start",
+        breathing_button_stop: "Stop",
+        breathing_button_restart: "Restart",
+        breathing_duration_sec: "seconds",
+        breathing_duration_min: "minutes",
+        breathing_msg_1: "Just focus on your breath",
+        breathing_msg_2: "Put everything aside",
+        breathing_msg_3: "Take a deep breath",
+        breathing_msg_4: "Relax and let go",
+        breathing_msg_5: "Calm your mind",
+        breathing_msg_6: "Relax more with every breath",
+        breathing_msg_7: "Feel the moment",
+        breathing_reminder_scheduled: "Reminder scheduled for tomorrow!",
+        breathing_button_remind: "Remind me tomorrow",
+        breathing_reminder_title: "Time to breathe",
+        notifications_breathing: "Breathing",
+        status_pending: "Pending",
+        status_replaced_cancelled: "Replaced and cancelled",
+        status_sent: "Sent",
+        status_cancelled: "Cancelled",
+        status_overdue: "Overdue",
+        status_scheduled: "Scheduled",
+        sort_date: "Date",
+        sort_text: "Text",
     },
     ru: {
         welcome: "Добро пожаловать",
@@ -357,10 +352,8 @@ export const TRANSLATIONS = {
         edit: "Изменить",
         archive: "Архив",
         archive_button: "Архивировать",
-
         completed: "Завершено",
         pending: "Ожидается",
-
         share_message: "Попробуй Taskify — красивое приложение для планирования дня! 🚀",
         retry_confirm_title: "Повторить",
         retry_confirm_message: "На какое время вы хотите отложить задачу?",
@@ -380,13 +373,9 @@ export const TRANSLATIONS = {
         done: "Сделано",
         created: "Создано",
         edited: "Изменено",
-
         close: "Закрыть",
-
         no_results: "Ничего не найдено",
         back: "Назад",
-
-
         select_language: "Выбор языка",
         select_theme: "Выбор интерфейса",
         task_details: "Детали задачи",
@@ -397,12 +386,10 @@ export const TRANSLATIONS = {
         tab_events: "События",
         tab_birthday: "Дни рождения",
         tab_movies: "Фильмы",
-
         tab_today: "Сегодня",
         tab_stats: "Статистика",
         tab_more: "Еще",
         tab_breathing_title: "Дыхание",
-
         mood_q1: "Какая сегодня погода в твоем внутреннем мире?",
         mood_q2: "Как сегодня выглядят цвета твоей души?",
         mood_q3: "Как проявляется твоя внутренняя энергия сегодня?",
@@ -422,10 +409,6 @@ export const TRANSLATIONS = {
         mood_unlock_time: "Результаты откроются в 21:00",
         today_weight: "Какую цифру показывают весы сегодня?",
         today_rating: "Оцени себя сегодня",
-
-
-
-
         monthly_stats: "Ежемесячная статистика",
         date: "Дата",
         time: "Время",
@@ -441,7 +424,6 @@ export const TRANSLATIONS = {
         enable: "Включить",
         retry: "Попробовать снова",
         confirm_delete: "Подтвердить удаление",
-
         notifications_todo: "Задачи",
         notifications_birthday: "Дни рождения",
         notifications_movie: "Фильмы",
@@ -458,14 +440,10 @@ export const TRANSLATIONS = {
         success: "Успешно",
         error: "Ошибка",
         reset_success_message: "Приложение сброшено. Пожалуйста, перезапустите приложение.",
-
-
-
+        task_added_success: "Задача успешно добавлена!",
         past_reminder_error: "Время напоминания не может быть в прошлом",
         attention: "Внимание",
         next: "Далее",
-
-
         disable_notifications_confirm: "Вы уверены, что хотите остановить все активные уведомления?",
         clear_history_confirm: "Вы уверены, что хотите удалить всю историю уведомлений?",
         home_plan_day: "Планируй свой день, создавай задачи",
@@ -477,14 +455,7 @@ export const TRANSLATIONS = {
         tab_expenses: "Расходы",
         execution_time: "Время выполнения",
         time_elapsed: "Прошло времени",
-
-
-
         security: "Безопасность",
-
-
-
-
         enable_biometrics: "Биометрический замок",
         biometrics_desc: "Требовать Face ID / Отпечаток пальца для входа.",
         biometrics_not_available: "Биометрическая аутентификация недоступна на вашем устройстве.",
@@ -495,24 +466,45 @@ export const TRANSLATIONS = {
         avg_mood: "Ср. Настроение",
         avg_rating: "Ср. Рейтинг",
         days_tracked: "Дней отслежено",
-
         test_reset: "Тест: Сбросить",
         today_tasks_header: "Напоминания на сегодня",
-
         days_short: "дн",
         hours_short: "ч",
         minutes_short: "мин",
         menu_add_task: "Задача",
         menu_add_birthday: "День рождения",
         menu_add_movie: "Фильм",
-
-
-
-
-
-
-
-
+        breathing_inhale: "Вдох",
+        breathing_hold: "Задержка",
+        breathing_exhale: "Выдох",
+        breathing_ready: "Готовы?",
+        breathing_get_ready: "Приготовьтесь",
+        breathing_completed_title: "Чувствуете себя лучше?",
+        breathing_completed_subtitle: "Вы готовы продолжать",
+        breathing_button_start: "Начать",
+        breathing_button_stop: "Остановить",
+        breathing_button_restart: "Заново",
+        breathing_duration_sec: "секунд",
+        breathing_duration_min: "минут",
+        breathing_msg_1: "Просто сосредоточьтесь на дыхании",
+        breathing_msg_2: "Отложите все дела",
+        breathing_msg_3: "Сделайте глубокий вдох",
+        breathing_msg_4: "Расслабьтесь и отдохните",
+        breathing_msg_5: "Успокойте свой ум",
+        breathing_msg_6: "Расслабляйтесь больше с каждым вдохом",
+        breathing_msg_7: "Почувствуйте момент",
+        breathing_reminder_scheduled: "Напоминание установлено на завтра!",
+        breathing_button_remind: "Напомнить завтра",
+        breathing_reminder_title: "Время дышать",
+        notifications_breathing: "Дыхание",
+        status_pending: "Ожидается",
+        status_replaced_cancelled: "Изменено и отменено",
+        status_sent: "Отправлено",
+        status_cancelled: "Отменено",
+        status_overdue: "Просрочено",
+        status_scheduled: "Запланировано",
+        sort_date: "Дата",
+        sort_text: "Текст",
     },
 };
 

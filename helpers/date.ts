@@ -1,9 +1,10 @@
-export const getFullFormatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
+export const getFullFormatDate = (date: Date, lang: string = 'az') => {
+    const locale = lang === 'az' ? 'az-AZ' : lang === 'en' ? 'en-US' : 'ru-RU';
+    return new Intl.DateTimeFormat(locale, {
         day: "numeric",
         month: "short",
         year: "numeric"
-    }).format(date)
+    }).format(date).replace('.', '');
 }
 
 export const formatDate = (dateString: string, lang: string = 'az') => {
@@ -12,8 +13,17 @@ export const formatDate = (dateString: string, lang: string = 'az') => {
 
     const day = date.toLocaleDateString(locale, { day: '2-digit' })
     let month = date.toLocaleDateString(locale, { month: 'short' })
-    // Remove trailing dot if any (common in some locales like Russian)
-    month = month.replace('.', '')
+
+    // Russian specific: fix abbreviations like 'февр.' to 'фев' and remove trailing dots
+    if (locale === 'ru-RU') {
+        month = month.replace('.', '');
+        if (month.toLowerCase() === 'февр') month = 'фев';
+        if (month.toLowerCase() === 'сент') month = 'сен';
+        if (month.toLowerCase() === 'нояб') month = 'ноя';
+    } else {
+        month = month.replace('.', '');
+    }
+
     // Capitalize first letter for consistency
     month = month.charAt(0).toUpperCase() + month.slice(1)
 
@@ -23,17 +33,45 @@ export const formatDate = (dateString: string, lang: string = 'az') => {
     return `${day}-${month}-${year} ${timeStr}`
 }
 
-export const getShortDate = (dateString: string) => {
+export const getShortDate = (dateString: string, lang: string = 'az') => {
     const date = new Date(dateString);
     const now = new Date();
     const isToday = date.toDateString() === now.toDateString();
+    const locale = lang === 'az' ? 'az-AZ' : lang === 'en' ? 'en-US' : 'ru-RU';
 
     if (isToday) {
-        return date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
     }
 
-    return date.toLocaleDateString('az-AZ', { day: '2-digit', month: 'short' });
+    let month = date.toLocaleDateString(locale, { month: 'short' });
+
+    // Russian specific fixes for 3-letter consistency
+    if (locale === 'ru-RU') {
+        month = month.replace('.', '');
+        if (month.toLowerCase() === 'февр') month = 'фев';
+        if (month.toLowerCase() === 'сент') month = 'сен';
+        if (month.toLowerCase() === 'нояб') month = 'ноя';
+    } else {
+        month = month.replace('.', '');
+    }
+
+    month = month.charAt(0).toUpperCase() + month.slice(1);
+    const day = date.toLocaleDateString(locale, { day: '2-digit' });
+
+    return `${day} ${month}`;
 }
+
+export const translateReminderStatus = (status: string | undefined, t: any) => {
+    if (!status) return undefined;
+
+    switch (status) {
+        case 'Gözlənilir': return t("status_pending");
+        case 'Dəyişdirilib və ləğv olunub': return t("status_replaced_cancelled");
+        case 'Göndərilib': return t("status_sent");
+        case 'Ləğv olunub': return t("status_cancelled");
+        default: return status;
+    }
+};
 
 export const formatDuration = (start: string, end: string, t: any) => {
     const startTime = new Date(start).getTime();

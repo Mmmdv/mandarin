@@ -3,7 +3,7 @@ import StyledText from "@/components/StyledText";
 import { GAP, PADDING, styles } from "@/constants/homeStyles";
 import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Dimensions, LayoutAnimation, Pressable, ScrollView, View } from "react-native";
@@ -25,24 +25,24 @@ export default function MoreScreen() {
 
     const menuItems = useMemo(() => [
         {
-            id: "breathing",
-            title: t("tab_breathing_title") || "Nəfəs al",
+            id: "mandarin_tree",
+            title: "Mandarin ağacı",
             description: t("coming_soon"),
-            icon: "flower" as keyof typeof Ionicons.glyphMap,
-            route: "/breathing",
-            color: "#FF9F43",
+            icon: "tree" as keyof typeof MaterialCommunityIcons.glyphMap, // İndi həqiqətən ağac ikonu var
+            route: "/more",
+            color: "#2ECC71",
             iconColor: "#FFF"
         },
         {
-            id: "settings",
-            title: t("settings"),
-            description: t("select_language") + ", " + t("select_theme"),
-            icon: "settings" as keyof typeof Ionicons.glyphMap,
-            route: "/settings",
-            color: "#54a0ff",
+            id: "breathing",
+            title: t("tab_breathing_title") || "Nəfəs al",
+            description: "Zehnini sakitləşdir və rahatla",
+            icon: "weather-windy" as keyof typeof MaterialCommunityIcons.glyphMap, // Nəfəs / külək hissi
+            route: "/breathing",
+            color: "#D2B48C",
             iconColor: "#FFF"
         },
-    ], [t]);
+    ], [t, colors]);
 
     const handlePress = useCallback((id: string, route: string) => {
         router.push(route as any);
@@ -66,7 +66,7 @@ export default function MoreScreen() {
             >
                 <View style={styles.cardHeader}>
                     <View style={[styles.iconContainer, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                        <Ionicons name={item.icon} size={24} color={item.iconColor} />
+                        <MaterialCommunityIcons name={item.icon} size={28} color={item.iconColor} />
                     </View>
                 </View>
 
@@ -97,7 +97,7 @@ export default function MoreScreen() {
                 onPress={() => handlePress(item.id, item.route)}
             >
                 <View style={[styles.listIconContainer, { backgroundColor: item.color }]}>
-                    <Ionicons name={item.icon} size={22} color={item.iconColor} />
+                    <MaterialCommunityIcons name={item.icon} size={22} color={item.iconColor} />
                 </View>
                 <View style={styles.listTextContainer}>
                     <StyledText style={[styles.listTitle, { color: colors.PRIMARY_TEXT }]}>{item.title}</StyledText>

@@ -1,22 +1,22 @@
 import { LayoutAnimation } from "react-native"
 
 export const toggleAnimation = {
-    duration: 700,
+    duration: 600,
     create: {
-        duration: 700,
+        duration: 600,
         type: LayoutAnimation.Types.spring,
         property: LayoutAnimation.Properties.opacity,
-        springDamping: 0.7,
+        springDamping: 0.8,
     },
     update: {
-        duration: 700,
+        duration: 600,
         type: LayoutAnimation.Types.spring,
-        springDamping: 0.7,
+        springDamping: 0.8,
     },
     delete: {
-        duration: 500,
+        duration: 400,
         type: LayoutAnimation.Types.spring,
         property: LayoutAnimation.Properties.opacity,
-        springDamping: 0.7,
+        springDamping: 1.0,
     },
 }
