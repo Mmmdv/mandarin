@@ -26,7 +26,7 @@ export default function MoreScreen() {
     const menuItems = useMemo(() => [
         {
             id: "mandarin_tree",
-            title: "Mandarin ağacı",
+            title: t("mandarin_tree"),
             description: t("coming_soon"),
             icon: "tree" as keyof typeof MaterialCommunityIcons.glyphMap, // İndi həqiqətən ağac ikonu var
             route: "/more",
@@ -36,7 +36,7 @@ export default function MoreScreen() {
         {
             id: "breathing",
             title: t("tab_breathing_title") || "Nəfəs al",
-            description: "Zehnini sakitləşdir və rahatla",
+            description: t("breathing_desc"),
             icon: "weather-windy" as keyof typeof MaterialCommunityIcons.glyphMap, // Nəfəs / külək hissi
             route: "/breathing",
             color: "#D2B48C",

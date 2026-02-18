@@ -31,12 +31,12 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                 {
                     opacity: disabled ? 0.3 : 1,
                     borderBottomColor: colors.PRIMARY_BORDER_DARK,
-                    borderBottomWidth: disabled ? 0 : 1,
+                    borderBottomWidth: disabled ? 0 : 0.2,
                 }
             ]}
         >
-            <View style={[styles.iconContainer, { backgroundColor: disabled ? '#ccc' : (color || colors.CHECKBOX_SUCCESS) }]}>
-                <Ionicons name={icon} size={14} color="#FFF" />
+            <View style={[styles.iconContainer, { backgroundColor: colors.PRIMARY_INACTIVE_BUTTON }]}>
+                <Ionicons name={icon} size={14} color={color || colors.PRIMARY_TEXT} />
             </View>
             <StyledText style={[styles.menuLabel, { color: colors.PRIMARY_TEXT }]}>{label}</StyledText>
         </TouchableOpacity>
@@ -96,21 +96,21 @@ const styles = StyleSheet.create({
     menuContainer: {
         position: 'absolute',
         width: 150,
-        borderRadius: 25,
-        borderWidth: 0.5,
+        borderRadius: 16,
+        borderWidth: 0.2,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
         overflow: 'hidden',
-        paddingVertical: 5,
+        paddingVertical: 1,
     },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 10,
-        paddingHorizontal: 15,
+        paddingHorizontal: 10,
     },
     iconContainer: {
         width: 20,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     menuLabel: {
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '600',
         flex: 1,
     }

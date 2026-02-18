@@ -433,7 +433,7 @@ export default function BreathingExercise() {
     };
 
     const durations = [
-        { label: `13 ${t("breathing_duration_sec")}`, value: 13 },
+        { label: `39 ${t("breathing_duration_sec")}`, value: 39 },
         { label: `1.5 ${t("breathing_duration_min")}`, value: 90 },
         { label: `3 ${t("breathing_duration_min")}`, value: 180 },
     ];

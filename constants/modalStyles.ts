@@ -23,6 +23,7 @@ export const modalStyles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "600",
         color: COLORS.PRIMARY_TEXT,
+        textAlign: "center",
     },
     divider: {
         height: 0.5,

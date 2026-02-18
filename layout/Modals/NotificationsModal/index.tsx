@@ -24,6 +24,18 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const insets = useSafeAreaInsets();
     const [refreshing, setRefreshing] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState<string>('all');
+
+    const filteredNotifications = React.useMemo(() => {
+        if (selectedStatus === 'all') return notifications;
+        return notifications.filter(n => {
+            // Handle combined status or specific mapping if needed
+            if (selectedStatus === 'Ləğv olunub') {
+                return n.status === 'Ləğv olunub' || n.status === 'Dəyişdirilib və ləğv olunub';
+            }
+            return n.status === selectedStatus;
+        });
+    }, [notifications, selectedStatus]);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -161,9 +173,58 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                     </View>
                 </View>
 
+                {/* Filter Chips */}
+                <View style={{ marginBottom: 0 }}>
+                    <FlatList
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        data={[
+                            { key: 'all', label: t('all') || 'Hamısı' },
+                            { key: 'Gözlənilir', label: t('status_pending') },
+                            { key: 'Göndərilib', label: t('status_sent') },
+                            { key: 'Ləğv olunub', label: t('status_cancelled') },
+                        ]}
+                        keyExtractor={(item) => item.key}
+                        contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 16, paddingBottom: 8 }}
+                        renderItem={({ item }) => {
+                            const isSelected = selectedStatus === item.key;
+                            return (
+                                <TouchableOpacity
+                                    onPress={() => setSelectedStatus(item.key)}
+                                    style={{
+                                        paddingHorizontal: 12, // Reduced padding
+                                        paddingVertical: 6,   // Reduced padding
+                                        borderRadius: 16,     // Adjusted radius
+                                        backgroundColor: isSelected ? colors.CHECKBOX_SUCCESS : 'transparent',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <StyledText style={{
+                                        color: isSelected ? '#fff' : colors.PLACEHOLDER,
+                                        fontSize: 12, // Keep small font
+                                        fontWeight: isSelected ? '700' : '500',
+                                        marginBottom: isSelected ? 4 : 0,
+                                    }}>
+                                        {item.label}
+                                    </StyledText>
+                                    {isSelected && (
+                                        <View style={{
+                                            width: 4,
+                                            height: 4,
+                                            borderRadius: 2,
+                                            backgroundColor: '#fff',
+                                        }} />
+                                    )}
+                                </TouchableOpacity>
+                            )
+                        }}
+                    />
+                </View>
+
                 {/* Content */}
                 <FlatList
-                    data={notifications}
+                    data={filteredNotifications}
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={styles.listContent}

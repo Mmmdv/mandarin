@@ -34,7 +34,8 @@ export const styles = StyleSheet.create({
         zIndex: 10,
     },
     listContent: {
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingTop: 8,
         paddingBottom: 40,
     },
     notificationItem: {

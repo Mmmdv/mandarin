@@ -49,7 +49,7 @@ export async function schedulePushNotification(title: string, body: string, trig
     return await Notifications.scheduleNotificationAsync({
         content: {
             title: displayTitle,
-            body: `\n\n${body}`,
+            body: body,
             sound: true,
         },
         trigger: {

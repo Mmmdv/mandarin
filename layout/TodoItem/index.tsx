@@ -12,6 +12,7 @@ import ArchiveTodoModal from "../Modals/ArchiveTodoModal.tsx";
 import DeleteTodoModal from "../Modals/DeleteTodoModal.tsx";
 import EditTodoModal from "../Modals/EditTodoModal.tsx";
 import RetryTodoModal from "../Modals/RetryTodoModal.tsx";
+import TodoMenuModal from "../Modals/TodoMenuModal";
 import ViewTodoModal from "../Modals/ViewTodoModal.tsx";
 import CelebrationEffect, { CelebrationType, createCelebrationAnimations, playCelebration } from "./CelebrationEffect";
 import { styles } from "./styles";
@@ -47,6 +48,9 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
     const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false)
     const [isRetryModalOpen, setIsRetryModalOpen] = useState(false)
     const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+    const [isMenuModalOpen, setIsMenuModalOpen] = useState(false)
+    const [menuAnchor, setMenuAnchor] = useState<{ x: number, y: number, width: number, height: number } | undefined>(undefined)
+    const menuButtonRef = useRef<any>(null)
     const [showCelebrate, setShowCelebrate] = useState(false)
     const [celebrationType, setCelebrationType] = useState<CelebrationType>('idea')
 
@@ -91,6 +95,13 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
         } else {
             checkTodo(id)
         }
+    }
+
+    const openMenu = () => {
+        menuButtonRef.current?.measure((x, y, width, height, pageX, pageY) => {
+            setMenuAnchor({ x: pageX, y: pageY, width, height });
+            setIsMenuModalOpen(true);
+        });
     }
 
     // Check if it's a new task (created within last 2 seconds)
@@ -188,14 +199,14 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                             <View style={styles.cardMetadata}>
                                 <Ionicons
                                     name={reminderStatus === 'Ləğv olunub' || reminderCancelled ? "notifications-off" : "hourglass-outline"}
-                                    size={10}
+                                    size={11}
                                     color={reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166"}
                                 />
                                 <View style={styles.cardTimeContainer}>
-                                    <StyledText style={{ fontSize: 8.5, fontWeight: '600', color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166" }}>
+                                    <StyledText style={{ fontSize: 9.5, fontWeight: '600', color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166" }}>
                                         {formatDate(reminder, lang).split(' ')[0]}
                                     </StyledText>
-                                    <StyledText style={[styles.cardTimeSmall, { color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166" }]}>
+                                    <StyledText style={[styles.cardTimeSmall, { fontSize: 9.5, color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166" }]}>
                                         {formatDate(reminder, lang).split(' ')[1]}
                                     </StyledText>
                                 </View>
@@ -204,38 +215,15 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     </View>
 
                     <View style={styles.cardControls}>
-                        {!isCompleted && !isArchived && (
-                            <>
-                                <TouchableOpacity onPress={onPressEdit} activeOpacity={0.7} hitSlop={10}>
-                                    <Ionicons name="create-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={onPressRetry} activeOpacity={0.7} hitSlop={10}>
-                                    <Ionicons name="sync-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={onPressDelete} activeOpacity={0.7} hitSlop={10}>
-                                    <Ionicons name="trash-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                                </TouchableOpacity>
-                            </>
-                        )}
-                        {isCompleted && !isArchived && (
-                            <View style={{ flexDirection: 'row', gap: 10 }}>
-                                <TouchableOpacity onPress={onPressRetry} activeOpacity={0.7} hitSlop={10}>
-                                    <Ionicons name="sync-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                                </TouchableOpacity>
-                                {archiveTodo && (
-                                    <TouchableOpacity onPress={onPressArchive} activeOpacity={0.7} hitSlop={10}>
-                                        <Ionicons name="archive-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        )}
-                        {isArchived && (
-                            <View style={{ flexDirection: 'row', gap: 10 }}>
-                                <TouchableOpacity onPress={() => setIsViewModalOpen(true)} activeOpacity={0.7} hitSlop={10}>
-                                    <Ionicons name="information-circle-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                                </TouchableOpacity>
-                            </View>
-                        )}
+                        <TouchableOpacity
+                            ref={menuButtonRef}
+                            onPress={openMenu}
+                            activeOpacity={0.7}
+                            hitSlop={10}
+                            collapsable={false}
+                        >
+                            <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -280,6 +268,19 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     reminder={reminder}
                     reminderCancelled={reminderCancelled}
                     notificationId={notificationId}
+                />
+                <TodoMenuModal
+                    isOpen={isMenuModalOpen}
+                    onClose={() => setIsMenuModalOpen(false)}
+                    onEdit={onPressEdit}
+                    onRetry={onPressRetry}
+                    onDelete={onPressDelete}
+                    onArchive={archiveTodo ? onPressArchive : undefined}
+                    onView={() => setIsViewModalOpen(true)}
+                    isCompleted={isCompleted}
+                    isArchived={isArchived}
+                    archiveTodoAvailable={!!archiveTodo}
+                    anchorPosition={menuAnchor}
                 />
             </Animated.View>
         );
@@ -377,61 +378,15 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 </TouchableOpacity>
             </View>
             <View style={styles.controlsContainer} onStartShouldSetResponder={() => true}>
-                {!isCompleted && !isArchived && (
-                    <>
-                        <TouchableOpacity onPress={onPressEdit} activeOpacity={0.7}>
-                            <Ionicons name="create-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={onPressRetry} activeOpacity={0.7}>
-                            <Ionicons name="sync-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                        </TouchableOpacity>
-                        <EditTodoModal
-                            title={title}
-                            isOpen={isEditModalOpen}
-                            onClose={() => setIsEditModalOpen(false)}
-                            onUpdate={(title, reminder, notificationId) => editTodo(id, title, reminder, notificationId)}
-                            reminder={reminder}
-                            reminderCancelled={reminderCancelled}
-                            notificationId={notificationId}
-                            categoryTitle={categoryTitle}
-                            categoryIcon={categoryIcon}
-                        />
-                        <TouchableOpacity onPress={onPressDelete} activeOpacity={0.7}>
-                            <Ionicons name="trash-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                        </TouchableOpacity>
-                        <DeleteTodoModal
-                            isOpen={isDeleteModalOpen}
-                            onClose={() => setIsDeleteModalOpen(false)}
-                            onDelete={() => deleteTodo(id)}
-                        />
-                    </>
-                )}
-                {isCompleted && !isArchived && (
-                    <>
-                        <TouchableOpacity onPress={onPressRetry} activeOpacity={0.7}>
-                            <Ionicons name="sync-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                        </TouchableOpacity>
-                        {archiveTodo && (
-                            <TouchableOpacity onPress={onPressArchive} activeOpacity={0.7}>
-                                <Ionicons name="archive-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                            </TouchableOpacity>
-                        )}
-                    </>
-                )}
-                {archiveTodo && (
-                    <ArchiveTodoModal
-                        isOpen={isArchiveModalOpen}
-                        onClose={() => setIsArchiveModalOpen(false)}
-                        onArchive={() => archiveTodo(id)}
-                    />
-                )}
-                {isArchived && (
-                    <>
-                        <TouchableOpacity onPress={() => setIsViewModalOpen(true)} activeOpacity={0.7}>
-                            <Ionicons name="information-circle-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
-                        </TouchableOpacity>
-                    </>
-                )}
+                <TouchableOpacity
+                    ref={menuButtonRef}
+                    onPress={openMenu}
+                    activeOpacity={0.7}
+                    hitSlop={10}
+                    collapsable={false}
+                >
+                    <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
+                </TouchableOpacity>
                 <RetryTodoModal
                     isOpen={isRetryModalOpen}
                     onClose={() => setIsRetryModalOpen(false)}
@@ -447,6 +402,43 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     reminder={reminder}
                     reminderCancelled={reminderCancelled}
                     notificationId={notificationId}
+                />
+
+                <EditTodoModal
+                    title={title}
+                    isOpen={isEditModalOpen}
+                    onClose={() => setIsEditModalOpen(false)}
+                    onUpdate={(title, reminder, notificationId) => editTodo(id, title, reminder, notificationId)}
+                    reminder={reminder}
+                    reminderCancelled={reminderCancelled}
+                    notificationId={notificationId}
+                    categoryTitle={categoryTitle}
+                    categoryIcon={categoryIcon}
+                />
+                <DeleteTodoModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setIsDeleteModalOpen(false)}
+                    onDelete={() => deleteTodo(id)}
+                />
+                {archiveTodo && (
+                    <ArchiveTodoModal
+                        isOpen={isArchiveModalOpen}
+                        onClose={() => setIsArchiveModalOpen(false)}
+                        onArchive={() => archiveTodo(id)}
+                    />
+                )}
+                <TodoMenuModal
+                    isOpen={isMenuModalOpen}
+                    onClose={() => setIsMenuModalOpen(false)}
+                    onEdit={onPressEdit}
+                    onRetry={onPressRetry}
+                    onDelete={onPressDelete}
+                    onArchive={archiveTodo ? onPressArchive : undefined}
+                    onView={() => setIsViewModalOpen(true)}
+                    isCompleted={isCompleted}
+                    isArchived={isArchived}
+                    archiveTodoAvailable={!!archiveTodo}
+                    anchorPosition={menuAnchor}
                 />
             </View>
         </Animated.View>
