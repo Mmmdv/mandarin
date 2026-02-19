@@ -174,25 +174,27 @@ export default function WeightTracker() {
     const containerColor = comp?.color || '#10B981';
 
     return (
-        <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 160 : undefined }]}>
+        <View style={{ marginBottom: 2.5, marginTop: 3 }}>
             <Pressable
                 onPress={toggleExpanded}
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 6,
-                    marginBottom: isExpanded ? 0 : -13,
-                    zIndex: 10,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    marginLeft: -10,
-                    marginRight: -20,
-                    marginTop: -13,
-                    paddingLeft: 10,
-                    paddingRight: 20,
-                    paddingVertical: 13,
-                    borderRadius: 20
-                }}
+                style={[
+                    homeStyles.card,
+                    {
+                        backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                        borderWidth: 0.3,
+                        borderColor: 'rgba(100, 116, 139, 0.3)',
+                        borderRadius: 20,
+                        paddingVertical: 13,
+                        paddingHorizontal: 20,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 10,
+                        overflow: 'hidden',
+                        marginBottom: 0,
+                        marginTop: 0,
+                        width: '100%'
+                    }
+                ]}
             >
                 <View style={[styles.iconContainer, { backgroundColor: `${comp?.color || '#10B981'}55`, zIndex: 2 }]}>
                     <Ionicons name="barbell" size={17} color={colors.SECTION_TEXT} />
@@ -209,7 +211,7 @@ export default function WeightTracker() {
                         <Ionicons name="refresh" size={18} color={colors.PLACEHOLDER} />
                     </Pressable>
                 )}
-                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto', zIndex: 2 }}>
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', zIndex: 2 }}>
                     <Animated.View style={{ transform: [{ rotate: getRotation() }] }}>
                         <Ionicons name="chevron-forward" size={14} color={colors.SECTION_TEXT} />
                     </Animated.View>
@@ -232,8 +234,17 @@ export default function WeightTracker() {
             </Pressable>
 
             {isExpanded && (
-                <>
-                    <View style={{ flex: 1, justifyContent: 'center', marginTop: 10 }}>
+                <View style={{
+                    marginTop: 10,
+                    backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                    borderWidth: 0.3,
+                    borderColor: 'rgba(100, 116, 139, 0.3)',
+                    borderRadius: 20,
+                    padding: 20,
+                    minHeight: 100,
+                    justifyContent: 'center'
+                }}>
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
                         {!currentWeight ? (
                             <View style={styles.contentContainer}>
                                 <View
@@ -319,8 +330,7 @@ export default function WeightTracker() {
                             </Animated.View>
                         )}
                     </View>
-
-                </>
+                </View>
             )}
 
         </View>

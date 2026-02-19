@@ -8,7 +8,7 @@ import { Todo } from '@/types/todo';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useRef, useState } from 'react';
-import { Animated, LayoutAnimation, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, FlatList, LayoutAnimation, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import StyledText from '../StyledText';
 
@@ -18,6 +18,7 @@ export default function ImportantTasksToday() {
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(true);
+    const [filter, setFilter] = useState<'all' | 'past' | 'waiting'>('all'); // Filter state
     const expandAnim = useRef(new Animated.Value(1)).current;
 
     const toggleExpanded = () => {
@@ -63,6 +64,19 @@ export default function ImportantTasksToday() {
             .sort((a, b) => new Date(a.reminder!).getTime() - new Date(b.reminder!).getTime());
     }, [todos, today]);
 
+    // Filter tasks based on selected tab
+    const filteredTasks = useMemo(() => {
+        const now = new Date();
+        if (filter === 'all') return todayTasks;
+        if (filter === 'past') {
+            return todayTasks.filter(task => new Date(task.reminder!) < now);
+        }
+        if (filter === 'waiting') {
+            return todayTasks.filter(task => new Date(task.reminder!) >= now);
+        }
+        return todayTasks;
+    }, [todayTasks, filter]);
+
     const handleTaskPress = () => {
         // Navigate to todo tab
         router.push('/(tabs)/todo');
@@ -76,40 +90,31 @@ export default function ImportantTasksToday() {
         return formatDate(reminder, lang).split(' ')[1];
     };
 
-    const getPriorityColor = (task: Todo, index: number) => {
-        // Detection for overdue in the main card
+    const getPriorityColor = (task: Todo) => {
         const isOverdue = task.reminder ? new Date(task.reminder) < new Date() : false;
-        if (isOverdue) return '#eb637aff'; // Use the same premium rose red
-
-        const palette = [
-            '#14B8A6', // Teal
-            '#3B82F6', // Blue
-            '#6366F1', // Indigo
-            '#8B5CF6', // Purple
-        ];
-        return palette[index % palette.length];
+        return isOverdue ? '#d43434' : '#3B82F6';
     };
 
     return (
-        <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 140 : undefined }]}>
+        <View style={{ marginBottom: 0, marginTop: 6 }}>
+            {/* Header Card */}
             <Pressable
                 onPress={toggleExpanded}
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 6,
-                    marginBottom: isExpanded ? 16 : -13,
-                    zIndex: 10,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    marginLeft: -10,
-                    marginRight: -20,
-                    marginTop: -13,
-                    paddingLeft: 10,
-                    paddingRight: 20,
-                    paddingVertical: 13,
-                    borderRadius: 20
-                }}
+                style={[
+                    homeStyles.card,
+                    {
+                        backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                        borderWidth: 0.3,
+                        borderColor: 'rgba(100, 116, 139, 0.3)',
+                        borderRadius: 20,
+                        paddingVertical: 13,
+                        paddingHorizontal: 20,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 10,
+                        overflow: 'hidden'
+                    }
+                ]}
             >
                 <View style={[styles.iconContainer, { backgroundColor: 'rgba(59, 130, 246, 0.55)', zIndex: 2 }]}>
                     <Ionicons name="notifications" size={17} color={colors.SECTION_TEXT} />
@@ -124,7 +129,8 @@ export default function ImportantTasksToday() {
                         <StyledText style={[styles.badgeText, { color: colors.SECTION_TEXT }]}>{todayTasks.length}</StyledText>
                     </View>
                 )}
-                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto', zIndex: 2 }}>
+                <View style={{ flex: 1 }} />
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', zIndex: 2 }}>
                     <Animated.View style={{ transform: [{ rotate: getRotation() }] }}>
                         <Ionicons
                             name="chevron-forward"
@@ -150,10 +156,71 @@ export default function ImportantTasksToday() {
                 />
             </Pressable>
 
+            {/* Content Card - Separate and below */}
             {isExpanded && (
-                <>
-                    {todayTasks.length === 0 ? (
-                        <View style={styles.emptyContainer}>
+                <View style={{ marginTop: 10 }}>
+                    {/* Filter Tabs */}
+                    <View style={{ marginBottom: 10 }}>
+                        <FlatList
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            data={[
+                                { key: 'all', label: t('all') },
+                                { key: 'past', label: t('status_overdue') },
+                                { key: 'waiting', label: t('status_pending') },
+                            ]}
+                            keyExtractor={(item) => item.key}
+                            contentContainerStyle={{ gap: 8, flexGrow: 1, justifyContent: 'center' }}
+                            renderItem={({ item }) => {
+                                const isSelected = filter === item.key;
+                                return (
+                                    <TouchableOpacity
+                                        onPress={() => setFilter(item.key as any)}
+                                        style={{
+                                            paddingHorizontal: 12,
+                                            paddingVertical: 6,
+                                            borderRadius: 16,
+                                            backgroundColor: isSelected ? '#3B82F6' : 'transparent', // Blue active or transparent
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <StyledText style={{
+                                            color: isSelected ? '#fff' : colors.PLACEHOLDER,
+                                            fontSize: 12,
+                                            fontWeight: isSelected ? '700' : '500',
+                                            marginBottom: isSelected ? 4 : 0, // Space for dot
+                                        }}>
+                                            {item.label}
+                                        </StyledText>
+                                        {isSelected && (
+                                            <View style={{
+                                                width: 4,
+                                                height: 4,
+                                                borderRadius: 2,
+                                                backgroundColor: '#fff',
+                                            }} />
+                                        )}
+                                    </TouchableOpacity>
+                                )
+                            }}
+                        />
+                    </View>
+
+                    {filteredTasks.length === 0 ? (
+                        <View style={[
+                            homeStyles.card,
+                            {
+                                backgroundColor: 'rgba(100, 116, 139, 0.1)', // Slightly lighter or same
+                                borderWidth: 0.3,
+                                borderColor: 'rgba(100, 116, 139, 0.2)',
+                                borderRadius: 20,
+                                padding: 20,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                minHeight: 140
+                            }
+                        ]}>
                             <View style={[styles.emptyIconContainer, { backgroundColor: colors.PRIMARY_BORDER }]}>
                                 <Ionicons name="checkmark-done-circle" size={40} color="#fefeffff" />
                             </View>
@@ -166,44 +233,52 @@ export default function ImportantTasksToday() {
                         </View>
                     ) : (
                         <View style={styles.tasksContainer}>
-                            {todayTasks.slice(0, 2).map((task, index) => (
-                                <Pressable
-                                    key={task.id}
-                                    style={({ pressed }) => [
-                                        styles.taskItem,
-                                        {
-                                            backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                                            borderWidth: 1,
-                                            borderColor: 'rgba(59, 130, 246, 0.1)',
-                                            opacity: pressed ? 0.7 : 1,
-                                            transform: [{ scale: pressed ? 0.98 : 1 }]
-                                        }
-                                    ]}
-                                    onPress={handleTaskPress}
-                                >
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                                        <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(task, index) }]} />
-                                        <View style={[styles.taskContent, { flex: 1 }]}>
-                                            <StyledText
-                                                style={[styles.taskTitle, { color: colors.PRIMARY_TEXT }]}
-                                                numberOfLines={1}
-                                            >
-                                                {task.title}
-                                            </StyledText>
-                                            <View style={styles.taskFooter}>
-                                                <View style={styles.timeContainer}>
-                                                    <Ionicons name="notifications-outline" size={13} color="rgba(59, 130, 246, 0.8)" />
-                                                    <StyledText style={[styles.timeText, { color: "rgba(59, 130, 246, 0.8)" }]}>
-                                                        {getTimeFromReminder(task.reminder!)}
-                                                    </StyledText>
+                            {filteredTasks.map((task, index) => {
+                                // Show only first 2 if not expanding full list, but here we just show distinct items
+                                // Show only first 3
+                                if (index >= 3) return null;
+
+                                return (
+                                    <Pressable
+                                        key={task.id}
+                                        style={({ pressed }) => [
+                                            styles.taskItem,
+                                            {
+                                                backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                                                borderWidth: 1,
+                                                borderColor: 'rgba(59, 130, 246, 0.1)',
+                                                borderLeftWidth: 4,
+                                                borderLeftColor: getPriorityColor(task) + '80',
+                                                opacity: pressed ? 0.7 : 1,
+                                                transform: [{ scale: pressed ? 0.98 : 1 }]
+                                            }
+                                        ]}
+                                        onPress={handleTaskPress}
+                                    >
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+                                            <View style={[styles.taskContent, { flex: 1 }]}>
+                                                <StyledText
+                                                    style={[styles.taskTitle, { color: colors.PRIMARY_TEXT }]}
+                                                    numberOfLines={1}
+                                                >
+                                                    {task.title}
+                                                </StyledText>
+                                                <View style={styles.taskFooter}>
+                                                    <View style={styles.timeContainer}>
+                                                        <Ionicons name="notifications-outline" size={13} color="#FFB74D" />
+                                                        <StyledText style={[styles.timeText, { color: "#FFB74D" }]}>
+                                                            {getTimeFromReminder(task.reminder!)}
+                                                        </StyledText>
+                                                    </View>
                                                 </View>
                                             </View>
+                                            <Ionicons name="chevron-forward" size={14} color="rgba(59, 130, 246, 0.5)" style={{ marginLeft: 8 }} />
                                         </View>
-                                        <Ionicons name="chevron-forward" size={14} color="rgba(59, 130, 246, 0.5)" style={{ marginLeft: 8 }} />
-                                    </View>
-                                </Pressable>
-                            ))}
-                            {todayTasks.length > 2 && (
+                                    </Pressable>
+                                );
+                            })}
+                            {filteredTasks.length > 3 && (
                                 <Pressable
                                     style={({ pressed }) => [
                                         styles.viewAllButton,
@@ -216,21 +291,21 @@ export default function ImportantTasksToday() {
                                     onPress={handleViewAll}
                                 >
                                     <StyledText style={[styles.viewAllText, { color: '#3B82F6' }]}>
-                                        {t('today_view_more')} ({todayTasks.length - 2})
+                                        {t('today_view_more')} ({filteredTasks.length - 3})
                                     </StyledText>
                                     <Ionicons name="arrow-forward" size={14} color="#3B82F6" />
                                 </Pressable>
                             )}
                         </View>
                     )}
-                </>
+                </View>
             )}
 
 
             <TodayTasksModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                tasks={todayTasks}
+                tasks={filteredTasks}
             />
         </View>
     );
@@ -288,7 +363,7 @@ const styles = StyleSheet.create({
         elevation: 1,
     },
     taskContent: {
-        gap: 4, // Increased from 2
+        gap: 6, // Increased from 2
     },
     taskHeader: {
         flexDirection: 'row',

@@ -5,7 +5,7 @@ import { selectNotifications } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
@@ -25,6 +25,19 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
     const insets = useSafeAreaInsets();
     const notifications = useSelector(selectNotifications);
     const router = useRouter();
+    const [filter, setFilter] = useState<'all' | 'past' | 'waiting'>('all');
+
+    const filteredTasks = useMemo(() => {
+        const now = new Date();
+        if (filter === 'all') return tasks;
+        if (filter === 'past') {
+            return tasks.filter(task => new Date(task.reminder!) < now);
+        }
+        if (filter === 'waiting') {
+            return tasks.filter(task => new Date(task.reminder!) >= now);
+        }
+        return tasks;
+    }, [tasks, filter]);
 
     const handleItemPress = (item: Todo) => {
         const notification = notifications.find(n => n.id === item.notificationId);
@@ -58,16 +71,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
     const renderItem = useCallback(({ item, index }: { item: Todo; index: number }) => {
         const itemIsOverdue = item.reminder ? isOverdue(item.reminder) : false;
 
-        // Premium color palette for non-overdue tasks
-        const palette = [
-            '#14B8A6', // Teal
-            '#3B82F6', // Blue
-            '#6366F1', // Indigo
-            '#8B5CF6', // Purple
-        ];
-
-        const baseColor = palette[index % palette.length];
-        const statusColor = itemIsOverdue ? '#eb637aff' : baseColor; // Aesthetic Rose Red for overdue
+        const statusColor = itemIsOverdue ? '#d43434' : '#3B82F6';
         const statusIcon = itemIsOverdue ? "alert-circle-outline" : "time-outline";
         const statusLabel = itemIsOverdue ? t("status_overdue") : t("status_pending");
 
@@ -81,7 +85,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
                         backgroundColor: colors.SECONDARY_BACKGROUND,
                         borderColor: colors.PRIMARY_BORDER_DARK,
                         borderLeftWidth: 4,
-                        borderLeftColor: statusColor,
+                        borderLeftColor: statusColor + '80',
                     }
                 ]}
             >
@@ -163,9 +167,56 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
                     <View style={localStyles.rightPlaceholder} />
                 </View>
 
-                {/* Content */}
+                {/* Filter Chips */}
+                <View style={{ marginBottom: 0, marginTop: 0 }}>
+                    <FlatList
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        data={[
+                            { key: 'all', label: t('all') },
+                            { key: 'past', label: t('status_overdue') },
+                            { key: 'waiting', label: t('status_pending') },
+                        ]}
+                        keyExtractor={(item) => item.key}
+                        contentContainerStyle={{ gap: 8, flexGrow: 1, justifyContent: 'center' }}
+                        renderItem={({ item }) => {
+                            const isSelected = filter === item.key;
+                            return (
+                                <TouchableOpacity
+                                    onPress={() => setFilter(item.key as any)}
+                                    style={{
+                                        paddingHorizontal: 12,
+                                        paddingVertical: 6,
+                                        borderRadius: 16,
+                                        backgroundColor: isSelected ? '#3B82F6' : 'transparent',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <StyledText style={{
+                                        color: isSelected ? '#fff' : colors.PLACEHOLDER,
+                                        fontSize: 12,
+                                        fontWeight: isSelected ? '700' : '500',
+                                        marginBottom: isSelected ? 4 : 0,
+                                    }}>
+                                        {item.label}
+                                    </StyledText>
+                                    {isSelected && (
+                                        <View style={{
+                                            width: 4,
+                                            height: 4,
+                                            borderRadius: 2,
+                                            backgroundColor: '#fff',
+                                        }} />
+                                    )}
+                                </TouchableOpacity>
+                            )
+                        }}
+                    />
+                </View>
+
                 <FlatList
-                    data={tasks}
+                    data={filteredTasks}
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={localStyles.listContent}

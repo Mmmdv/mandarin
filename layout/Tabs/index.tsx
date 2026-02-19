@@ -69,7 +69,10 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             canPreventDefault: true,
         });
 
-        if (!isFocused && !event.defaultPrevented) {
+        // Check if we are actually on the same route, regardless of visual focus (mapping)
+        const isSameRoute = state.routes[state.index].name === route.name;
+
+        if (!isSameRoute && !event.defaultPrevented) {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
             const usageId = getUsageId(route.name);

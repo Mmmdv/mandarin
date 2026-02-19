@@ -6,9 +6,10 @@ type StyledModalProps = {
     isOpen: boolean
     onClose: () => void
     children: React.ReactNode
+    closeOnOverlayPress?: boolean
 }
 
-const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children }) => {
+const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, closeOnOverlayPress }) => {
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
     useEffect(() => {
@@ -64,7 +65,9 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children }) 
                         ]}
                         onPress={() => {
                             Keyboard.dismiss()
-                            // onClose() 
+                            if (closeOnOverlayPress) {
+                                onClose()
+                            }
                         }}
                     >
                         <Pressable style={styles.contentContainer} onPress={() => { }}>

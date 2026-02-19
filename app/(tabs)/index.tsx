@@ -38,7 +38,7 @@ export default function Home() {
             color: "#322D92",
             iconColor: "#FFF",
             backgroundImage: require("@/assets/images/MainPage/tasksBackground.png"),
-            imageOpacity: 0.05
+            imageOpacity: 0.03
         },
         {
             id: 'movies',
@@ -49,7 +49,7 @@ export default function Home() {
             color: "#90122E",
             iconColor: "#FFF",
             backgroundImage: require("@/assets/images/MainPage/filmsBackground.png"),
-            imageOpacity: 0.12
+            imageOpacity: 0.05
         },
         {
             id: 'birthday',
@@ -60,7 +60,7 @@ export default function Home() {
             color: "#9D6506",
             iconColor: "#FFF",
             backgroundImage: require("@/assets/images/MainPage/birthdayBackground.png"),
-            imageOpacity: 0.12
+            imageOpacity: 0.05
         },
         {
             id: 'shopping',
@@ -71,7 +71,7 @@ export default function Home() {
             color: "#037487",
             iconColor: "#FFF",
             backgroundImage: require("@/assets/images/MainPage/shoppingBackground.png"),
-            imageOpacity: 0.12
+            imageOpacity: 0.05
         },
         {
             id: 'events',
@@ -82,7 +82,7 @@ export default function Home() {
             color: "#593A9D",
             iconColor: "#FFF",
             backgroundImage: require("@/assets/images/MainPage/eventsBackground.png"),
-            imageOpacity: 0.12
+            imageOpacity: 0.05
         },
         {
             id: 'expenses',
@@ -93,7 +93,7 @@ export default function Home() {
             color: "#0A7652",
             iconColor: "#FFF",
             backgroundImage: require("@/assets/images/MainPage/expensesBackground.png"),
-            imageOpacity: 0.12
+            imageOpacity: 0.05
         }
     ], [t]);
 

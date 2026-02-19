@@ -40,16 +40,21 @@ export default function BreathingScreen() {
             // Block back press
             return;
         }
-        router.back();
+        if (navigation.canGoBack()) {
+            navigation.goBack();
+        } else {
+            router.replace('/');
+        }
     };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 10 }]}>
+            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 10, zIndex: 10 }]}>
                 <TouchableOpacity
                     onPress={handleBackPress}
-                    style={{ justifyContent: 'center', paddingRight: 10, opacity: isBreathingActive ? 0.3 : 1 }}
+                    style={{ justifyContent: 'center', paddingRight: 10, opacity: isBreathingActive ? 0.3 : 1, zIndex: 20 }}
                     disabled={isBreathingActive}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 60 }}
                 >
                     <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>

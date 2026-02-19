@@ -185,7 +185,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                             { key: 'Ləğv olunub', label: t('status_cancelled') },
                         ]}
                         keyExtractor={(item) => item.key}
-                        contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 16, paddingBottom: 8 }}
+                        contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 16, paddingBottom: 8, flexGrow: 1, justifyContent: 'center' }}
                         renderItem={({ item }) => {
                             const isSelected = selectedStatus === item.key;
                             return (
@@ -195,7 +195,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ visible, onClos
                                         paddingHorizontal: 12, // Reduced padding
                                         paddingVertical: 6,   // Reduced padding
                                         borderRadius: 16,     // Adjusted radius
-                                        backgroundColor: isSelected ? colors.CHECKBOX_SUCCESS : 'transparent',
+                                        backgroundColor: isSelected ? '#3B82F6' : 'transparent',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}

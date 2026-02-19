@@ -40,7 +40,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
     const reminderStatus: NotificationStatus | undefined = notification?.status;
 
     return (
-        <StyledModal isOpen={isOpen} onClose={onClose}>
+        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={[modalStyles.modalContainer, localStyles.container]}>
                 <View style={[modalStyles.iconContainer, {
                     backgroundColor: useTheme().colors.SECONDARY_BACKGROUND,

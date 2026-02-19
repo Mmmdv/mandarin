@@ -4,6 +4,7 @@ import { GAP, PADDING, styles } from "@/constants/homeStyles";
 import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Dimensions, LayoutAnimation, Pressable, ScrollView, View } from "react-native";
@@ -30,17 +31,21 @@ export default function MoreScreen() {
             description: t("coming_soon"),
             icon: "tree" as keyof typeof MaterialCommunityIcons.glyphMap, // İndi həqiqətən ağac ikonu var
             route: "/more",
-            color: "#2ECC71",
-            iconColor: "#FFF"
+            color: "#1F8B4C",
+            iconColor: "#FFF",
+            backgroundImage: require("@/assets/images/MainPage/mandarinBackground.png"),
+            imageOpacity: 0.1
         },
         {
             id: "breathing",
-            title: t("tab_breathing_title") || "Nəfəs al",
+            title: t("tab_breathing_title"),
             description: t("breathing_desc"),
             icon: "weather-windy" as keyof typeof MaterialCommunityIcons.glyphMap, // Nəfəs / külək hissi
             route: "/breathing",
-            color: "#D2B48C",
-            iconColor: "#FFF"
+            color: "#978265",
+            iconColor: "#FFF",
+            backgroundImage: require("@/assets/images/MainPage/relaxBackground.png"),
+            imageOpacity: 0.1
         },
     ], [t, colors]);
 
@@ -78,6 +83,22 @@ export default function MoreScreen() {
                 </View>
 
                 <View style={[styles.decorativeCircle, { backgroundColor: 'rgba(255,255,255,0.1)' }]} />
+                {item.backgroundImage && (
+                    <Image
+                        source={item.backgroundImage}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            opacity: item.imageOpacity || 0.15,
+                            zIndex: 0
+                        }}
+                        contentFit="cover"
+                        transition={600}
+                    />
+                )}
             </Pressable>
         );
     }, [handlePress]);

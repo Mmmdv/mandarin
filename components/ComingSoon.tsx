@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Animated, Easing, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { Pressable } from "react-native";
 
 interface ComingSoonProps {
@@ -14,6 +14,7 @@ interface ComingSoonProps {
 const ComingSoon: React.FC<ComingSoonProps> = ({ title }) => {
     const { colors, t } = useTheme();
     const router = useRouter();
+    const navigation = useNavigation();
     const scaleAnim = useRef(new Animated.Value(0.5)).current;
     const opacityAnim = useRef(new Animated.Value(0)).current;
     const [refreshing, setRefreshing] = useState(false);
@@ -51,8 +52,18 @@ const ComingSoon: React.FC<ComingSoonProps> = ({ title }) => {
     return (
         <View style={{ flex: 1, backgroundColor: colors.PRIMARY_BACKGROUND }}>
             {title && (
-                <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-                    <Pressable onPress={() => router.back()} style={{ justifyContent: 'center', paddingRight: 10 }}>
+                <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, zIndex: 10 }]}>
+                    <Pressable
+                        onPress={() => {
+                            if (navigation.canGoBack()) {
+                                navigation.goBack();
+                            } else {
+                                router.replace('/');
+                            }
+                        }}
+                        style={{ justifyContent: 'center', paddingRight: 10, zIndex: 20 }}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 60 }}
+                    >
                         <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
                     </Pressable>
                     <View style={{ flex: 1, justifyContent: 'center' }}>

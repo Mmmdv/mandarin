@@ -6,7 +6,7 @@ import useRefresh from "@/hooks/useRefresh"
 import { useTheme } from "@/hooks/useTheme"
 import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
-import { useRouter } from "expo-router"
+import { useNavigation, useRouter } from "expo-router"
 import { useEffect, useRef, useState } from "react"
 import { Animated, LayoutAnimation, Platform, ScrollView, TouchableOpacity, UIManager, View } from "react-native"
 import ArchiveAllModal from "../Modals/ArchiveAllModal.tsx"
@@ -37,12 +37,15 @@ type TodoListProps = {
 const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo, onArchiveTodo, onRetryTodo, onClearArchive, archivedTodos, onArchiveAll, onAddRequest, categoryTitle, categoryIcon }) => {
     const { colors, t, lang } = useTheme()
     const router = useRouter();
+    const navigation = useNavigation();
     const [todoSortBy, setTodoSortBy] = useState<SortBy>("date")
     const [todoSortOrder, setTodoSortOrder] = useState<SortOrder>("desc")
     const [doneSortBy, setDoneSortBy] = useState<SortBy>("date")
     const [doneSortOrder, setDoneSortOrder] = useState<SortOrder>("desc")
     const [archiveSortBy, setArchiveSortBy] = useState<SortBy>("date")
     const [archiveSortOrder, setArchiveSortOrder] = useState<SortOrder>("desc")
+
+    // ... (state declarations roughly same as before, no change needed until render)
 
     const [todoExpanded, setTodoExpanded] = useState(true)
     const [doneExpanded, setDoneExpanded] = useState(false)
@@ -226,8 +229,18 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     return (
         <View style={{ flex: 1 }}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 10 }}>
+            <View style={[styles.header, { zIndex: 10 }]}>
+                <TouchableOpacity
+                    onPress={() => {
+                        if (navigation.canGoBack()) {
+                            navigation.goBack();
+                        } else {
+                            router.replace('/');
+                        }
+                    }}
+                    style={{ marginRight: 10, zIndex: 20 }}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 60 }}
+                >
                     <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>
                 <View style={{ flex: 1, justifyContent: 'center' }}>

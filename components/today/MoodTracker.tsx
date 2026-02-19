@@ -139,24 +139,27 @@ export default function MoodTracker() {
     const currentThemeColor = selectedMoodDisplay?.color || '#6366F1';
 
     return (
-        <View style={[homeStyles.card, { backgroundColor: 'rgba(100, 116, 139, 0.15)', borderWidth: 0.3, borderColor: 'rgba(100, 116, 139, 0.3)', borderRadius: 20, paddingVertical: 13, paddingLeft: 10, paddingRight: 20, marginTop: 6, marginBottom: 5, minHeight: isExpanded ? 140 : undefined }]}>
+        <View style={{ marginBottom: 2.5, marginTop: 3 }}>
             <Pressable
                 onPress={toggleExpanded}
                 style={{
+                    backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                    borderWidth: 0.3,
+                    borderColor: 'rgba(100, 116, 139, 0.3)',
+                    borderRadius: 20,
+                    paddingVertical: 13,
+                    paddingHorizontal: 20,
                     flexDirection: 'row',
                     alignItems: 'center',
-                    gap: 6,
-                    marginBottom: isExpanded ? 8 : -13,
-                    zIndex: 10,
-                    position: 'relative',
+                    gap: 10,
                     overflow: 'hidden',
-                    marginLeft: -10,
-                    marginRight: -20,
-                    marginTop: -13,
-                    paddingLeft: 10,
-                    paddingRight: 20,
-                    paddingVertical: 13,
-                    borderRadius: 20
+                    ...homeStyles.card, // spread homeStyles.card to keep other props if any, though most are overridden. 
+                    // homeStyles.card usually has some shadow/margin. taking care to not double up margin.
+                    marginBottom: 0,
+                    marginTop: 0,
+                    marginLeft: 0,
+                    marginRight: 0,
+                    width: '100%'
                 }}
             >
                 <View style={[styles.iconContainer, { backgroundColor: `${currentThemeColor}55`, zIndex: 2 }]}>
@@ -165,7 +168,7 @@ export default function MoodTracker() {
                 <StyledText style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0, zIndex: 2 }]}>
                     {t(questionKey)}
                 </StyledText>
-                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', marginLeft: 'auto', zIndex: 2 }}>
+                <View style={{ width: 24, alignItems: 'flex-end', justifyContent: 'center', zIndex: 2 }}>
                     <Animated.View style={{ transform: [{ rotate: getRotation() }] }}>
                         <Ionicons name="chevron-forward" size={14} color={colors.SECTION_TEXT} />
                     </Animated.View>
@@ -188,7 +191,16 @@ export default function MoodTracker() {
             </Pressable>
 
             {isExpanded && (
-                <>
+                <View style={{
+                    marginTop: 10,
+                    backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                    borderWidth: 0.3,
+                    borderColor: 'rgba(100, 116, 139, 0.3)',
+                    borderRadius: 20,
+                    padding: 20,
+                    minHeight: 100,
+                    justifyContent: 'center'
+                }}>
                     {selectedMoodId ? (
                         <Animated.View style={[
                             styles.votedContainer,
@@ -245,7 +257,7 @@ export default function MoodTracker() {
                             ))}
                         </View>
                     )}
-                </>
+                </View>
             )}
 
         </View>
