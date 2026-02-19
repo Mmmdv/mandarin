@@ -175,12 +175,12 @@ export default function WeightTracker() {
                 style={[
                     homeStyles.card,
                     {
-                        backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
                         borderWidth: 0.3,
                         borderColor: 'rgba(100, 116, 139, 0.3)',
                         borderRadius: 20,
                         paddingVertical: 13,
-                        paddingHorizontal: 20,
+                        paddingHorizontal: 10,
                         flexDirection: 'row',
                         alignItems: 'center',
                         gap: 10,
@@ -231,7 +231,7 @@ export default function WeightTracker() {
             {isExpanded && (
                 <View style={{
                     marginTop: 10,
-                    backgroundColor: 'rgba(100, 116, 139, 0.15)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
                     borderWidth: 0.3,
                     borderColor: 'rgba(100, 116, 139, 0.3)',
                     borderRadius: 20,
@@ -328,6 +328,11 @@ export default function WeightTracker() {
                 </View>
             )}
 
+            {isExpanded && (
+                <View style={homeStyles.separatorContainer}>
+                    <View style={homeStyles.separatorLine} />
+                </View>
+            )}
         </View>
     );
 }

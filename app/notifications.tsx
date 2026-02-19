@@ -1,4 +1,5 @@
 import StyledButton from "@/components/ui/StyledButton";
+import StyledHeader from "@/components/ui/StyledHeader";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
@@ -10,7 +11,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const NotificationsPage = () => {
     const { colors, t, lang } = useTheme();
@@ -18,7 +18,6 @@ const NotificationsPage = () => {
     const router = useRouter();
     const notifications = useAppSelector(selectNotifications);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-    const insets = useSafeAreaInsets();
     const [refreshing, setRefreshing] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
@@ -126,27 +125,9 @@ const NotificationsPage = () => {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            {/* Header */}
-            <View style={[
-                styles.header,
-                {
-                    borderBottomColor: colors.PRIMARY_BORDER_DARK,
-                    backgroundColor: colors.SECONDARY_BACKGROUND,
-                }
-            ]}>
-                <View style={styles.leftSection}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color={colors.PRIMARY_TEXT} />
-                    </TouchableOpacity>
-
-                    <View style={styles.titleContainer}>
-                        <StyledText style={{ fontSize: 18, fontFamily: 'Poppins_600SemiBold', color: colors.PRIMARY_TEXT }}>
-                            {t("notifications")}
-                        </StyledText>
-                    </View>
-                </View>
-
-                <View style={styles.rightPlaceholder}>
+            <StyledHeader
+                title={t("notifications")}
+                rightSection={
                     <View style={{ flexDirection: 'row', gap: 15 }}>
                         {notifications.some(n => !n.read) && (
                             <TouchableOpacity onPress={handleMarkAllRead}>
@@ -159,8 +140,8 @@ const NotificationsPage = () => {
                             </TouchableOpacity>
                         )}
                     </View>
-                </View>
-            </View>
+                }
+            />
 
             {/* Filter Chips */}
             <View style={{ marginBottom: 0 }}>
@@ -184,7 +165,7 @@ const NotificationsPage = () => {
                                     paddingHorizontal: 12,
                                     paddingVertical: 6,
                                     borderRadius: 16,
-                                    backgroundColor: isSelected ? '#3B82F6' : 'transparent',
+                                    backgroundColor: isSelected ? '#234E94' : 'transparent',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                 }}
@@ -263,34 +244,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingTop: 55,
-        paddingHorizontal: 20,
-        paddingBottom: 14,
-        borderBottomWidth: 0.5,
-        position: 'relative',
-    },
-    backButton: {
-        padding: 8,
-        marginLeft: -8,
-        zIndex: 10,
-    },
-    leftSection: {
-        flexDirection: "row",
-        alignItems: "center",
-        flex: 1,
-    },
-    titleContainer: {
-        marginLeft: 8,
-    },
-    rightPlaceholder: {
-        minWidth: 40,
-        alignItems: 'flex-end',
-        zIndex: 10,
-    },
     listContent: {
         paddingHorizontal: 20,
         paddingTop: 8,
@@ -312,11 +265,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "400",
         lineHeight: 20,
-        marginBottom: 2,
+        marginBottom: 5,
     },
     itemDate: {
         fontSize: 12,
         color: "#c2c1c1ff",
+        marginBottom: 5,
     },
     emptyContainer: {
         flex: 1,

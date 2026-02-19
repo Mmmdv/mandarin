@@ -111,7 +111,7 @@ const GestureWrapper: React.FC<GestureWrapperProps> = ({ children }) => {
     });
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
             <GestureDetector gesture={gesture}>
                 <Animated.View style={styles.container}>
                     {children}

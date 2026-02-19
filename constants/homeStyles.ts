@@ -125,4 +125,15 @@ export const styles = StyleSheet.create({
         fontSize: 13,
         lineHeight: 18,
     },
+    separatorContainer: {
+        marginTop: 12,
+        marginBottom: 8,
+        alignItems: 'center',
+    },
+    separatorLine: {
+        width: 25,
+        height: 4,
+        borderRadius: 5,
+        backgroundColor: 'rgba(194, 210, 231, 0.9)',
+    },
 });

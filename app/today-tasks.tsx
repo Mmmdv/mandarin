@@ -1,43 +1,51 @@
+import GestureWrapper from "@/components/layout/GestureWrapper";
+import StyledHeader from "@/components/ui/StyledHeader";
 import StyledText from "@/components/ui/StyledText";
 import { formatDate } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { selectNotifications } from "@/store/slices/notificationSlice";
+import { selectTodos } from "@/store/slices/todoSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
-import { FlatList, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
-type TodayTasksModalProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    tasks: Todo[];
-};
-
-const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
-    isOpen,
-    onClose,
-    tasks
-}) => {
+export default function TodayTasksScreen() {
     const { colors, t, lang } = useTheme();
     const insets = useSafeAreaInsets();
     const notifications = useSelector(selectNotifications);
+    const todos = useSelector(selectTodos);
     const router = useRouter();
     const [filter, setFilter] = useState<'all' | 'past' | 'waiting'>('all');
 
+    const today = new Date().toISOString().split('T')[0];
+
+    const todayTasks = useMemo(() => {
+        return todos
+            .filter((todo: Todo) => {
+                if (!todo.reminder || todo.isCompleted || todo.isArchived) {
+                    return false;
+                }
+                const reminderDate = todo.reminder.split('T')[0];
+                return reminderDate === today;
+            })
+            .sort((a, b) => new Date(a.reminder!).getTime() - new Date(b.reminder!).getTime());
+    }, [todos, today]);
+
     const filteredTasks = useMemo(() => {
         const now = new Date();
-        if (filter === 'all') return tasks;
+        if (filter === 'all') return todayTasks;
         if (filter === 'past') {
-            return tasks.filter(task => new Date(task.reminder!) < now);
+            return todayTasks.filter(task => new Date(task.reminder!) < now);
         }
         if (filter === 'waiting') {
-            return tasks.filter(task => new Date(task.reminder!) >= now);
+            return todayTasks.filter(task => new Date(task.reminder!) >= now);
         }
-        return tasks;
-    }, [tasks, filter]);
+        return todayTasks;
+    }, [todayTasks, filter]);
 
     const handleItemPress = (item: Todo) => {
         const notification = notifications.find(n => n.id === item.notificationId);
@@ -53,11 +61,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
             else if (icon.includes('list')) path = "/(tabs)/todo";
         }
 
-        onClose();
-        // Use a small timeout to let the modal close smoothly before navigating
-        setTimeout(() => {
-            router.push(path);
-        }, 100);
+        router.push(path);
     };
 
     const getTimeFromReminder = (reminder: string) => {
@@ -68,19 +72,21 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
         return new Date(reminder) < new Date();
     };
 
-    const renderItem = useCallback(({ item, index }: { item: Todo; index: number }) => {
+    const renderItem = useCallback(({ item }: { item: Todo }) => {
         const itemIsOverdue = item.reminder ? isOverdue(item.reminder) : false;
 
         const statusColor = itemIsOverdue ? '#d43434' : '#3B82F6';
         const statusIcon = itemIsOverdue ? "alert-circle-outline" : "time-outline";
         const statusLabel = itemIsOverdue ? t("status_overdue") : t("status_pending");
 
+        const categoryIcon = notifications.find(n => n.id === item.notificationId)?.categoryIcon;
+
         return (
             <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={() => handleItemPress(item)}
                 style={[
-                    localStyles.notificationItem,
+                    styles.notificationItem,
                     {
                         backgroundColor: colors.SECONDARY_BACKGROUND,
                         borderColor: colors.PRIMARY_BORDER_DARK,
@@ -89,29 +95,16 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
                     }
                 ]}
             >
-                <View style={{ width: 44, alignItems: 'center' }}>
-                    <View style={[
-                        localStyles.iconContainer,
-                        {
-                            backgroundColor: `${statusColor}15`,
-                            // Glow effect matching the specific item color
-                            shadowColor: statusColor,
-                            shadowOffset: { width: 0, height: 0 },
-                            shadowOpacity: itemIsOverdue ? 0.6 : 0.3,
-                            shadowRadius: 10,
-                            elevation: itemIsOverdue ? 5 : 2,
-                        }
-                    ]}>
-                        <Ionicons
-                            name={(notifications.find(n => n.id === item.notificationId)?.categoryIcon as any) || "list-outline"}
-                            size={22}
-                            color={statusColor}
-                        />
-                    </View>
+                <View style={{ width: 32, alignItems: 'center' }}>
+                    {categoryIcon && !Ionicons.glyphMap[categoryIcon as keyof typeof Ionicons.glyphMap] ? (
+                        <StyledText style={{ fontSize: 24 }}>{categoryIcon}</StyledText>
+                    ) : (
+                        <Ionicons name={(categoryIcon as any) || "list-outline"} size={26} color={statusColor} />
+                    )}
                 </View>
-                <View style={localStyles.contentContainer}>
+                <View style={styles.contentContainer}>
                     <StyledText style={[
-                        localStyles.itemTitle,
+                        styles.itemTitle,
                         {
                             color: colors.PRIMARY_TEXT,
                             fontWeight: "600",
@@ -129,46 +122,20 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
                     </View>
                 </View>
 
-                {/* Right Arrow Icon */}
-                <View style={localStyles.rightIconContainer}>
+                <View style={styles.rightIconContainer}>
                     <Ionicons name="chevron-forward" size={18} color={colors.PLACEHOLDER} />
                 </View>
             </TouchableOpacity>
         );
-    }, [colors]);
+    }, [colors, t, lang, notifications]);
 
     return (
-        <Modal
-            animationType="slide"
-            transparent={false}
-            visible={isOpen}
-            onRequestClose={onClose}
-        >
-            <View style={[localStyles.container, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: insets.bottom }]}>
-                {/* Header */}
-                <View style={[
-                    localStyles.header,
-                    {
-                        borderBottomColor: colors.PRIMARY_BORDER_DARK,
-                        backgroundColor: colors.SECONDARY_BACKGROUND,
-                        paddingTop: insets.top + 16
-                    }
-                ]}>
-                    <TouchableOpacity onPress={onClose} style={localStyles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color={colors.PRIMARY_TEXT} />
-                    </TouchableOpacity>
+        <GestureWrapper>
+            <View style={[styles.mainContainer, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+                <StyledHeader title={t('today_tasks_header')} />
 
-                    <View style={localStyles.titleContainer}>
-                        <StyledText style={[localStyles.headerTitle, { color: colors.PRIMARY_TEXT }]}>
-                            {t('today_tasks_header')}
-                        </StyledText>
-                    </View>
-
-                    <View style={localStyles.rightPlaceholder} />
-                </View>
-
-                {/* Filter Chips */}
-                <View style={{ marginBottom: 0, marginTop: 0 }}>
+                {/* Filter Chips matching Notifications style */}
+                <View style={{ marginBottom: 0 }}>
                     <FlatList
                         horizontal
                         showsHorizontalScrollIndicator={false}
@@ -178,7 +145,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
                             { key: 'waiting', label: t('status_pending') },
                         ]}
                         keyExtractor={(item) => item.key}
-                        contentContainerStyle={{ gap: 8, flexGrow: 1, justifyContent: 'center' }}
+                        contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 16, paddingBottom: 8, flexGrow: 1, justifyContent: 'center' }}
                         renderItem={({ item }) => {
                             const isSelected = filter === item.key;
                             return (
@@ -188,7 +155,7 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
                                         paddingHorizontal: 12,
                                         paddingVertical: 6,
                                         borderRadius: 16,
-                                        backgroundColor: isSelected ? '#3B82F6' : 'transparent',
+                                        backgroundColor: isSelected ? '#234E94' : 'transparent',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}
@@ -219,80 +186,46 @@ const TodayTasksModal: React.FC<TodayTasksModalProps> = ({
                     data={filteredTasks}
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={localStyles.listContent}
+                    contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20, paddingTop: 8 }]}
                     ListEmptyComponent={
-                        <View style={localStyles.emptyContainer}>
+                        <View style={styles.emptyContainer}>
                             <Ionicons name="calendar-outline" size={64} color={colors.PLACEHOLDER} style={{ marginBottom: 16 }} />
                             <StyledText style={{ color: colors.PLACEHOLDER, fontSize: 16 }}>{t("no_results")}</StyledText>
                         </View>
                     }
                 />
             </View>
-        </Modal>
+        </GestureWrapper>
     );
-};
+}
 
-const localStyles = StyleSheet.create({
-    container: {
+const styles = StyleSheet.create({
+    mainContainer: {
         flex: 1,
-    },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 20,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-    },
-    backButton: {
-        padding: 8,
-        marginLeft: -8,
-        zIndex: 10,
-    },
-    titleContainer: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: '700',
-    },
-    rightPlaceholder: {
-        width: 40,
     },
     listContent: {
-        padding: 20,
-        paddingBottom: 40,
+        paddingHorizontal: 20,
     },
     notificationItem: {
         flexDirection: "row",
         alignItems: "center",
         padding: 16,
-        borderRadius: 12,
+        borderRadius: 16,
         marginBottom: 12,
-        borderWidth: 1,
+        borderWidth: 0.5,
         gap: 16,
-    },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        justifyContent: "center",
-        alignItems: "center",
     },
     contentContainer: {
         flex: 1,
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: "400",
-        lineHeight: 20,
+        lineHeight: 22,
         marginBottom: 2,
     },
     rightIconContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        paddingLeft: 4,
     },
     emptyContainer: {
         flex: 1,
@@ -301,5 +234,3 @@ const localStyles = StyleSheet.create({
         marginTop: 100,
     },
 });
-
-export default TodayTasksModal;

@@ -142,5 +142,10 @@ export const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.2)',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    stickyTodoHeader: {
+        marginHorizontal: 20,
+        marginTop: 6,
+        marginBottom: 2,
     }
 })

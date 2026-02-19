@@ -1,5 +1,6 @@
 import BiometricGuard from "@/components/features/BiometricGuard/index";
 import { AppStatusBar } from "@/components/layout/AppStatusBar";
+import { useTheme } from "@/hooks/useTheme";
 // Force reload comment 3
 import { registerForLocalNotificationsAsync } from '@/constants/notifications';
 import Header from "@/layout/Header/index";
@@ -47,6 +48,28 @@ Notifications.setNotificationHandler({
   }),
 });
 
+function RootLayoutNav() {
+  const { colors } = useTheme();
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.PRIMARY_BACKGROUND }}>
+      <SafeAreaProvider style={{ backgroundColor: colors.PRIMARY_BACKGROUND }}>
+        <AppStatusBar />
+        <BiometricGuard>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.PRIMARY_BACKGROUND }
+            }}
+          >
+            <Stack.Screen name="(tabs)" options={{ header: () => <Header />, headerShown: true }} />
+          </Stack>
+        </BiometricGuard>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}
+
 export default function RootLayout() {
   // Warm up haptics API silently
   useEffect(() => {
@@ -71,19 +94,10 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
-            <AppStatusBar />
-            <BiometricGuard>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" options={{ header: () => <Header />, headerShown: true }} />
-              </Stack>
-            </BiometricGuard>
-          </PersistGate>
-        </Provider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <RootLayoutNav />
+      </PersistGate>
+    </Provider>
   );
 }

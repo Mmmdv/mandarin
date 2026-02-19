@@ -21,13 +21,12 @@ export const styles = StyleSheet.create({
         marginBottom: 8,
     },
     emptyIconContainer: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: 45,
+        height: 45,
+        borderRadius: 22,
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 12,
-        opacity: 0.3,
     },
     emptyText: {
         fontSize: 16,
@@ -43,7 +42,7 @@ export const styles = StyleSheet.create({
     },
     taskItem: {
         borderRadius: 10,
-        paddingVertical: 8, // Increased from 6
+        paddingVertical: 16, // Increased further
         paddingHorizontal: 12,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
@@ -100,7 +99,7 @@ export const styles = StyleSheet.create({
     },
     viewAllText: {
         color: '#FFF',
-        fontSize: 14, // Reduced font size
+        fontSize: 15, // Reduced font size
         fontWeight: '600',
     },
     iconContainer: {
