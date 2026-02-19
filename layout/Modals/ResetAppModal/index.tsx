@@ -1,6 +1,6 @@
-import StyledButton from "@/components/StyledButton";
-import StyledModal from "@/components/StyledModal";
-import StyledText from "@/components/StyledText";
+import StyledButton from "@/components/ui/StyledButton";
+import StyledModal from "@/components/ui/StyledModal";
+import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";

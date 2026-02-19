@@ -1,5 +1,5 @@
-import StyledRefreshControl from "@/components/StyledRefreshControl";
-import StyledText from "@/components/StyledText";
+import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
+import StyledText from "@/components/ui/StyledText";
 import { GAP, PADDING, styles } from "@/constants/homeStyles";
 import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";

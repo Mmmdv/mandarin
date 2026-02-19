@@ -1,8 +1,8 @@
-import { AppStatusBar } from "@/components/AppStatusBar";
-import BiometricGuard from "@/components/BiometricGuard";
-// Force reload comment 1
+import BiometricGuard from "@/components/features/BiometricGuard/index";
+import { AppStatusBar } from "@/components/layout/AppStatusBar";
+// Force reload comment 3
 import { registerForLocalNotificationsAsync } from '@/constants/notifications';
-import Header from "@/layout/Header";
+import Header from "@/layout/Header/index";
 import store, { persistor } from "@/store";
 import { markAsRead, updateNotificationStatus } from "@/store/slices/notificationSlice";
 // import analytics from "@react-native-firebase/analytics";

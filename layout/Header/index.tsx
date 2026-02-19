@@ -1,12 +1,11 @@
-import StyledText from "@/components/StyledText";
+import StyledText from "@/components/ui/StyledText";
 import { useTheme } from "@/hooks/useTheme";
 import { Poppins_600SemiBold, useFonts } from '@expo-google-fonts/poppins';
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { Image, Share, StyleSheet, TouchableOpacity, View } from "react-native";
 
-import NotificationsModal from "@/layout/Modals/NotificationsModal";
 import { useAppSelector } from "@/store";
 import { selectIsBreathingActive } from "@/store/slices/appSlice";
 import { selectUnreadCount } from "@/store/slices/notificationSlice";
@@ -17,7 +16,6 @@ const Header: React.FC = () => {
   const router = useRouter();
   const unreadCount = useAppSelector(selectUnreadCount);
   const isBreathingActive = useSelector(selectIsBreathingActive);
-  const [notificationsVisible, setNotificationsVisible] = useState(false);
 
   let [fontsLoaded] = useFonts({
     Poppins_600SemiBold,
@@ -55,7 +53,7 @@ const Header: React.FC = () => {
           <Ionicons name="share-outline" size={22} color={colors.PRIMARY_TEXT} />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => setNotificationsVisible(true)}
+          onPress={() => router.push("/notifications")}
           activeOpacity={0.7}
           style={[styles.iconButton, { opacity: isBreathingActive ? 0.3 : 1 }]}
           disabled={isBreathingActive}
@@ -98,12 +96,6 @@ const Header: React.FC = () => {
           <Ionicons name="settings-outline" size={22} color={colors.PRIMARY_TEXT} />
         </TouchableOpacity>
       </View>
-
-
-      <NotificationsModal
-        visible={notificationsVisible}
-        onClose={() => setNotificationsVisible(false)}
-      />
     </View>
   );
 };

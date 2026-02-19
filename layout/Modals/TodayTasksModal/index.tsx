@@ -1,4 +1,4 @@
-import StyledText from "@/components/StyledText";
+import StyledText from "@/components/ui/StyledText";
 import { formatDate } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { selectNotifications } from "@/store/slices/notificationSlice";

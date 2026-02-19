@@ -1,5 +1,5 @@
-import ComingSoon from "@/components/ComingSoon";
-import GestureWrapper from "@/components/GestureWrapper";
+import ComingSoon from "@/components/features/ComingSoon";
+import GestureWrapper from "@/components/layout/GestureWrapper";
 import { useTheme } from "@/hooks/useTheme";
 import { View } from "react-native";
 

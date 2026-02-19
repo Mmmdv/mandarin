@@ -1,5 +1,5 @@
-import StyledText from "@/components/StyledText";
-import MonthlyStats from "@/components/today/MonthlyStats";
+import StyledText from "@/components/ui/StyledText";
+import MonthlyStats from "@/components/features/today/MonthlyStats";
 import { styles } from "@/constants/homeStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { useRouter } from "expo-router";

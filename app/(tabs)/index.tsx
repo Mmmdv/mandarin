@@ -1,11 +1,11 @@
-import StyledText from "@/components/StyledText";
+import StyledText from "@/components/ui/StyledText";
 import { COL_2_WIDTH, GAP, PADDING, styles } from "@/constants/homeStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { incrementUsage, selectUsageStats } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 // import analytics from "@react-native-firebase/analytics";
-import StyledRefreshControl from "@/components/StyledRefreshControl";
+import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
 import useRefresh from "@/hooks/useRefresh";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";

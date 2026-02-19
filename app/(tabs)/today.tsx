@@ -1,9 +1,9 @@
-import StyledRefreshControl from "@/components/StyledRefreshControl";
-import StyledText from "@/components/StyledText";
-import ImportantTasksToday from "@/components/today/ImportantTasksToday";
-import MoodTracker from "@/components/today/MoodTracker";
-import RatingTracker from "@/components/today/RatingTracker";
-import WeightTracker from "@/components/today/WeightTracker";
+import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
+import StyledText from "@/components/ui/StyledText";
+import ImportantTasksToday from "@/components/features/today/ImportantTasksToday";
+import MoodTracker from "@/components/features/today/MoodTracker";
+import RatingTracker from "@/components/features/today/RatingTracker";
+import WeightTracker from "@/components/features/today/WeightTracker";
 import { styles } from "@/constants/homeStyles";
 import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";

@@ -1,6 +1,6 @@
-import BreathingExercise from "@/components/BreathingExercise";
-import StyledRefreshControl from "@/components/StyledRefreshControl";
-import StyledText from "@/components/StyledText";
+import BreathingExercise from "@/components/features/BreathingExercise";
+import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
+import StyledText from "@/components/ui/StyledText";
 import { styles } from "@/constants/homeStyles";
 import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";

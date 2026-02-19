@@ -1,4 +1,4 @@
-import StyledText from "@/components/StyledText";
+import StyledText from "@/components/ui/StyledText";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions, Modal, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";

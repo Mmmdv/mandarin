@@ -1,9 +1,9 @@
-import GestureWrapper from "@/components/GestureWrapper";
+import GestureWrapper from "@/components/layout/GestureWrapper";
 import { COLORS } from "@/constants/ui";
 import { useTheme } from "@/hooks/useTheme";
 import useTodo from "@/hooks/useTodo";
-import AddTodoModal from "@/layout/Modals/AddTodoModal";
-import TodoList from "@/layout/TodoList";
+import AddTodoModal from "@/components/features/todo/modals/AddTodoModal";
+import TodoList from "@/components/features/todo/TodoList";
 import { useEffect, useState } from "react";
 import { Platform, StatusBar, StyleSheet, UIManager, View } from "react-native";
 
