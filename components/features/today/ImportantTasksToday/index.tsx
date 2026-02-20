@@ -106,7 +106,7 @@ export default function ImportantTasksToday() {
     };
 
     return (
-        <View style={{ marginBottom: 0, marginTop: 6 }}>
+        <View style={{ marginBottom: 2.5, marginTop: 3 }}>
             <Pressable
                 onPress={toggleExpanded}
                 style={[
@@ -284,7 +284,13 @@ export default function ImportantTasksToday() {
                                 <Ionicons name="checkmark-done-circle" size={35} color="#fefeffff" />
                             </View>
                             <StyledText style={[styles.emptyText, { color: colors.PRIMARY_BORDER }]}>
-                                {selectedDate === new Date().toISOString().split('T')[0] ? t('today_no_tasks') : t('selected_date_no_tasks')}
+                                {selectedTasks.length === 0
+                                    ? (selectedDate === new Date().toISOString().split('T')[0] ? t('today_no_tasks') : t('selected_date_no_tasks'))
+                                    : filter === 'past'
+                                        ? (selectedDate === new Date().toISOString().split('T')[0] ? t('today_no_overdue_tasks') : t('selected_date_no_overdue_tasks'))
+                                        : filter === 'waiting'
+                                            ? (selectedDate === new Date().toISOString().split('T')[0] ? t('today_no_pending_tasks') : t('selected_date_no_pending_tasks'))
+                                            : (selectedDate === new Date().toISOString().split('T')[0] ? t('today_no_tasks') : t('selected_date_no_tasks'))}
                             </StyledText>
                             <StyledText style={[styles.emptySubtext, { color: colors.PRIMARY_BORDER }]}>
                                 {t('today_have_nice_day')}

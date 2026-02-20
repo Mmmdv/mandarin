@@ -28,7 +28,7 @@ export function WeightStats({ weightMetrics, weightChartData, colors, isDark, t 
                         <View style={statsStyles.chartContainer}>
                             <LineChart
                                 data={weightChartData}
-                                width={Dimensions.get("window").width - 80}
+                                width={Dimensions.get("window").width - 50}
                                 height={180}
                                 chartConfig={{
                                     backgroundColor: colors.SECONDARY_BACKGROUND,
@@ -38,12 +38,13 @@ export function WeightStats({ weightMetrics, weightChartData, colors, isDark, t 
                                     color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
                                     labelColor: (opacity = 1) => colors.PLACEHOLDER,
                                     style: { borderRadius: 16 },
-                                    propsForDots: { r: "5", strokeWidth: "2", stroke: "#3b82f6" },
+                                    propsForDots: { r: "2.5", strokeWidth: "1", stroke: "#3b82f6" },
                                     propsForBackgroundLines: {
                                         strokeDasharray: "",
                                         strokeWidth: 0.5,
                                         stroke: (colors.PLACEHOLDER.slice(0, 7)) + '12'
-                                    }
+                                    },
+                                    paddingRight: 32,
                                 }}
                                 bezier
                                 style={{ marginVertical: 8, borderRadius: 16 }}

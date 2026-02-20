@@ -41,7 +41,7 @@ const Header: React.FC = () => {
         <View style={styles.iconWrapper}>
           <Image source={require("@/assets/images/logo.png")} style={styles.logoImage} />
         </View>
-        <StyledText style={[styles.appName, { color: isDark ? '#E5E7EB' : '#1F2937' }]}>Mandarin</StyledText>
+        <StyledText style={[styles.appName, { color: isDark ? '#E5E7EB' : '#1F2937' }]}>Aýpara</StyledText>
       </View>
       <View style={styles.rightSection}>
         <TouchableOpacity
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   leftSection: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
   },
   rightSection: {
     flexDirection: "row",
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     width: 32,
-    height: 30,
+    height: 32,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontFamily: 'Poppins_600SemiBold',
-    fontSize: 20,
+    fontSize: 18,
     color: '#E5E7EB',
   },
   iconButton: {

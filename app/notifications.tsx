@@ -20,16 +20,48 @@ const NotificationsPage = () => {
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
+    const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
 
     const filteredNotifications = React.useMemo(() => {
-        if (selectedStatus === 'all') return notifications;
-        return notifications.filter(n => {
-            if (selectedStatus === 'Ləğv olunub') {
-                return n.status === 'Ləğv olunub' || n.status === 'Dəyişdirilib və ləğv olunub';
-            }
-            return n.status === selectedStatus;
-        });
-    }, [notifications, selectedStatus]);
+        let result = notifications;
+
+        if (selectedStatus !== 'all') {
+            result = result.filter(n => {
+                if (selectedStatus === 'Ləğv olunub') {
+                    return n.status === 'Ləğv olunub' || n.status === 'Dəyişdirilib və ləğv olunub';
+                }
+                return n.status === selectedStatus;
+            });
+        }
+
+        if (selectedPeriod !== 'all') {
+            const now = new Date();
+            result = result.filter(n => {
+                const nDate = new Date(n.date);
+                if (selectedPeriod === 'day') {
+                    return nDate.getDate() === now.getDate() &&
+                        nDate.getMonth() === now.getMonth() &&
+                        nDate.getFullYear() === now.getFullYear();
+                } else if (selectedPeriod === 'week') {
+                    const startOfWeek = new Date(now);
+                    startOfWeek.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+                    startOfWeek.setHours(0, 0, 0, 0);
+
+                    const endOfWeek = new Date(startOfWeek);
+                    endOfWeek.setDate(startOfWeek.getDate() + 6);
+                    endOfWeek.setHours(23, 59, 59, 999);
+
+                    return nDate >= startOfWeek && nDate <= endOfWeek;
+                } else if (selectedPeriod === 'month') {
+                    return nDate.getMonth() === now.getMonth() &&
+                        nDate.getFullYear() === now.getFullYear();
+                }
+                return true;
+            });
+        }
+
+        return result;
+    }, [notifications, selectedStatus, selectedPeriod]);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -143,7 +175,56 @@ const NotificationsPage = () => {
                 }
             />
 
-            {/* Filter Chips */}
+            {/* Period Filter Chips */}
+            <View style={{ marginBottom: 0 }}>
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={[
+                        { key: 'all', label: t('all') || 'Hamısı' },
+                        { key: 'day', label: t('tab_today') || 'Bugün' },
+                        { key: 'week', label: t('stats_week') || 'Həftəlik' },
+                        { key: 'month', label: t('stats_month') || 'Aylıq' },
+                    ]}
+                    keyExtractor={(item) => item.key}
+                    contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 16, paddingBottom: 4, flexGrow: 1, justifyContent: 'center' }}
+                    renderItem={({ item }) => {
+                        const isSelected = selectedPeriod === item.key;
+                        return (
+                            <TouchableOpacity
+                                onPress={() => setSelectedPeriod(item.key)}
+                                style={{
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 6,
+                                    borderRadius: 16,
+                                    backgroundColor: isSelected ? '#234E94' : 'transparent',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <StyledText style={{
+                                    color: isSelected ? '#fff' : colors.PLACEHOLDER,
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? '700' : '500',
+                                    marginBottom: isSelected ? 4 : 0,
+                                }}>
+                                    {item.label}
+                                </StyledText>
+                                {isSelected && (
+                                    <View style={{
+                                        width: 4,
+                                        height: 4,
+                                        borderRadius: 2,
+                                        backgroundColor: '#fff',
+                                    }} />
+                                )}
+                            </TouchableOpacity>
+                        )
+                    }}
+                />
+            </View>
+
+            {/* Status Filter Chips */}
             <View style={{ marginBottom: 0 }}>
                 <FlatList
                     horizontal
@@ -155,7 +236,7 @@ const NotificationsPage = () => {
                         { key: 'Ləğv olunub', label: t('status_cancelled') },
                     ]}
                     keyExtractor={(item) => item.key}
-                    contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 16, paddingBottom: 8, flexGrow: 1, justifyContent: 'center' }}
+                    contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 8, paddingBottom: 16, flexGrow: 1, justifyContent: 'center' }}
                     renderItem={({ item }) => {
                         const isSelected = selectedStatus === item.key;
                         return (

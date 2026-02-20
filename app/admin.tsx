@@ -5,6 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { RootState, useAppDispatch, useAppSelector } from "@/store";
 import { Lang, Theme, updateAppSetting } from "@/store/slices/appSlice";
 import { clearNotifications } from "@/store/slices/notificationSlice";
+import { setMood, setRating, setWeight } from "@/store/slices/todaySlice";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -53,6 +54,43 @@ export default function AdminScreen() {
         today_daily: false,
         notifications: false,
     });
+
+    const [mockPeriod, setMockPeriod] = useState<number>(7);
+
+    const generateMockHistory = () => {
+        Alert.alert(
+            "Statistika Yarat",
+            `${mockPeriod} günlük statistika (Mood, Çəki, Rating) yaradılsın?`,
+            [
+                { text: t("cancel"), style: "cancel" },
+                {
+                    text: "Yarat",
+                    style: "default",
+                    onPress: () => {
+                        const today = new Date();
+                        for (let i = mockPeriod; i >= 0; i--) {
+                            const d = new Date(today);
+                            d.setDate(today.getDate() - i);
+                            const dateStr = d.toISOString().split("T")[0];
+
+                            // Lower probabilities to create realistic gaps
+                            if (Math.random() < 0.50) { // 25% chance of mood logging
+                                dispatch(setMood({ date: dateStr, mood: Math.floor(Math.random() * 5) + 1 }));
+                            }
+                            if (Math.random() < 0.50) { // 15% chance of weight logging
+                                const weight = 70 + Math.random() * 2;
+                                dispatch(setWeight({ date: dateStr, weight: parseFloat(weight.toFixed(1)) }));
+                            }
+                            if (Math.random() < 0.50) { // 20% chance of rating logging
+                                dispatch(setRating({ date: dateStr, rating: Math.floor(Math.random() * 5) + 1 }));
+                            }
+                        }
+                        Alert.alert("Uğurlu", `${mockPeriod} günlük saxta data yaradıldı.`);
+                    },
+                },
+            ]
+        );
+    };
 
     const toggleGroup = (key: string) => {
         setExpandedGroups(prev => ({ ...prev, [key]: !prev[key] }));
@@ -632,6 +670,50 @@ export default function AdminScreen() {
                             )}
                         </View>
                     ))}
+
+                    {/* Mock Data Generator Zone */}
+                    <View style={[styles.dangerZone, { borderColor: isDark ? '#1a365d' : '#bfdbfe', marginBottom: 16 }]}>
+                        <StyledText style={[styles.dangerTitle, { color: '#3b82f6' }]}>
+                            🛠️ Test Statistikası Yarat
+                        </StyledText>
+
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+                            {[
+                                { label: '1 Həftə', days: 7 },
+                                { label: '1 Ay', days: 30 },
+                                { label: '1 İl', days: 365 },
+                                { label: '2-3 İl', days: 1000 },
+                            ].map(option => (
+                                <TouchableOpacity
+                                    key={option.days}
+                                    style={{
+                                        paddingVertical: 8,
+                                        paddingHorizontal: 12,
+                                        borderRadius: 8,
+                                        borderWidth: 1,
+                                        borderColor: '#3b82f6',
+                                        backgroundColor: mockPeriod === option.days ? '#3b82f6' : 'transparent'
+                                    }}
+                                    onPress={() => setMockPeriod(option.days)}
+                                >
+                                    <StyledText style={{ color: mockPeriod === option.days ? '#fff' : '#3b82f6', fontSize: 13, fontWeight: "600" }}>
+                                        {option.label}
+                                    </StyledText>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.dangerButton, { backgroundColor: isDark ? '#172554' : '#eff6ff', marginBottom: 0 }]}
+                            onPress={generateMockHistory}
+                            activeOpacity={0.7}
+                        >
+                            <Ionicons name="bar-chart-outline" size={18} color="#3b82f6" />
+                            <StyledText style={[styles.dangerButtonText, { color: '#3b82f6' }]}>
+                                {mockPeriod} Günlük Statistika Yarat
+                            </StyledText>
+                        </TouchableOpacity>
+                    </View>
 
                     {/* Danger Zone */}
                     <View style={[styles.dangerZone, { borderColor: isDark ? '#3b1a1a' : '#fecaca' }]}>

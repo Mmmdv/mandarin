@@ -37,7 +37,7 @@ export function RatingStats({ ratingMetrics, colors, isDark, t }: RatingStatsPro
                                     />
                                 ))}
                             </View>
-                            <StyledText style={[statsStyles.ratingTotalText, { color: colors.PLACEHOLDER }]}>
+                            <StyledText style={[statsStyles.ratingTotalText, { color: colors.PRIMARY_TEXT, opacity: 0.7 }]}>
                                 {ratingMetrics.total} {t("days_short")}
                             </StyledText>
                         </View>

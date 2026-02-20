@@ -84,7 +84,7 @@ export const statsStyles = StyleSheet.create({
         padding: 6
     },
     completionPercent: {
-        fontSize: 29,
+        fontSize: 26,
         fontWeight: '800'
     },
     completionLabel: {
@@ -135,14 +135,16 @@ export const statsStyles = StyleSheet.create({
     emptyText: {
         textAlign: 'center',
         color: '#888',
-        fontSize: 13,
-        paddingVertical: 10
+        fontSize: 15,
+        paddingTop: 4,
+        paddingBottom: 24,
+        width: '100%',
     },
     chipsContainer: {
         paddingHorizontal: 20,
         gap: 8,
         paddingTop: 0,
-        paddingBottom: 4,
+        paddingBottom: 0,
         flexGrow: 1,
         justifyContent: 'center'
     },
@@ -175,9 +177,9 @@ export const statsStyles = StyleSheet.create({
         fontWeight: '500'
     },
     chartContainer: {
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
-        paddingRight: 15
+        marginLeft: -20,
     },
     summaryRow: {
         flexDirection: 'row',
@@ -191,7 +193,7 @@ export const statsStyles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 4
+        gap: 6
     },
     summaryContent: {
         flexDirection: 'row',
@@ -201,13 +203,14 @@ export const statsStyles = StyleSheet.create({
         gap: 6
     },
     summaryValue: {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: '800',
         textAlign: 'center'
     },
     summaryLabel: {
-        fontSize: 9,
-        fontWeight: '600',
+        fontSize: 10,
+        fontWeight: '500',
+        textAlign: 'center',
         textTransform: 'uppercase'
     },
     avgBadge: {

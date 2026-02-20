@@ -1,7 +1,6 @@
 import StyledRefreshControl from "@/components/ui/StyledRefreshControl"
 import StyledText from "@/components/ui/StyledText"
 import { toggleAnimation } from "@/constants/animations"
-import { styles as homeStyles } from "@/constants/homeStyles"
 import { sortTodos } from "@/helpers/sort"
 import useRefresh from "@/hooks/useRefresh"
 import { useTheme } from "@/hooks/useTheme"
@@ -71,9 +70,6 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
         if (pendingTodos.length === 0) {
             setTodoExpanded(false)
             Animated.timing(todoAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
-        } else if (pendingTodos.length > prevPendingCount.current) {
-            setTodoExpanded(true)
-            Animated.timing(todoAnimation, { toValue: 1, duration: 300, useNativeDriver: true }).start()
         }
         prevPendingCount.current = pendingTodos.length
     }, [pendingTodos.length])
@@ -82,9 +78,6 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
         if (completedTodos.length === 0) {
             setDoneExpanded(false)
             Animated.timing(doneAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
-        } else if (completedTodos.length > prevCompletedCount.current) {
-            setDoneExpanded(true)
-            Animated.timing(doneAnimation, { toValue: 1, duration: 300, useNativeDriver: true }).start()
         }
         prevCompletedCount.current = completedTodos.length
     }, [completedTodos.length])
@@ -93,9 +86,6 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
         if (archivedTodos.length === 0) {
             setArchiveExpanded(false)
             Animated.timing(archiveAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
-        } else if (archivedTodos.length > prevArchivedCount.current) {
-            setArchiveExpanded(true)
-            Animated.timing(archiveAnimation, { toValue: 1, duration: 300, useNativeDriver: true }).start()
         }
         prevArchivedCount.current = archivedTodos.length
     }, [archivedTodos.length])
@@ -499,9 +489,6 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                         />
                                     ))}
                                 </View>
-                                <View style={homeStyles.separatorContainer}>
-                                    <View style={homeStyles.separatorLine} />
-                                </View>
                             </>
                         )}
                     </View>
@@ -566,9 +553,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                         />
                                     ))}
                                 </View>
-                                <View style={{ marginTop: 12, marginBottom: 8, alignItems: 'center' }}>
-                                    <View style={{ width: 25, height: 4, borderRadius: 5, backgroundColor: 'rgba(194, 210, 231, 0.9)' }} />
-                                </View>
+
                             </>
                         )}
                     </View>

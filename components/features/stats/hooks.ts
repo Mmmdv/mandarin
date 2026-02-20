@@ -15,7 +15,7 @@ export function useStatsLogic(period: Period) {
         return Object.entries(dailyRecords)
             .filter(([dateStr]) => {
                 const d = new Date(dateStr + "T12:00:00");
-                return period === "all" || (d >= start && d <= end);
+                return d >= start && d <= end;
             })
             .map(([, val]) => val as { mood?: number; weight?: number; rating?: number });
     }, [todayState.daily, period]);
@@ -26,16 +26,6 @@ export function useStatsLogic(period: Period) {
             totalCreated: 0, totalCompleted: 0, totalDeleted: 0,
             totalArchived: 0, totalCompletionTimeMs: 0
         };
-
-        if (period === "all") {
-            return {
-                created: stats.totalCreated,
-                completed: stats.totalCompleted,
-                deleted: stats.totalDeleted,
-                archived: stats.totalArchived,
-                completionTimeMs: stats.totalCompletionTimeMs,
-            };
-        }
 
         const filtered = filterByPeriod(dailyStats, period);
         return filtered.reduce(
@@ -52,9 +42,6 @@ export function useStatsLogic(period: Period) {
 
     const breathingData = useMemo(() => {
         const history = appState.breathingHistory || {};
-        if (period === "all") {
-            return appState.breathingStats || { totalSessions: 0, totalDurationSec: 0 };
-        }
         const filtered = filterByPeriod(history, period);
         return filtered.reduce(
             (acc, day) => ({
@@ -109,31 +96,61 @@ export function useStatsLogic(period: Period) {
         const filtered = Object.entries(dailyRecords)
             .filter(([dateStr, val]: [string, any]) => {
                 const d = new Date(dateStr + "T12:00:00");
-                return val.weight !== undefined && (period === "all" || (d >= start && d <= end));
+                return val.weight !== undefined && (d >= start && d <= end);
             })
             .sort(([dateA], [dateB]) => dateA.localeCompare(dateB));
 
-        if (filtered.length < 2) return null;
+        let finalData: [string, any][] = filtered;
+        const locale = appState.lang === 'az' ? 'az-AZ' : appState.lang === 'ru' ? 'ru-RU' : 'en-US';
 
-        const labels = filtered.map(([dateStr]) => {
-            const d = new Date(dateStr + "T12:00:00");
-            if (period === "week" || period === "all") return `${d.getDate()}`;
-            if (period === "month") return `${d.getDate()}/${d.getMonth() + 1}`;
+        // Downsample for long periods
+        if (period === "year" || period === "365") {
+            const groups: Record<string, { sum: number, count: number, date: Date }> = {};
+            filtered.forEach(([dateStr, val]: [string, any]) => {
+                const d = new Date(dateStr + "T12:00:00");
+                let key: string;
 
-            const locale = appState.lang === 'az' ? 'az-AZ' : appState.lang === 'ru' ? 'ru-RU' : 'en-US';
+                if (period === "year") {
+                    // Group by Week for "This Year"
+                    const firstDayOfYear = new Date(d.getFullYear(), 0, 1);
+                    const pastDaysOfYear = (d.getTime() - firstDayOfYear.getTime()) / 86400000;
+                    const weekNum = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+                    key = `${d.getFullYear()}-W${weekNum}`;
+                } else {
+                    // Keep Monthly for "365 days"
+                    key = `${d.getFullYear()}-${d.getMonth()}`;
+                }
+
+                if (!groups[key]) {
+                    groups[key] = { sum: 0, count: 0, date: d };
+                }
+                groups[key].sum += val.weight;
+                groups[key].count += 1;
+            });
+            finalData = Object.values(groups)
+                .sort((a, b) => a.date.getTime() - b.date.getTime())
+                .map(group => [group.date.toISOString(), { weight: group.sum / group.count }]);
+        }
+
+        if (finalData.length < 2) return null;
+
+        const labels = finalData.map(([dateStr]) => {
+            const d = new Date(dateStr);
+            if (period === "week") return `${d.getDate()}`;
+            if (period === "month") return `${d.getDate()}`;
             return d.toLocaleString(locale, { month: 'short' });
         });
 
-        const dataPoints = filtered.map(([, val]: [string, any]) => val.weight);
-
-        const spread = Math.ceil(labels.length / 5);
-        const displayLabels = labels.map((l, i) => (i % spread === 0 ? l : ""));
+        const dataPoints = finalData.map(([, val]: [string, any]) => val.weight);
+        const spread = Math.ceil(labels.length / 6);
+        const displayLabels = labels.map((l, i) => (i % spread === 0 || i === labels.length - 1 ? l : ""));
 
         return {
             labels: displayLabels,
             datasets: [{ data: dataPoints }],
         };
     }, [todayState.daily, period, appState.lang]);
+
 
     const ratingMetrics = useMemo(() => {
         const values = filteredDailyData.filter(d => d.rating !== undefined).map(d => d.rating!);

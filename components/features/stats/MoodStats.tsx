@@ -62,7 +62,7 @@ export function MoodStats({ moodMetrics, colors, isDark, t }: MoodStatsProps) {
                                     <Ionicons name={moodMetrics.moods[level].icon as any} size={20} color={moodMetrics.moods[level].color} />
                                     <View style={{ flex: 1 }}>
                                         <StyledText style={{ fontSize: 12, fontWeight: '700', color: colors.PRIMARY_TEXT }}>{percent}%</StyledText>
-                                        <StyledText style={{ fontSize: 8, color: colors.PLACEHOLDER, textTransform: 'uppercase' }}>{count} {t("days_short")}</StyledText>
+                                        <StyledText style={{ fontSize: 8, color: colors.PRIMARY_TEXT, opacity: 0.7, textTransform: 'uppercase' }}>{count} {t("days_short")}</StyledText>
                                     </View>
                                     {count > 0 && <View style={[statsStyles.activeIndicator, { backgroundColor: moodMetrics.moods[level].color }]} />}
                                 </View>

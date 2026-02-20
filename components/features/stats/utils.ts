@@ -1,5 +1,5 @@
 
-export type Period = "week" | "month" | "year" | "all";
+export type Period = "week" | "month" | "year" | "365";
 
 export function getDateRange(period: Period): { start: Date; end: Date } {
     const now = new Date();
@@ -18,14 +18,19 @@ export function getDateRange(period: Period): { start: Date; end: Date } {
         case "year":
             start = new Date(end.getFullYear(), 0, 1);
             break;
+        case "365":
+            start = new Date(end);
+            start.setDate(start.getDate() - 364);
+            start.setHours(0, 0, 0, 0);
+            break;
         default:
             start = new Date(2000, 0, 1);
     }
     return { start, end };
 }
 
+
 export function filterByPeriod<T>(records: Record<string, T>, period: Period): T[] {
-    if (period === "all") return Object.values(records);
 
     const { start, end } = getDateRange(period);
     return Object.entries(records)

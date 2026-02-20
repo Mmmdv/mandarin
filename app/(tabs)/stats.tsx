@@ -1,7 +1,6 @@
 import StyledText from "@/components/ui/StyledText";
 import { styles } from "@/constants/homeStyles";
 import { useTheme } from "@/hooks/useTheme";
-import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native";
 
@@ -18,7 +17,7 @@ import { WeightStats } from "@/components/features/stats/WeightStats";
 export default function Stats() {
     const { colors, t } = useTheme();
     const [refreshing, setRefreshing] = useState(false);
-    const [period, setPeriod] = useState<Period>("all");
+    const [period, setPeriod] = useState<Period>("week");
 
     // Logic separated into a custom hook
     const {
@@ -37,29 +36,9 @@ export default function Stats() {
         { key: "week" as Period, label: t("stats_week") },
         { key: "month" as Period, label: t("stats_month") },
         { key: "year" as Period, label: t("stats_year") },
-        { key: "all" as Period, label: t("stats_all_time") },
+        { key: "365" as Period, label: t("stats_365") },
     ], [t]);
 
-    // ─── Period label ───
-    const periodLabel = useMemo(() => {
-        const now = new Date();
-        const locale = lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US';
-
-        switch (period) {
-            case "week": {
-                const start = new Date(now);
-                start.setDate(start.getDate() - 6);
-                return `${start.getDate()}.${String(start.getMonth() + 1).padStart(2, '0')} — ${now.getDate()}.${String(now.getMonth() + 1).padStart(2, '0')}`;
-            }
-            case "month": {
-                return now.toLocaleString(locale, { month: 'long', year: 'numeric' });
-            }
-            case "year":
-                return `${now.getFullYear()}`;
-            default:
-                return t("stats_all_time");
-        }
-    }, [period, lang, t]);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -68,7 +47,7 @@ export default function Stats() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 4 }]}>
+            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 12 }]}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("tab_stats")}
@@ -79,7 +58,7 @@ export default function Stats() {
             </View>
 
             {/* ─── Period Chips ─── */}
-            <View>
+            <View style={{ backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 12 }}>
                 <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -110,7 +89,7 @@ export default function Stats() {
             </View>
 
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[styles.scrollContent, { paddingTop: 12 }]}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
@@ -121,14 +100,6 @@ export default function Stats() {
                     />
                 }
             >
-                {/* Date range context */}
-                <View style={statsStyles.periodLabelRow}>
-                    <Ionicons name="calendar-outline" size={14} color={colors.PLACEHOLDER} />
-                    <StyledText style={[statsStyles.periodLabelText, { color: colors.PLACEHOLDER }]}>
-                        {periodLabel}
-                    </StyledText>
-                </View>
-
                 {/* Statistics Sections */}
                 <TodoStats todoData={todoData} colors={colors} isDark={isDark} t={t} />
                 <BreathingStats breathingData={breathingData} colors={colors} isDark={isDark} t={t} />
