@@ -36,24 +36,26 @@ export function filterByPeriod<T>(records: Record<string, T>, period: Period): T
         .map(([, val]) => val);
 }
 
-export function formatDuration(totalSec: number): string {
+export function formatDuration(totalSec: number, labels: { h: string, m: string, s: string }): string {
     if (totalSec === 0) return "—";
     const hours = Math.floor(totalSec / 3600);
     const mins = Math.floor((totalSec % 3600) / 60);
     const secs = totalSec % 60;
-    if (hours > 0) return `${hours}s ${mins}d`;
-    if (mins > 0) return `${mins}d ${secs}s`;
-    return `${secs}s`;
+
+    if (hours > 0) return `${hours}${labels.h} ${mins}${labels.m}`;
+    if (mins > 0) return `${mins}${labels.m} ${secs}${labels.s}`;
+    return `${secs}${labels.s}`;
 }
 
-export function formatMs(totalMs: number, count: number): string {
+export function formatMs(totalMs: number, count: number, labels: { d: string, h: string, m: string }): string {
     if (count === 0 || totalMs === 0) return "—";
     const avgMs = totalMs / count;
     const minutes = Math.floor(avgMs / 60000);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-    if (days > 0) return `${days}g ${hours % 24}s`;
-    if (hours > 0) return `${hours}s ${minutes % 60}d`;
-    if (minutes > 0) return `${minutes}d`;
-    return `<1d`;
+
+    if (days > 0) return `${days}${labels.d} ${hours % 24}${labels.h}`;
+    if (hours > 0) return `${hours}${labels.h} ${minutes % 60}${labels.m}`;
+    if (minutes > 0) return `${minutes}${labels.m}`;
+    return `<1${labels.m}`;
 }

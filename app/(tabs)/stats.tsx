@@ -68,16 +68,18 @@ export default function Stats() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 4 }]}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("tab_stats")}
                     </StyledText>
                 </View>
+                {/* Placeholder View for alignment consistency with other headers having icons */}
+                <View style={{ width: 0, height: 40 }} />
             </View>
 
             {/* ─── Period Chips ─── */}
-            <View style={{ marginBottom: 4 }}>
+            <View>
                 <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}

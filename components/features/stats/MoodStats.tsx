@@ -27,7 +27,7 @@ export function MoodStats({ moodMetrics, colors, isDark, t }: MoodStatsProps) {
                     <View style={{ gap: 8 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                             <StyledText style={{ fontSize: 13, color: colors.PLACEHOLDER, fontWeight: '600' }}>{t("stats_mood_spectrum")}</StyledText>
-                            <View style={[statsStyles.avgBadge, { backgroundColor: isDark ? '#1e1e1a' : '#f8f9fa' }]}>
+                            <View style={[statsStyles.avgBadge, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }]}>
                                 <Ionicons name={moodMetrics.avgMood.icon as any} size={14} color={moodMetrics.avgMood.color} style={{ marginRight: 6 }} />
                                 <StyledText style={{ fontSize: 14, fontWeight: '800', color: colors.PRIMARY_TEXT }}>{moodMetrics.avg}</StyledText>
                             </View>
@@ -58,7 +58,7 @@ export function MoodStats({ moodMetrics, colors, isDark, t }: MoodStatsProps) {
                             const level = i + 1;
                             const percent = Math.round((count / moodMetrics.total) * 100);
                             return (
-                                <View key={i} style={[statsStyles.moodChip, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+                                <View key={i} style={[statsStyles.moodChip, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }]}>
                                     <Ionicons name={moodMetrics.moods[level].icon as any} size={20} color={moodMetrics.moods[level].color} />
                                     <View style={{ flex: 1 }}>
                                         <StyledText style={{ fontSize: 12, fontWeight: '700', color: colors.PRIMARY_TEXT }}>{percent}%</StyledText>

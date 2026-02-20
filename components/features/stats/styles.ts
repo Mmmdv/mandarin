@@ -34,7 +34,7 @@ export const statsStyles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12
+        marginRight: 6
     },
     sectionTitle: {
         fontSize: 17,
@@ -75,21 +75,24 @@ export const statsStyles = StyleSheet.create({
         marginBottom: 18
     },
     completionCircle: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        borderWidth: 4,
+        width: 108,
+        height: 108,
+        borderRadius: 54,
+        borderWidth: 4.5,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        padding: 6
     },
     completionPercent: {
-        fontSize: 26,
+        fontSize: 29,
         fontWeight: '800'
     },
     completionLabel: {
         fontSize: 9,
         fontWeight: '600',
-        textTransform: 'uppercase'
+        textTransform: 'uppercase',
+        textAlign: 'center',
+        paddingHorizontal: 8
     },
     completionDetails: {
         flex: 1,
@@ -111,7 +114,7 @@ export const statsStyles = StyleSheet.create({
         fontWeight: '500'
     },
     detailValue: {
-        fontSize: 15,
+        fontSize: 13,
         fontWeight: '700'
     },
     avgTimeCard: {
@@ -125,7 +128,7 @@ export const statsStyles = StyleSheet.create({
         fontWeight: '500'
     },
     avgTimeValue: {
-        fontSize: 17,
+        fontSize: 15,
         fontWeight: '700',
         marginTop: 2
     },
@@ -138,8 +141,8 @@ export const statsStyles = StyleSheet.create({
     chipsContainer: {
         paddingHorizontal: 20,
         gap: 8,
-        paddingTop: 4,
-        paddingBottom: 12,
+        paddingTop: 0,
+        paddingBottom: 4,
         flexGrow: 1,
         justifyContent: 'center'
     },
@@ -164,8 +167,8 @@ export const statsStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        paddingHorizontal: 4,
-        marginBottom: 10
+        paddingHorizontal: 20,
+        marginBottom: 2
     },
     periodLabelText: {
         fontSize: 13,
@@ -175,6 +178,37 @@ export const statsStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingRight: 15
+    },
+    summaryRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 4,
+        padding: 12,
+        borderRadius: 16,
+    },
+    summaryItem: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4
+    },
+    summaryContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: 6
+    },
+    summaryValue: {
+        fontSize: 12,
+        fontWeight: '800',
+        textAlign: 'center'
+    },
+    summaryLabel: {
+        fontSize: 9,
+        fontWeight: '600',
+        textTransform: 'uppercase'
     },
     avgBadge: {
         flexDirection: 'row',
@@ -220,20 +254,30 @@ export const statsStyles = StyleSheet.create({
     },
     ratingSummary: {
         alignItems: 'center',
-        minWidth: 80
+        minWidth: 100,
+        gap: 8
+    },
+    ratingResult: {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        borderRadius: 16,
+        gap: 2
     },
     ratingAvgText: {
-        fontSize: 36,
+        fontSize: 28,
         fontWeight: '800'
     },
     starsRow: {
         flexDirection: 'row',
         gap: 2,
-        marginVertical: 4
     },
     ratingTotalText: {
-        fontSize: 11,
-        fontWeight: '500'
+        fontSize: 10,
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        marginTop: 4
     },
     ratingBreakdown: {
         flex: 1,

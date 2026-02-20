@@ -25,20 +25,22 @@ export function RatingStats({ ratingMetrics, colors, isDark, t }: RatingStatsPro
             {ratingMetrics ? (
                 <View style={statsStyles.ratingContainer}>
                     <View style={statsStyles.ratingSummary}>
-                        <StyledText style={[statsStyles.ratingAvgText, { color: colors.PRIMARY_TEXT }]}>{ratingMetrics.avg}</StyledText>
-                        <View style={statsStyles.starsRow}>
-                            {[1, 2, 3, 4, 5].map((s) => (
-                                <Ionicons
-                                    key={s}
-                                    name={s <= Math.round(Number(ratingMetrics.avg) / 2) ? "star" : "star-outline"}
-                                    size={12}
-                                    color="#f59e0bCC"
-                                />
-                            ))}
+                        <View style={[statsStyles.ratingResult, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }]}>
+                            <StyledText style={[statsStyles.ratingAvgText, { color: colors.PRIMARY_TEXT }]}>{ratingMetrics.avg}</StyledText>
+                            <View style={statsStyles.starsRow}>
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                    <Ionicons
+                                        key={s}
+                                        name={s <= Math.round(Number(ratingMetrics.avg) / 2) ? "star" : "star-outline"}
+                                        size={12}
+                                        color="#f59e0bCC"
+                                    />
+                                ))}
+                            </View>
+                            <StyledText style={[statsStyles.ratingTotalText, { color: colors.PLACEHOLDER }]}>
+                                {ratingMetrics.total} {t("days_short")}
+                            </StyledText>
                         </View>
-                        <StyledText style={[statsStyles.ratingTotalText, { color: colors.PLACEHOLDER }]}>
-                            {ratingMetrics.total} {t("days_short")}
-                        </StyledText>
                     </View>
 
                     <View style={statsStyles.ratingBreakdown}>

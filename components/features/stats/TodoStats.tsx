@@ -37,8 +37,8 @@ export function TodoStats({ todoData, colors, isDark, t }: TodoStatsProps) {
                     {[
                         { color: '#3b82f6CC', label: t("created"), val: todoData.created },
                         { color: '#10b981CC', label: t("completed"), val: todoData.completed },
-                        { color: '#8b5cf6CC', label: t("archive_button"), val: todoData.archived },
-                        { color: '#ef4444CC', label: t("delete"), val: todoData.deleted },
+                        { color: '#8b5cf6CC', label: t("stats_archived"), val: todoData.archived },
+                        { color: '#ef4444CC', label: t("stats_deleted"), val: todoData.deleted },
                     ].map(item => (
                         <View key={item.label} style={statsStyles.completionDetailRow}>
                             <View style={[statsStyles.detailDot, { backgroundColor: item.color }]} />
@@ -48,11 +48,17 @@ export function TodoStats({ todoData, colors, isDark, t }: TodoStatsProps) {
                     ))}
                 </View>
             </View>
-            <View style={[statsStyles.avgTimeCard, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+            <View style={[statsStyles.avgTimeCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }]}>
                 <Ionicons name="timer-outline" size={20} color="#6366f1CC" />
                 <View style={{ flex: 1, marginLeft: 12 }}>
                     <StyledText style={[statsStyles.avgTimeLabel, { color: colors.PLACEHOLDER }]}>{t("stats_avg_completion_time")}</StyledText>
-                    <StyledText style={[statsStyles.avgTimeValue, { color: colors.PRIMARY_TEXT }]}>{formatMs(todoData.completionTimeMs, todoData.completed)}</StyledText>
+                    <StyledText style={[statsStyles.avgTimeValue, { color: colors.PRIMARY_TEXT }]}>
+                        {formatMs(todoData.completionTimeMs, todoData.completed, {
+                            d: t("days_short"),
+                            h: t("hours_short"),
+                            m: t("minutes_short")
+                        })}
+                    </StyledText>
                 </View>
             </View>
         </View>

@@ -1,9 +1,9 @@
 import StyledText from "@/components/ui/StyledText";
+import { Ionicons } from "@expo/vector-icons";
 import React from 'react';
 import { Dimensions, View } from 'react-native';
 import { LineChart } from "react-native-chart-kit";
 import { SectionHeader } from './SectionHeader';
-import { StatCard } from './StatCard';
 import { statsStyles } from './styles';
 
 interface WeightStatsProps {
@@ -54,10 +54,24 @@ export function WeightStats({ weightMetrics, weightChartData, colors, isDark, t 
                             />
                         </View>
                     )}
-                    <View style={statsStyles.statsGrid}>
-                        <StatCard icon="analytics-outline" iconColor="#10b981CC" iconBg={isDark ? '#1a2e1aCC' : '#fffCC'} label={t("stats_avg")} value={weightMetrics.avg} delay={100} colors={colors} />
-                        <StatCard icon="trending-up" iconColor="#ef4444CC" iconBg={isDark ? '#2e1a1aCC' : '#fee2e2CC'} label={t("stats_max")} value={weightMetrics.max} delay={200} colors={colors} />
-                        <StatCard icon="trending-down" iconColor="#10b981CC" iconBg={isDark ? '#1a2e1aCC' : '#d1fae5CC'} label={t("stats_min")} value={weightMetrics.min} delay={300} colors={colors} />
+                    <View style={[statsStyles.summaryRow, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)' }]}>
+                        <View style={statsStyles.summaryItem}>
+                            <Ionicons name="analytics-outline" size={20} color="#10b981CC" />
+                            <StyledText style={[statsStyles.summaryValue, { color: colors.PRIMARY_TEXT }]}>{weightMetrics.avg}</StyledText>
+                            <StyledText style={[statsStyles.summaryLabel, { color: colors.PLACEHOLDER }]}>{t("stats_avg")}</StyledText>
+                        </View>
+                        <View style={{ width: 1, height: 28, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+                        <View style={statsStyles.summaryItem}>
+                            <Ionicons name="trending-up" size={20} color="#ef4444CC" />
+                            <StyledText style={[statsStyles.summaryValue, { color: colors.PRIMARY_TEXT }]}>{weightMetrics.max}</StyledText>
+                            <StyledText style={[statsStyles.summaryLabel, { color: colors.PLACEHOLDER }]}>{t("stats_max")}</StyledText>
+                        </View>
+                        <View style={{ width: 1, height: 28, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+                        <View style={statsStyles.summaryItem}>
+                            <Ionicons name="trending-down" size={20} color="#10b981CC" />
+                            <StyledText style={[statsStyles.summaryValue, { color: colors.PRIMARY_TEXT }]}>{weightMetrics.min}</StyledText>
+                            <StyledText style={[statsStyles.summaryLabel, { color: colors.PLACEHOLDER }]}>{t("stats_min")}</StyledText>
+                        </View>
                     </View>
                 </View>
             ) : (
