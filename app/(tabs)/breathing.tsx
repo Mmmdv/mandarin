@@ -58,7 +58,8 @@ export default function BreathingScreen() {
                 >
                     <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>
-                <View style={{ flex: 1, justifyContent: 'center' }}>
+                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Ionicons name="leaf-outline" size={20} color={colors.PRIMARY_TEXT} />
                     <StyledText style={styles.greeting}>
                         {t("tab_breathing_title") || "Nəfəs al"}
                     </StyledText>

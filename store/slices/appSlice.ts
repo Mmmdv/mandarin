@@ -11,6 +11,11 @@ export enum Theme {
     LIGHT = "light"
 }
 
+export interface BreathingStats {
+    totalSessions: number;
+    totalDurationSec: number;
+}
+
 export interface AppState {
     lang: Lang
     theme: Theme
@@ -23,9 +28,10 @@ export interface AppState {
     expensesNotifications: boolean
     username?: string
     biometricEnabled: boolean
-    locationEnabled: boolean
     usageStats: Record<string, number>
     isBreathingActive: boolean
+    breathingStats: BreathingStats
+    breathingHistory: Record<string, { sessions: number; durationSec: number }>
 }
 
 const initialState: AppState = {
@@ -40,7 +46,6 @@ const initialState: AppState = {
     expensesNotifications: true,
     username: "",
     biometricEnabled: false,
-    locationEnabled: true,
     usageStats: {
         todo: 0,
         movies: 0,
@@ -49,7 +54,12 @@ const initialState: AppState = {
         events: 0,
         expenses: 0
     },
-    isBreathingActive: false
+    isBreathingActive: false,
+    breathingStats: {
+        totalSessions: 0,
+        totalDurationSec: 0,
+    },
+    breathingHistory: {}
 }
 
 export interface UpdateAppSettingsPayload {
@@ -64,7 +74,6 @@ export interface UpdateAppSettingsPayload {
     expensesNotifications?: boolean
     username?: string
     biometricEnabled?: boolean
-    locationEnabled?: boolean
 }
 
 export const appSlice = createSlice({
@@ -75,7 +84,7 @@ export const appSlice = createSlice({
             state: AppState,
             action: PayloadAction<UpdateAppSettingsPayload>
         ) => {
-            const { lang, theme, notificationsEnabled, username, biometricEnabled, locationEnabled } = action.payload;
+            const { lang, theme, notificationsEnabled, username, biometricEnabled } = action.payload;
             if (lang) state.lang = lang
             if (theme) state.theme = theme
             if (notificationsEnabled !== undefined) state.notificationsEnabled = notificationsEnabled
@@ -87,10 +96,24 @@ export const appSlice = createSlice({
             if (action.payload.expensesNotifications !== undefined) state.expensesNotifications = action.payload.expensesNotifications
             if (username !== undefined) state.username = username
             if (biometricEnabled !== undefined) state.biometricEnabled = biometricEnabled
-            if (locationEnabled !== undefined) state.locationEnabled = locationEnabled
         },
         setBreathingActive: (state, action: PayloadAction<boolean>) => {
             state.isBreathingActive = action.payload;
+        },
+        logBreathingSession: (state, action: PayloadAction<number>) => {
+            if (!state.breathingStats) {
+                state.breathingStats = { totalSessions: 0, totalDurationSec: 0 };
+            }
+            state.breathingStats.totalSessions += 1;
+            state.breathingStats.totalDurationSec += action.payload;
+            // Daily history
+            if (!state.breathingHistory) state.breathingHistory = {};
+            const today = new Date().toISOString().split('T')[0];
+            if (!state.breathingHistory[today]) {
+                state.breathingHistory[today] = { sessions: 0, durationSec: 0 };
+            }
+            state.breathingHistory[today].sessions += 1;
+            state.breathingHistory[today].durationSec += action.payload;
         },
         incrementUsage: (state, action: PayloadAction<string>) => {
             if (!state.usageStats) {
@@ -112,7 +135,7 @@ export const appSlice = createSlice({
     },
 })
 
-export const { updateAppSetting, incrementUsage, setBreathingActive } = appSlice.actions
+export const { updateAppSetting, incrementUsage, setBreathingActive, logBreathingSession } = appSlice.actions
 
 export const selectAppSettings = (state: { app: AppState }): AppState => state.app
 export const selectUsageStats = (state: { app: AppState }) => state.app.usageStats

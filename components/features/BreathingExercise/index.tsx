@@ -2,13 +2,13 @@ import TaskSuccessModal from '@/components/features/todo/modals/TaskSuccessModal
 import StyledText from "@/components/ui/StyledText";
 import { schedulePushNotification } from '@/constants/notifications';
 import { useTheme } from '@/hooks/useTheme';
-import { setBreathingActive } from '@/store/slices/appSlice';
+import { logBreathingSession, setBreathingActive } from '@/store/slices/appSlice';
 import { addNotification } from '@/store/slices/notificationSlice';
 import { addTodo } from '@/store/slices/todoSlice';
 import { Todo } from '@/types/todo';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { Audio as ExpoAudio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import * as Notifications from 'expo-notifications';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -33,11 +33,10 @@ export default function BreathingExercise() {
     // Sound settings
     const [isSoundEnabled, setIsSoundEnabled] = useState(false);
     const [isSeaEnabled, setIsSeaEnabled] = useState(false);
-    const [isLoaded, setIsLoaded] = useState(false);
     const [countdown, setCountdown] = useState<number | null>(null);
 
-    const whooshRef = useRef<any>(null);
-    const seaRef = useRef<any>(null);
+    const whooshPlayer = useAudioPlayer(SOUNDS.whoosh);
+    const seaPlayer = useAudioPlayer(SOUNDS.sea);
 
     const handleStop = useCallback(() => {
         setIsActive(false);
@@ -53,6 +52,7 @@ export default function BreathingExercise() {
         setIsActive(false);
         setIsCompleted(true);
         dispatch(setBreathingActive(false));
+        dispatch(logBreathingSession(selectedDuration));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
         // Completion animation
@@ -61,7 +61,7 @@ export default function BreathingExercise() {
             duration: 800,
             useNativeDriver: true,
         }).start();
-    }, [dispatch]);
+    }, [dispatch, selectedDuration]);
 
     const [reminderScheduled, setReminderScheduled] = useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -129,78 +129,45 @@ export default function BreathingExercise() {
         }
     };
 
-    // Load sounds on mount
+    // Configure players on mount
     useEffect(() => {
-        const loadSounds = async () => {
-            try {
-                // Load local assets
-                const { sound: whooshSound } = await (ExpoAudio.Sound as any).createAsync(
-                    SOUNDS.whoosh,
-                    { volume: 0.9, rate: 0.9, shouldCorrectPitch: true }
-                );
-                whooshRef.current = whooshSound;
-
-                const { sound: seaSound } = await (ExpoAudio.Sound as any).createAsync(
-                    SOUNDS.sea,
-                    { isLooping: true, volume: 0.6 }
-                );
-                seaRef.current = seaSound;
-                setIsLoaded(true);
-            } catch (error) {
-                console.log("Error loading sounds:", error);
-            }
-        };
-
-        loadSounds();
-
-        return () => {
-            if (whooshRef.current) whooshRef.current.unloadAsync();
-            if (seaRef.current) seaRef.current.unloadAsync();
-        };
+        if (whooshPlayer) {
+            whooshPlayer.volume = 0.9;
+        }
+        if (seaPlayer) {
+            seaPlayer.loop = true;
+            seaPlayer.volume = 0.6;
+        }
     }, []);
 
     // Handle background sea waves
     useEffect(() => {
-        const handleSeaSound = async () => {
-            if (!isLoaded || !seaRef.current) return;
-
-            try {
-                const status = await seaRef.current.getStatusAsync();
-                if (!status.isLoaded) return;
-
-                if (isSeaEnabled && isActive) {
-                    await seaRef.current.playAsync();
-                } else {
-                    await seaRef.current.pauseAsync();
-                }
-            } catch (error) {
-                console.log("Error handling sea sound:", error);
+        if (!seaPlayer) return;
+        try {
+            if (isSeaEnabled && isActive) {
+                seaPlayer.play();
+            } else {
+                seaPlayer.pause();
             }
-        };
-        handleSeaSound();
-    }, [isSeaEnabled, isActive, isLoaded]);
+        } catch (error) {
+            console.log("Error handling sea sound:", error);
+        }
+    }, [isSeaEnabled, isActive]);
 
     // Play whoosh only on exhale
     useEffect(() => {
-        const playWhoosh = async () => {
-            if (!isLoaded || !whooshRef.current) return;
-
-            try {
-                const status = await whooshRef.current.getStatusAsync();
-                if (!status.isLoaded) return;
-
-                if (isActive && isSoundEnabled && phase === 'exhale') {
-                    await whooshRef.current.setPositionAsync(0);
-                    await whooshRef.current.playAsync();
-                } else if (phase !== 'exhale') {
-                    await whooshRef.current.stopAsync();
-                }
-            } catch (error) {
-                console.log("Error playing whoosh:", error);
+        if (!whooshPlayer) return;
+        try {
+            if (isActive && isSoundEnabled && phase === 'exhale') {
+                whooshPlayer.seekTo(0);
+                whooshPlayer.play();
+            } else if (phase !== 'exhale') {
+                whooshPlayer.pause();
             }
-        };
-        playWhoosh();
-    }, [phase, isSoundEnabled, isActive, isLoaded]);
+        } catch (error) {
+            console.log("Error playing whoosh:", error);
+        }
+    }, [phase, isSoundEnabled, isActive]);
 
     // Responsive sizes
     const containerWidth = screenWidth - 40;

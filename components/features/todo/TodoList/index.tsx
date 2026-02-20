@@ -108,7 +108,11 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const sortedCompletedTodos = sortTodos(completedTodos, doneSortBy, doneSortOrder, lang, "completedAt")
     const sortedArchivedTodos = sortTodos(archivedTodos, archiveSortBy, archiveSortOrder, lang, "archivedAt")
 
-    const toggleSection = (setter: React.Dispatch<React.SetStateAction<boolean>>, anim: any) => {
+    const toggleSection = (
+        setter: React.Dispatch<React.SetStateAction<boolean>>,
+        anim: Animated.Value,
+        section: 'todo' | 'done' | 'archive'
+    ) => {
         setter(prev => {
             const newValue = !prev
             Animated.timing(anim, {
@@ -116,6 +120,23 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 duration: 300,
                 useNativeDriver: true,
             }).start()
+
+            // Açılan zaman digər bölmələri bağla
+            if (newValue) {
+                if (section !== 'todo') {
+                    setTodoExpanded(false)
+                    Animated.timing(todoAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
+                }
+                if (section !== 'done') {
+                    setDoneExpanded(false)
+                    Animated.timing(doneAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
+                }
+                if (section !== 'archive') {
+                    setArchiveExpanded(false)
+                    Animated.timing(archiveAnimation, { toValue: 0, duration: 300, useNativeDriver: true }).start()
+                }
+            }
+
             LayoutAnimation.configureNext(toggleAnimation);
             return newValue
         });
@@ -275,7 +296,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
             {(todoExpanded || doneExpanded || archiveExpanded) && (
                 <TouchableOpacity
                     style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: 'rgba(79, 70, 229, 0.15)', borderWidth: 0.2, borderColor: 'rgba(79, 70, 229, 0.3)' }]}
-                    onPress={() => toggleSection(setTodoExpanded, todoAnimation)}
+                    onPress={() => toggleSection(setTodoExpanded, todoAnimation, 'todo')}
                     disabled={sortedPendingTodos.length === 0}
                 >
                     <View style={[styles.sectionTitleContainer, sortedPendingTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
@@ -317,7 +338,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
             {(doneExpanded || archiveExpanded) && (
                 <TouchableOpacity
                     style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 0.2, borderColor: 'rgba(16, 185, 129, 0.3)' }]}
-                    onPress={() => toggleSection(setDoneExpanded, doneAnimation)}
+                    onPress={() => toggleSection(setDoneExpanded, doneAnimation, 'done')}
                     disabled={sortedCompletedTodos.length === 0}
                 >
                     <View style={[styles.sectionTitleContainer, sortedCompletedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
@@ -364,7 +385,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
             {archiveExpanded && (
                 <TouchableOpacity
                     style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderWidth: 0.2, borderColor: 'rgba(139, 92, 246, 0.3)' }]}
-                    onPress={() => toggleSection(setArchiveExpanded, archiveAnimation)}
+                    onPress={() => toggleSection(setArchiveExpanded, archiveAnimation, 'archive')}
                     disabled={sortedArchivedTodos.length === 0}
                 >
                     <View style={[styles.sectionTitleContainer, sortedArchivedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
@@ -432,7 +453,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         {!todoExpanded && (
                             <TouchableOpacity
                                 style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(79, 70, 229, 0.15)', borderWidth: 0.2, borderColor: 'rgba(79, 70, 229, 0.3)', elevation: 0, zIndex: 0 }]}
-                                onPress={() => toggleSection(setTodoExpanded, todoAnimation)}
+                                onPress={() => toggleSection(setTodoExpanded, todoAnimation, 'todo')}
                                 disabled={sortedPendingTodos.length === 0}
                             >
                                 <View style={[styles.sectionTitleContainer, sortedPendingTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
@@ -493,7 +514,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                         {!doneExpanded && (
                             <TouchableOpacity
                                 style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 0.2, borderColor: 'rgba(16, 185, 129, 0.3)', elevation: 0, zIndex: 0 }]}
-                                onPress={() => toggleSection(setDoneExpanded, doneAnimation)}
+                                onPress={() => toggleSection(setDoneExpanded, doneAnimation, 'done')}
                                 disabled={sortedCompletedTodos.length === 0}
                             >
                                 <View style={[styles.sectionTitleContainer, sortedCompletedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>
@@ -558,7 +579,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     {!archiveExpanded && (
                         <TouchableOpacity
                             style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderWidth: 0.2, borderColor: 'rgba(139, 92, 246, 0.3)', elevation: 0, zIndex: 0 }]}
-                            onPress={() => toggleSection(setArchiveExpanded, archiveAnimation)}
+                            onPress={() => toggleSection(setArchiveExpanded, archiveAnimation, 'archive')}
                             disabled={sortedArchivedTodos.length === 0}
                         >
                             <View style={[styles.sectionTitleContainer, sortedArchivedTodos.length === 0 && { opacity: 0.5 }, { zIndex: 2 }]}>

@@ -40,7 +40,7 @@ export default function MoreScreen() {
             id: "breathing",
             title: t("tab_breathing_title"),
             description: t("breathing_desc"),
-            icon: "weather-windy" as keyof typeof MaterialCommunityIcons.glyphMap, // Nəfəs / külək hissi
+            icon: "leaf" as keyof typeof MaterialCommunityIcons.glyphMap, // Nəfəs / külək hissi
             route: "/breathing",
             color: "#978265",
             iconColor: "#FFF",
