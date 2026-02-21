@@ -26,10 +26,10 @@ export const getModalStyles = (colors: any) => StyleSheet.create({
         textAlign: "center",
     },
     divider: {
-        height: 0.3,
+        height: 0.6,
         backgroundColor: colors.PRIMARY_BORDER_DARK,
         width: "100%",
-        opacity: 0.15,
+        opacity: 0.8,
     },
     messageText: {
         fontSize: 14,

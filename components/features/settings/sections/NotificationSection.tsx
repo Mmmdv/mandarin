@@ -167,15 +167,15 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
             </View>
 
             {/* Manage Notification Categories Modal */}
-            <StyledModal isOpen={isManageModalOpen} onClose={() => setIsManageModalOpen(false)}>
-                <View style={[modalThemeStyles.modalContainer, { width: '100%', paddingHorizontal: 0 }]}>
+            <StyledModal isOpen={isManageModalOpen} onClose={() => setIsManageModalOpen(false)} closeOnOverlayPress={true}>
+                <View style={[styles.modalPremiumContainer, { paddingHorizontal: 0 }]}>
                     <View style={[modalThemeStyles.iconContainer, {
                         backgroundColor: colors.TAB_BAR,
                         shadowColor: colors.CHECKBOX_SUCCESS,
-                        shadowOffset: { width: 0, height: 4 },
+                        shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.3,
-                        shadowRadius: 8,
-                        elevation: 5,
+                        shadowRadius: 2,
+                        elevation: 2,
                         marginBottom: 10
                     }]}>
                         <Ionicons name="notifications" size={28} color={colors.CHECKBOX_SUCCESS} />
@@ -183,7 +183,7 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
 
                     <StyledText style={modalThemeStyles.headerText}>{t("manage_notification_categories")}</StyledText>
 
-                    <View style={[modalThemeStyles.divider, { marginVertical: 15, opacity: 0.3 }]} />
+                    <View style={[modalThemeStyles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK, marginVertical: 15, opacity: 0.3 }]} />
 
                     <View style={{ width: '100%', paddingHorizontal: 20 }}>
                         <View style={styles.aboutContainer}>
@@ -209,40 +209,40 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
                         </View>
                     </View>
 
-                    <View style={[modalThemeStyles.buttonsContainer, { paddingHorizontal: 20, marginTop: 24 }]}>
+                    <View style={[modalThemeStyles.buttonsContainer, { paddingHorizontal: 20, marginTop: 10, width: '100%' }]}>
                         <StyledButton
                             label={t("close")}
                             onPress={() => setIsManageModalOpen(false)}
                             variant="dark_button"
-                            style={{ width: '100%' }}
+                            style={{ flex: 1 }}
                         />
                     </View>
                 </View>
             </StyledModal>
 
             {/* Notification Disable Confirmation Modal */}
-            <StyledModal isOpen={isConfirmDisableOpen} onClose={() => setIsConfirmDisableOpen(false)}>
-                <View style={modalThemeStyles.modalContainer}>
+            <StyledModal isOpen={isConfirmDisableOpen} onClose={() => setIsConfirmDisableOpen(false)} closeOnOverlayPress={true}>
+                <View style={styles.modalPremiumContainer}>
                     <View style={[modalThemeStyles.iconContainer, {
                         backgroundColor: colors.TAB_BAR,
                         shadowColor: "#FF6B6B",
-                        shadowOffset: { width: 0, height: 4 },
+                        shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.3,
-                        shadowRadius: 8,
-                        elevation: 5
+                        shadowRadius: 2,
+                        elevation: 2
                     }]}>
                         <Ionicons name="notifications-off" size={28} color="#FF6B6B" />
                     </View>
 
                     <StyledText style={modalThemeStyles.headerText}>{t("notifications")}</StyledText>
 
-                    <View style={[modalThemeStyles.divider, { opacity: 0.3 }]} />
+                    <View style={[modalThemeStyles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK, opacity: 0.3 }]} />
 
                     <StyledText style={modalThemeStyles.messageText}>
                         {t("disable_notifications_confirm")}
                     </StyledText>
 
-                    <View style={modalThemeStyles.buttonsContainer}>
+                    <View style={[modalThemeStyles.buttonsContainer, { marginTop: 10 }]}>
                         <StyledButton
                             label={t("cancel")}
                             onPress={() => setIsConfirmDisableOpen(false)}

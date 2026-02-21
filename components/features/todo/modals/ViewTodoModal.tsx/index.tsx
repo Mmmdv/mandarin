@@ -46,18 +46,18 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
                     backgroundColor: colors.TAB_BAR,
-                    shadowColor: "#4ECDC4",
-                    shadowOffset: { width: 0, height: 4 },
+                    shadowColor: colors.CHECKBOX_SUCCESS,
+                    shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 5
+                    shadowRadius: 2,
+                    elevation: 2
                 }]}>
                     <Ionicons name="checkbox" size={28} color="#4ECDC4" />
                 </View>
 
                 <StyledText style={styles.headerText}>{t("task_details")}</StyledText>
 
-                <View style={[modalStyles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK, opacity: 0.3 }]} />
+                <View style={modalStyles.divider} />
 
                 {/* Prominent Task Title */}
                 <View style={styles.titleSection}>

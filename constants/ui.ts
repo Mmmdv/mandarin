@@ -22,6 +22,9 @@ export const DarkTheme = {
   TAB_BAR: "#0d1422ff", // Original secondary background
   ADD_BUTTON: "#384864ff",
   REMINDER: "#FFD166",
+  DARK_BUTTON_BACKGROUND: "#0d1422ff",
+  DARK_BUTTON_BORDER: "#3a3f47",
+  DARK_BUTTON_SHADOW: "#4ECDC4",
 };
 
 export const LightTheme = {
@@ -43,11 +46,14 @@ export const LightTheme = {
   PLACEHOLDER: "#8E8E93",
   ERROR_INPUT_TEXT: "#FF3B30",
   SECTION_TEXT: "#3A3A3C",
-  TINT: "#3e5a8bff",
+  TINT: 'rgba(79, 70, 229, 0.6)',
   INACTIVE: "#8E8E93",
-  TAB_BAR: "#F2F2F7",
-  ADD_BUTTON: "#3e5a8bff",
+  TAB_BAR: "#f1f1f3ff",
+  ADD_BUTTON: 'rgba(79, 70, 229, 0.6)',
   REMINDER: "#D97706", // Darker orange-yellow for light mode readability
+  DARK_BUTTON_BACKGROUND: 'rgba(79, 70, 229, 0.6)',
+  DARK_BUTTON_BORDER: "transparent",
+  DARK_BUTTON_SHADOW: 'rgba(79, 70, 229, 0.6)',
 };
 
 export const COLORS = DarkTheme;

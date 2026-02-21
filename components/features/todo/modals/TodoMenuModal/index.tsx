@@ -48,7 +48,7 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
                     {
                         opacity: disabled ? 0.3 : 1,
                         borderBottomColor: colors.PRIMARY_BORDER_DARK,
-                        borderBottomWidth: isLast ? 0 : 0.5,
+                        borderBottomWidth: isLast ? 0 : 0.2,
                     }
                 ]}
             >
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         borderRadius: 16,
-        borderWidth: 0.5,
+        borderWidth: 0.2,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 12,

@@ -247,17 +247,17 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                     <View style={[modalStyles.iconContainer, {
                         backgroundColor: colors.TAB_BAR,
                         shadowColor: colors.CHECKBOX_SUCCESS,
-                        shadowOffset: { width: 0, height: 4 },
+                        shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.3,
-                        shadowRadius: 8,
-                        elevation: 5
+                        shadowRadius: 2,
+                        elevation: 2
                     }]}>
                         <Ionicons name="add" size={28} color={colors.CHECKBOX_SUCCESS} />
                     </View>
 
                     <StyledText style={themedLocalStyles.headerText}>{t("add")}</StyledText>
 
-                    <View style={[modalStyles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK, opacity: 0.3 }]} />
+                    <View style={modalStyles.divider} />
 
                     <Pressable onPress={() => inputRef.current?.focus()} style={{ width: '100%', alignItems: 'center', zIndex: 10 }} disabled={isRecording || isAnalyzing}>
                         <Animated.View style={[
@@ -448,10 +448,10 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                 <View style={[themedModalStyles.iconContainer, {
                                     backgroundColor: colors.TAB_BAR,
                                     shadowColor: picker.showDatePicker ? "#5BC0EB" : colors.REMINDER,
-                                    shadowOffset: { width: 0, height: 4 },
+                                    shadowOffset: { width: 0, height: 2 },
                                     shadowOpacity: 0.3,
-                                    shadowRadius: 8,
-                                    elevation: 5
+                                    shadowRadius: 2,
+                                    elevation: 2
                                 }]}>
                                     <Ionicons
                                         name={picker.showDatePicker ? "calendar" : "time"}
@@ -464,7 +464,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                     {picker.showDatePicker ? t("date") : t("time")}
                                 </StyledText>
 
-                                <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
+                                <View style={modalStyles.divider} />
 
                                 <View style={{ width: '100%', height: 150, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
                                     <DateTimePicker
@@ -518,17 +518,17 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                             <View style={[themedModalStyles.iconContainer, {
                                 backgroundColor: colors.TAB_BAR,
                                 shadowColor: colors.REMINDER,
-                                shadowOffset: { width: 0, height: 4 },
+                                shadowOffset: { width: 0, height: 2 },
                                 shadowOpacity: 0.3,
-                                shadowRadius: 8,
-                                elevation: 5
+                                shadowRadius: 2,
+                                elevation: 2
                             }]}>
                                 <Ionicons name="notifications" size={28} color={colors.REMINDER} />
                             </View>
 
                             <StyledText style={themedModalStyles.headerText}>{t("enable_notifications")}</StyledText>
 
-                            <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
+                            <View style={modalStyles.divider} />
 
                             <StyledText style={themedModalStyles.messageText}>
                                 {t("enable_notifications_desc")}
@@ -564,17 +564,17 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                             <View style={[themedModalStyles.iconContainer, {
                                 backgroundColor: colors.TAB_BAR,
                                 shadowColor: "#FFB74D",
-                                shadowOffset: { width: 0, height: 4 },
+                                shadowOffset: { width: 0, height: 2 },
                                 shadowOpacity: 0.3,
-                                shadowRadius: 8,
-                                elevation: 5
+                                shadowRadius: 2,
+                                elevation: 2
                             }]}>
                                 <Ionicons name="alert-circle" size={28} color="#FFB74D" />
                             </View>
 
                             <StyledText style={themedModalStyles.headerText}>{t("attention")}</StyledText>
 
-                            <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
+                            <View style={modalStyles.divider} />
 
                             <StyledText style={themedModalStyles.messageText}>
                                 {t("past_reminder_error")}

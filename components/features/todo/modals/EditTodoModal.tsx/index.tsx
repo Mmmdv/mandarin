@@ -126,17 +126,17 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                 <View style={[modalStyles.iconContainer, {
                     backgroundColor: colors.TAB_BAR,
                     shadowColor: "#5BC0EB",
-                    shadowOffset: { width: 0, height: 4 },
+                    shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 5
+                    shadowRadius: 2,
+                    elevation: 2
                 }]}>
                     <Ionicons name="create-outline" size={28} color="#5BC0EB" />
                 </View>
 
                 <StyledText style={themedLocalStyles.headerText}>{t("edit")}</StyledText>
 
-                <View style={[modalStyles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK, opacity: 0.3 }]} />
+                <View style={modalStyles.divider} />
 
                 <Pressable onPress={() => inputRef.current?.focus()} style={{ width: '100%', alignItems: 'center', zIndex: 10 }}>
                     <Animated.View style={[
@@ -255,7 +255,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                                 {picker.showDatePicker ? t("date") : t("time")}
                             </StyledText>
 
-                            <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
+                            <View style={themedModalStyles.divider} />
 
                             <View style={{ width: '100%', height: 150, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
                                 <DateTimePicker
@@ -318,7 +318,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
 
                         <StyledText style={themedModalStyles.headerText}>{t("enable_notifications")}</StyledText>
 
-                        <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
+                        <View style={themedModalStyles.divider} />
 
                         <StyledText style={themedModalStyles.messageText}>
                             {t("enable_notifications_desc")}
@@ -364,7 +364,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
 
                         <StyledText style={themedModalStyles.headerText}>{t("attention")}</StyledText>
 
-                        <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
+                        <View style={themedModalStyles.divider} />
 
                         <StyledText style={themedModalStyles.messageText}>
                             {t("past_reminder_error")}

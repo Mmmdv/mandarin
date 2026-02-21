@@ -1,11 +1,12 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { getModalStyles } from "@/constants/modalStyles";
+import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
+import { getStyles } from "./styles";
 
 type RetryTodoModalProps = {
     isOpen: boolean
@@ -16,64 +17,65 @@ type RetryTodoModalProps = {
 const RetryTodoModal: React.FC<RetryTodoModalProps> = ({
     isOpen,
     onClose,
-    onRetry }) => {
-    const { t, colors } = useTheme();
-    const themedStyles = useMemo(() => getModalStyles(colors), [colors]);
+    onRetry
+}) => {
+    const { t, colors, isDark } = useTheme();
+    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
     return (
-        <StyledModal isOpen={isOpen} onClose={onClose}>
-            <View style={themedStyles.modalContainer}>
-                <View style={[themedStyles.iconContainer, {
-                    backgroundColor: colors.SECONDARY_BACKGROUND,
+        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
+            <View style={styles.container}>
+                <View style={[modalStyles.iconContainer, {
+                    backgroundColor: colors.TAB_BAR,
                     shadowColor: "#4F46E5",
-                    shadowOffset: { width: 0, height: 4 },
+                    shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 5
+                    shadowRadius: 2,
+                    elevation: 2
                 }]}>
                     <Ionicons name="sync-outline" size={28} color="#4F46E5" />
                 </View>
 
-                <StyledText style={themedStyles.headerText}>{t("retry_confirm_title")}</StyledText>
+                <StyledText style={styles.headerText}>{t("retry_confirm_title")}</StyledText>
 
-                <View style={[themedStyles.divider, { opacity: 0.3 }]} />
+                <View style={modalStyles.divider} />
 
-                <StyledText style={themedStyles.messageText}>
+                <StyledText style={styles.messageText}>
                     {t("retry_confirm_message")}
                 </StyledText>
 
-                <View style={localStyles.optionsContainer}>
-                    <View style={localStyles.buttonRow}>
+                <View style={styles.optionsContainer}>
+                    <View style={styles.buttonRow}>
                         <StyledButton
                             label={t("retry_1_hour")}
                             onPress={() => onRetry('hour')}
                             variant="dark_button"
-                            style={localStyles.optionButton}
+                            style={styles.optionButton}
                         />
                         <StyledButton
                             label={t("retry_1_day")}
                             onPress={() => onRetry('day')}
                             variant="dark_button"
-                            style={localStyles.optionButton}
+                            style={styles.optionButton}
                         />
                     </View>
-                    <View style={localStyles.buttonRow}>
+                    <View style={styles.buttonRow}>
                         <StyledButton
                             label={t("retry_1_week")}
                             onPress={() => onRetry('week')}
                             variant="dark_button"
-                            style={localStyles.optionButton}
+                            style={styles.optionButton}
                         />
                         <StyledButton
                             label={t("retry_1_month")}
                             onPress={() => onRetry('month')}
                             variant="dark_button"
-                            style={localStyles.optionButton}
+                            style={styles.optionButton}
                         />
                     </View>
                 </View>
 
-                <View style={[themedStyles.buttonsContainer, { marginTop: 10 }]}>
+                <View style={[modalStyles.buttonsContainer, { justifyContent: "center", marginTop: 8 }]}>
                     <StyledButton
                         label={t("cancel")}
                         onPress={onClose}
@@ -86,20 +88,5 @@ const RetryTodoModal: React.FC<RetryTodoModalProps> = ({
     );
 };
 
-const localStyles = StyleSheet.create({
-    optionsContainer: {
-        width: '100%',
-        gap: 10,
-        marginVertical: 15,
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        gap: 10,
-        justifyContent: 'space-between',
-    },
-    optionButton: {
-        flex: 1,
-    }
-});
+export default RetryTodoModal;
 
-export default RetryTodoModal
