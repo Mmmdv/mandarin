@@ -5,21 +5,17 @@ import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as Contacts from "expo-contacts";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-    Alert,
     Animated,
     Keyboard,
-    Linking,
     Platform,
     ScrollView,
     StyleSheet,
     TextInput,
-    TouchableOpacity,
     TouchableWithoutFeedback,
-    View,
+    View
 } from "react-native";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
@@ -43,7 +39,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     onClose,
     onAdd,
 }) => {
-    const { t, colors, theme, contactsEnabled } = useTheme();
+    const { t, colors, theme } = useTheme();
     const router = useRouter();
     const [name, setName] = useState("");
     const [nickname, setNickname] = useState("");
@@ -71,52 +67,6 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     useEffect(() => {
         if (nameError && name) setNameError(false);
     }, [name]);
-
-    const pickContact = async () => {
-        if (!contactsEnabled) {
-            onClose();
-            router.push("/settings");
-            return;
-        }
-        const { status } = await Contacts.requestPermissionsAsync();
-        if (status === 'granted') {
-            try {
-                const contact = await Contacts.presentContactPickerAsync();
-
-                if (contact) {
-                    // Name
-                    const fullName = [contact.firstName, contact.lastName].filter(Boolean).join(" ");
-                    if (fullName) setName(fullName);
-
-                    // Phone
-                    if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
-                        setPhone(contact.phoneNumbers[0].number || "");
-                    }
-
-                    // Birthday
-                    if (contact.birthday) {
-                        const { day, month, year } = contact.birthday;
-                        if (day && month) {
-                            const bDate = new Date(year || 2000, month - 1, day);
-                            setDate(bDate);
-                            setDateError(false);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error("Error picking contact:", err);
-            }
-        } else {
-            Alert.alert(
-                t("attention"),
-                t("contacts_permission_denied"),
-                [
-                    { text: t("cancel"), style: "cancel" },
-                    { text: t("settings"), onPress: () => Linking.openSettings() }
-                ]
-            );
-        }
-    };
 
     const onPressAdd = () => {
         let hasError = false;
@@ -188,141 +138,132 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{ gap: 16, paddingBottom: 10 }}
                     >
-                        {/* Pick from Contacts Button / Selected Contact Display */}
-                        <TouchableOpacity
-                            onPress={pickContact}
-                            activeOpacity={0.7}
-                            style={[
-                                styles.contactPickerButton,
-                                {
-                                    backgroundColor: name ? colors.SECONDARY_BACKGROUND : colors.PRIMARY_INACTIVE_BUTTON,
-                                    borderColor: name ? BIRTHDAY_LIGHT : colors.PRIMARY_BORDER_DARK,
-                                    height: name ? 60 : 44, // Daha hündür düymə seçilmiş kontakt üçün
-                                    paddingHorizontal: 12, // Əlavə boşluq
-                                }
-                            ]}
-                        >
-                            <Ionicons
-                                name={name ? "person" : "person-add-outline"}
-                                size={name ? 24 : 18}
-                                color={BIRTHDAY_LIGHT}
-                            />
-                            <View style={{ flex: 1, marginLeft: name ? 10 : 0 }}>
-                                <StyledText style={[
-                                    styles.contactPickerText,
+                        {/* 1. Name Input */}
+                        <View style={styles.inputGroup}>
+                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
+                                {t("birthday_name")} *
+                            </StyledText>
+                            <TextInput
+                                style={[
+                                    styles.input,
                                     {
                                         color: colors.PRIMARY_TEXT,
-                                        textAlign: name ? 'left' : 'center'
-                                    }
-                                ]}>
-                                    {name || t("birthday_pick_contact")}
-                                </StyledText>
-                                {name && phone ? (
-                                    <StyledText style={{ color: colors.PLACEHOLDER, fontSize: 12, marginTop: 2 }}>
-                                        {phone}
-                                    </StyledText>
-                                ) : null}
-                            </View>
-                            {name && (
-                                <Ionicons name="chevron-forward" size={16} color={colors.PLACEHOLDER} />
-                            )}
-                        </TouchableOpacity>
+                                        backgroundColor: colors.PRIMARY_BACKGROUND,
+                                        borderColor: nameError ? "#FF6B6B" : colors.PRIMARY_BORDER_DARK,
+                                    },
+                                ]}
+                                placeholder={t("birthday_name_placeholder")}
+                                placeholderTextColor={colors.PLACEHOLDER}
+                                value={name}
+                                onChangeText={setName}
+                            />
+                        </View>
 
-                        {!contactsEnabled && !name && (
-                            <View style={{ padding: 10, alignItems: 'center' }}>
-                                <StyledText style={{ color: "#FF6161", fontSize: 13, textAlign: 'center' }}>
-                                    {t("contacts_permission_denied")}
-                                </StyledText>
-                            </View>
-                        )}
+                        {/* 2. Phone Input (Optional) */}
+                        <View style={styles.inputGroup}>
+                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
+                                {t("birthday_phone")}
+                            </StyledText>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    {
+                                        color: colors.PRIMARY_TEXT,
+                                        backgroundColor: colors.PRIMARY_BACKGROUND,
+                                        borderColor: colors.PRIMARY_BORDER_DARK,
+                                    },
+                                ]}
+                                placeholder="+994 -- --- -- --"
+                                placeholderTextColor={colors.PLACEHOLDER}
+                                value={phone}
+                                onChangeText={setPhone}
+                                keyboardType="phone-pad"
+                            />
+                        </View>
 
-                        {name ? (
-                            <Animated.View style={{ gap: 16 }}>
-                                {/* 3. Date Picker (Mandatory) */}
-                                <View style={styles.inputGroup}>
-                                    <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                        {t("birthday_date")} *
-                                    </StyledText>
-                                    <View
+                        {/* 3. Date Picker (Mandatory) */}
+                        <View style={styles.inputGroup}>
+                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
+                                {t("birthday_date")} *
+                            </StyledText>
+                            <View
+                                style={[
+                                    styles.dateButton,
+                                    {
+                                        backgroundColor: colors.PRIMARY_BACKGROUND,
+                                        borderColor: dateError ? "#FF6B6B" : colors.PRIMARY_BORDER_DARK,
+                                    },
+                                ]}
+                            >
+                                {Platform.OS === "android" ? (
+                                    <StyledText
                                         style={[
-                                            styles.dateButton,
-                                            {
-                                                backgroundColor: colors.PRIMARY_BACKGROUND,
-                                                borderColor: dateError ? "#FF6B6B" : colors.PRIMARY_BORDER_DARK,
-                                            },
+                                            styles.dateText,
+                                            { color: date ? colors.PRIMARY_TEXT : colors.PLACEHOLDER },
                                         ]}
+                                        onPress={() => setShowDatePicker(true)}
                                     >
-                                        {Platform.OS === "android" ? (
-                                            <StyledText
-                                                style={[
-                                                    styles.dateText,
-                                                    { color: date ? colors.PRIMARY_TEXT : colors.PLACEHOLDER },
-                                                ]}
-                                                onPress={() => setShowDatePicker(true)}
-                                            >
-                                                {date ? formatDate(date) : t("birthday_date")}
-                                            </StyledText>
-                                        ) : (
-                                            <DateTimePicker
-                                                value={date || new Date(2000, 0, 1)}
-                                                mode="date"
-                                                display="compact"
-                                                onChange={onDateChange}
-                                                maximumDate={new Date()}
-                                                themeVariant={theme}
-                                                style={{ flex: 1 }}
-                                            />
-                                        )}
-                                        <Ionicons name="calendar-outline" size={20} color={BIRTHDAY_LIGHT} />
-                                    </View>
-                                </View>
-
-                                {/* 4. Nickname Input (Müraciət forması) */}
-                                <View style={styles.inputGroup}>
-                                    <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                        {t("birthday_nickname")}
+                                        {date ? formatDate(date) : t("birthday_date")}
                                     </StyledText>
-                                    <TextInput
-                                        style={[
-                                            styles.input,
-                                            {
-                                                color: colors.PRIMARY_TEXT,
-                                                backgroundColor: colors.PRIMARY_BACKGROUND,
-                                                borderColor: colors.PRIMARY_BORDER_DARK,
-                                            },
-                                        ]}
-                                        placeholder={t("birthday_nickname_placeholder")}
-                                        placeholderTextColor={colors.PLACEHOLDER}
-                                        value={nickname}
-                                        onChangeText={setNickname}
+                                ) : (
+                                    <DateTimePicker
+                                        value={date || new Date(2000, 0, 1)}
+                                        mode="date"
+                                        display="compact"
+                                        onChange={onDateChange}
+                                        maximumDate={new Date()}
+                                        themeVariant={theme}
+                                        style={{ flex: 1 }}
                                     />
-                                </View>
+                                )}
+                                <Ionicons name="calendar-outline" size={20} color={BIRTHDAY_LIGHT} />
+                            </View>
+                        </View>
 
-                                {/* 5. Note Input (Qeyd) */}
-                                <View style={styles.inputGroup}>
-                                    <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                        {t("birthday_note")}
-                                    </StyledText>
-                                    <TextInput
-                                        style={[
-                                            styles.input,
-                                            styles.noteInput,
-                                            {
-                                                color: colors.PRIMARY_TEXT,
-                                                backgroundColor: colors.PRIMARY_BACKGROUND,
-                                                borderColor: colors.PRIMARY_BORDER_DARK,
-                                            },
-                                        ]}
-                                        placeholder={t("birthday_note_placeholder")}
-                                        placeholderTextColor={colors.PLACEHOLDER}
-                                        value={note}
-                                        onChangeText={setNote}
-                                        multiline
-                                        numberOfLines={2}
-                                    />
-                                </View>
-                            </Animated.View>
-                        ) : null}
+                        {/* 4. Nickname Input (Müraciət forması) */}
+                        <View style={styles.inputGroup}>
+                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
+                                {t("birthday_nickname")}
+                            </StyledText>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    {
+                                        color: colors.PRIMARY_TEXT,
+                                        backgroundColor: colors.PRIMARY_BACKGROUND,
+                                        borderColor: colors.PRIMARY_BORDER_DARK,
+                                    },
+                                ]}
+                                placeholder={t("birthday_nickname_placeholder")}
+                                placeholderTextColor={colors.PLACEHOLDER}
+                                value={nickname}
+                                onChangeText={setNickname}
+                            />
+                        </View>
+
+                        {/* 5. Note Input (Qeyd) */}
+                        <View style={styles.inputGroup}>
+                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
+                                {t("birthday_note")}
+                            </StyledText>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    styles.noteInput,
+                                    {
+                                        color: colors.PRIMARY_TEXT,
+                                        backgroundColor: colors.PRIMARY_BACKGROUND,
+                                        borderColor: colors.PRIMARY_BORDER_DARK,
+                                    },
+                                ]}
+                                placeholder={t("birthday_note_placeholder")}
+                                placeholderTextColor={colors.PLACEHOLDER}
+                                value={note}
+                                onChangeText={setNote}
+                                multiline
+                                numberOfLines={2}
+                            />
+                        </View>
 
                         {/* Android Date Picker */}
                         {Platform.OS === "android" && showDatePicker && (
@@ -391,22 +332,6 @@ const styles = StyleSheet.create({
     dateText: {
         fontSize: 14,
         flex: 1,
-    },
-    contactPickerButton: {
-        width: "100%",
-        height: 44,
-        borderRadius: 10,
-        borderWidth: 1,
-        borderStyle: 'dashed',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        marginBottom: 16,
-    },
-    contactPickerText: {
-        fontSize: 14,
-        fontWeight: '600',
     },
 });
 

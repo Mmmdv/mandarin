@@ -15,10 +15,11 @@ import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { getIconName, getLabelName } from "./helpers";
-import { styles } from "./styles";
+import { getStyles } from "./styles";
 
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-    const { t } = useTheme();
+    const { t, colors, isDark } = useTheme();
+    const styles = getStyles(colors);
     const dispatch = useDispatch();
 
     const routes = state.routes;
@@ -107,19 +108,23 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                                     width: 56,
                                     height: 56,
                                     borderRadius: 28,
-                                    backgroundColor: '#384864ff',
+                                    backgroundColor: colors.ADD_BUTTON,
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                    shadowColor: "#6f83a5ff",
+                                    shadowColor: colors.ADD_BUTTON,
                                     shadowOffset: {
                                         width: 0,
-                                        height: 1,
+                                        height: 2,
                                     },
-                                    shadowOpacity: 0.3,
-                                    shadowRadius: 4.65,
-                                    elevation: 8,
+                                    shadowOpacity: 0.25,
+                                    shadowRadius: 3.84,
+                                    elevation: 5,
                                 }}>
-                                    <Ionicons name="add" size={32} color="#86cfeeff" />
+                                    <Ionicons
+                                        name="add"
+                                        size={32}
+                                        color="#d2e7f0ff"
+                                    />
                                 </View>
                             </TouchableOpacity>
                         );
@@ -150,14 +155,14 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                                         <Ionicons
                                             name={iconName}
                                             size={26}
-                                            color={isFocused ? "#86cfeeff" : "#e6e2e2ff"}
+                                            color={isFocused ? colors.TINT : colors.INACTIVE}
                                             style={route.name === "today" ? { opacity: 0.9 } : {}}
                                         />
                                         {route.name === "today" && (
                                             <View style={{
                                                 position: 'absolute',
                                                 top: 6,
-                                                backgroundColor: '#131519', // Tab bar arxa fonu
+                                                backgroundColor: colors.TAB_BAR, // Tab bar arxa fonu
                                                 borderRadius: 4,
                                                 paddingHorizontal: 2,
                                                 minWidth: 18,
@@ -167,7 +172,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                                                 <Text style={{
                                                     fontSize: 14,
                                                     fontWeight: 'bold',
-                                                    color: '#FFFFFF',
+                                                    color: isFocused ? colors.TINT : colors.PRIMARY_TEXT,
                                                 }}>
                                                     {new Date().getDate()}
                                                 </Text>
@@ -177,7 +182,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                                     <Text style={[
                                         styles.tabLabel,
                                         {
-                                            color: isFocused ? "#86cfeeff" : "#e6e2e2ff",
+                                            color: isFocused ? colors.TINT : colors.INACTIVE,
                                             fontWeight: isFocused ? "700" : "400",
                                         }
                                     ]} numberOfLines={1}>

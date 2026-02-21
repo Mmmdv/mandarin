@@ -1,12 +1,11 @@
+import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
 import StyledText from "@/components/ui/StyledText";
-import { COL_2_WIDTH, GAP, PADDING, styles } from "@/constants/homeStyles";
+import { COL_2_WIDTH, GAP, PADDING, getStyles } from "@/constants/homeStyles";
+import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";
 import { incrementUsage, selectUsageStats } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-// import analytics from "@react-native-firebase/analytics";
-import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
-import useRefresh from "@/hooks/useRefresh";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Dimensions, LayoutAnimation, Pressable, ScrollView, View } from "react-native";
@@ -18,6 +17,9 @@ type ViewMode = "card" | "list";
 
 export default function Home() {
     const { colors, t, username } = useTheme();
+    // Memoized styles to ensure stability
+    const styles = useMemo(() => getStyles(colors), [colors]);
+
     const router = useRouter();
     const dispatch = useDispatch();
     const usageStats = useSelector(selectUsageStats);
@@ -101,34 +103,23 @@ export default function Home() {
         return [...baseFeatures].sort((a, b) => {
             const usageA = usageStats?.[a.id] || 0;
             const usageB = usageStats?.[b.id] || 0;
-
-            // If usage is same, keep original order (or prioritize todo)
             if (usageB === usageA) {
                 if (a.id === 'todo') return -1;
                 if (b.id === 'todo') return 1;
                 return 0;
             }
-
             return usageB - usageA;
         });
     }, [baseFeatures, usageStats]);
 
     const handlePress = useCallback((id: string, route: string) => {
         dispatch(incrementUsage(id));
-        // try {
-        //     if (analytics().logSelectContent) {
-        //         analytics().logSelectContent({
-        //             content_type: 'feature_card',
-        //             item_id: id,
-        //         });
-        //     }
-        // } catch (e) {
-        //     // Silently fail in Expo Go
-        // }
         router.push(route as any);
     }, [router, dispatch]);
 
-    const renderCard = useCallback((item: any, cardWidth: number, height: number = 150, isFullWidth: boolean = false) => {
+    // renderCard function simplified to not rely on useCallback if it's causing scoping issues
+    const renderCard = (item: any, cardWidth: number, height: number = 150, isFullWidth: boolean = false) => {
+        if (!styles) return null;
         return (
             <Pressable
                 key={item.id}
@@ -179,9 +170,10 @@ export default function Home() {
                 )}
             </Pressable>
         );
-    }, [handlePress]);
+    };
 
-    const renderListItem = useCallback((item: any) => {
+    const renderListItem = (item: any) => {
+        if (!styles) return null;
         return (
             <Pressable
                 key={item.id}
@@ -205,13 +197,13 @@ export default function Home() {
                 <Ionicons name="chevron-forward" size={20} color={colors.PLACEHOLDER} />
             </Pressable>
         );
-    }, [handlePress, colors]);
+    };
 
     const { refreshing, onRefresh } = useRefresh();
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 10 }]}>
+        <View style={styles.container}>
+            <View style={[styles.header, { paddingBottom: 10 }]}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("welcome")}
@@ -222,7 +214,6 @@ export default function Home() {
                     style={({ pressed }) => [
                         styles.viewToggleButton,
                         {
-                            backgroundColor: colors.SECONDARY_BACKGROUND,
                             opacity: pressed ? 0.7 : 1,
                         }
                     ]}
@@ -246,16 +237,12 @@ export default function Home() {
                     />
                 }
             >
-
-
                 {viewMode === "card" ? (
                     <>
-                        {/* 1. Full Width - Dynamic Main Card */}
                         <View style={[styles.row, { marginTop: 6 }]}>
                             {renderCard(dynamicFeatures[0], width - (PADDING * 2), 160, true)}
                         </View>
 
-                        {/* 2. Mosaic Row */}
                         <View style={styles.row}>
                             <View style={{ width: COL_2_WIDTH }}>
                                 {renderCard(dynamicFeatures[1], COL_2_WIDTH, 260 + GAP)}
@@ -266,7 +253,6 @@ export default function Home() {
                             </View>
                         </View>
 
-                        {/* 3. Bottom Row */}
                         <View style={styles.row}>
                             {renderCard(dynamicFeatures[4], COL_2_WIDTH, 130)}
                             {renderCard(dynamicFeatures[5], COL_2_WIDTH, 130)}

@@ -8,14 +8,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Updates from "expo-updates";
-import React from "react";
+import React, { useMemo } from "react";
 import { DevSettings, Image, Linking, Platform, TouchableOpacity, View } from "react-native";
 import { useDispatch } from "react-redux";
-import { styles } from "../styles";
+import { getSettingsStyles } from "../styles";
 
 const ApplicationSection: React.FC = () => {
     const { colors, t } = useTheme();
     const dispatch = useDispatch();
+    const styles = useMemo(() => getSettingsStyles(colors), [colors]);
     const [isResetModalOpen, setIsResetModalOpen] = React.useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = React.useState(false);
 
@@ -34,18 +35,10 @@ const ApplicationSection: React.FC = () => {
 
     const onConfirmReset = async () => {
         try {
-            // 1. Cancel all notifications in the OS
             await Notifications.cancelAllScheduledNotificationsAsync();
-
-            // 2. Clear all AsyncStorage data (including Redux persist data)
             await AsyncStorage.clear();
-
-            // 3. Clear Redux state and its persistence
             await persistor.purge();
-
-            // 4. Dispatch global reset action to clear in-memory state
             dispatch({ type: 'RESET_APP' });
-
             setIsResetModalOpen(false);
             setIsSuccessModalOpen(true);
         } catch (error) {
@@ -56,7 +49,6 @@ const ApplicationSection: React.FC = () => {
 
     const handleCloseSuccess = () => {
         setIsSuccessModalOpen(false);
-        // Add a small delay to ensure the modal is closing/closed before reload
         setTimeout(async () => {
             try {
                 if (Updates && typeof Updates.reloadAsync === 'function') {
@@ -66,7 +58,6 @@ const ApplicationSection: React.FC = () => {
                 }
             } catch (reloadError) {
                 console.error("Failed to reload app:", reloadError);
-                // Fallback for development
                 if (__DEV__) {
                     DevSettings.reload();
                 }
@@ -77,37 +68,37 @@ const ApplicationSection: React.FC = () => {
     return (
         <>
             <View style={styles.section}>
-                <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>{t("application")}</StyledText>
+                <StyledText style={styles.sectionTitle}>{t("application")}</StyledText>
                 <View style={styles.aboutContainer}>
-                    <View style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0 }]}>
+                    <View style={styles.aboutRow}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                             <Image
                                 source={require("@/assets/images/logo.png")}
                                 style={{ width: 32, height: 32, borderRadius: 8 }}
                             />
                             <View>
-                                <StyledText style={{ fontSize: 16, fontWeight: '600', color: colors.PRIMARY_TEXT }}>{t("version")}</StyledText>
+                                <StyledText style={[styles.aboutLabel, { fontWeight: '600' }]}>{t("version")}</StyledText>
                                 <StyledText style={{ fontSize: 13, color: colors.PLACEHOLDER }}>v{appVersion}</StyledText>
                             </View>
                         </View>
                     </View>
                     <TouchableOpacity
-                        style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0 }]}
+                        style={styles.aboutRow}
                         onPress={handleRateUs}
                     >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                            <Ionicons name="star" size={20} color="#888" />
-                            <StyledText style={[styles.aboutLabel, { color: colors.PRIMARY_TEXT }]}>{t("rate_us")}</StyledText>
+                            <Ionicons name="star" size={20} color={colors.PLACEHOLDER} />
+                            <StyledText style={styles.aboutLabel}>{t("rate_us")}</StyledText>
                         </View>
                         <Ionicons name="chevron-forward" size={20} color={colors.PLACEHOLDER} />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0 }]}
+                        style={[styles.aboutRow, { borderBottomWidth: 0 }]}
                         onPress={handleResetStorage}
                     >
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                            <Ionicons name="trash-bin" size={20} color="#888" />
-                            <StyledText style={[styles.aboutLabel, { color: colors.PRIMARY_TEXT }]}>{t("reset_factory")}</StyledText>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 0 }}>
+                            <Ionicons name="trash-bin" size={20} color={colors.PLACEHOLDER} />
+                            <StyledText style={styles.aboutLabel}>{t("reset_factory")}</StyledText>
                         </View>
                         <Ionicons name="chevron-forward" size={20} color={colors.PLACEHOLDER} />
                     </TouchableOpacity>
@@ -127,6 +118,5 @@ const ApplicationSection: React.FC = () => {
         </>
     );
 };
-
 
 export default ApplicationSection;

@@ -2,7 +2,7 @@ import CustomSwitch from "@/components/ui/CustomSwitch";
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { modalStyles } from "@/constants/modalStyles";
+import { getModalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { updateAppSetting, UpdateAppSettingsPayload } from "@/store/slices/appSlice";
@@ -10,9 +10,9 @@ import { cancelAllNotifications } from "@/store/slices/notificationSlice";
 import { cancelAllReminders, selectTodos } from "@/store/slices/todoSlice";
 import { Ionicons } from "@expo/vector-icons";
 import * as Notifications from "expo-notifications";
-import React from "react";
+import React, { useMemo } from "react";
 import { LayoutAnimation, Linking, Platform, TouchableOpacity, UIManager, View } from "react-native";
-import { styles } from "../styles";
+import { getSettingsStyles } from "../styles";
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -36,6 +36,9 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
     } = useTheme();
     const dispatch = useAppDispatch();
     const todos = useAppSelector(selectTodos);
+
+    const styles = useMemo(() => getSettingsStyles(colors), [colors]);
+    const modalThemeStyles = useMemo(() => getModalStyles(colors), [colors]);
 
     const [isLoadingNotifications, setIsLoadingNotifications] = React.useState(false);
     const [isConfirmDisableOpen, setIsConfirmDisableOpen] = React.useState(false);
@@ -91,20 +94,13 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
 
     const confirmDisableNotifications = async () => {
         try {
-            // Update global setting
             dispatch(updateAppSetting({ notificationsEnabled: false }));
-
-            // Cancel ALL scheduled notifications in the OS
             await Notifications.cancelAllScheduledNotificationsAsync();
-
-            // Synchronize state and history
             dispatch(cancelAllNotifications());
             dispatch(cancelAllReminders());
-
             setIsConfirmDisableOpen(false);
         } catch (error) {
             console.error("Error disabling notifications:", error);
-            // Even if OS cancellation fails, we should still update state
             setIsConfirmDisableOpen(false);
         }
     };
@@ -113,10 +109,8 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
         dispatch(updateAppSetting({ [key]: value }));
 
         if (!value) {
-            // If toggling off, handle cancellations and status updates
             if (key === 'todoNotifications') {
                 try {
-                    // Cancel specifically using todo notification IDs for reliability
                     for (const todo of todos) {
                         if (todo.notificationId && !todo.isCompleted && !todo.isArchived) {
                             await Notifications.cancelScheduledNotificationAsync(todo.notificationId);
@@ -144,12 +138,12 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
     return (
         <>
             <View style={styles.section}>
-                <StyledText style={[styles.sectionTitle, { color: colors.PRIMARY_TEXT }]}>{t("notifications")}</StyledText>
+                <StyledText style={styles.sectionTitle}>{t("notifications")}</StyledText>
                 <View style={styles.aboutContainer}>
-                    <View style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: notificationsEnabled ? 1 : 0, backgroundColor: colors.SECONDARY_BACKGROUND }]}>
+                    <View style={[styles.aboutRow, !notificationsEnabled && { borderBottomWidth: 0 }]}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                            <Ionicons name="notifications" size={20} color={notificationsEnabled ? colors.CHECKBOX_SUCCESS : "#888"} />
-                            <StyledText style={[styles.aboutLabel, { color: colors.PRIMARY_TEXT }]}>{t("enable_notifications")}</StyledText>
+                            <Ionicons name="notifications" size={20} color={notificationsEnabled ? colors.CHECKBOX_SUCCESS : colors.PLACEHOLDER} />
+                            <StyledText style={styles.aboutLabel}>{t("enable_notifications")}</StyledText>
                         </View>
                         <CustomSwitch
                             onValueChange={handleNotificationToggle}
@@ -159,12 +153,12 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
 
                     {notificationsEnabled && (
                         <TouchableOpacity
-                            style={[styles.aboutRow, { borderColor: colors.PRIMARY_BORDER_DARK, borderBottomWidth: 0, backgroundColor: colors.SECONDARY_BACKGROUND }]}
+                            style={[styles.aboutRow, { borderBottomWidth: 0 }]}
                             onPress={() => setIsManageModalOpen(true)}
                         >
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                                 <Ionicons name="options-outline" size={20} color={colors.PLACEHOLDER} />
-                                <StyledText style={[styles.aboutLabel, { color: colors.PRIMARY_TEXT }]}>{t("manage_notification_categories")}</StyledText>
+                                <StyledText style={styles.aboutLabel}>{t("manage_notification_categories")}</StyledText>
                             </View>
                             <Ionicons name="chevron-forward" size={20} color={colors.PLACEHOLDER} />
                         </TouchableOpacity>
@@ -174,9 +168,9 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
 
             {/* Manage Notification Categories Modal */}
             <StyledModal isOpen={isManageModalOpen} onClose={() => setIsManageModalOpen(false)}>
-                <View style={[modalStyles.modalContainer, { width: '100%', paddingHorizontal: 0 }]}>
-                    <View style={[modalStyles.iconContainer, {
-                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                <View style={[modalThemeStyles.modalContainer, { width: '100%', paddingHorizontal: 0 }]}>
+                    <View style={[modalThemeStyles.iconContainer, {
+                        backgroundColor: colors.TAB_BAR,
                         shadowColor: colors.CHECKBOX_SUCCESS,
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: 0.3,
@@ -187,35 +181,35 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
                         <Ionicons name="notifications" size={28} color={colors.CHECKBOX_SUCCESS} />
                     </View>
 
-                    <StyledText style={modalStyles.headerText}>{t("manage_notification_categories")}</StyledText>
+                    <StyledText style={modalThemeStyles.headerText}>{t("manage_notification_categories")}</StyledText>
 
-                    <View style={[modalStyles.divider, { marginVertical: 15 }]} />
+                    <View style={[modalThemeStyles.divider, { marginVertical: 15, opacity: 0.3 }]} />
 
                     <View style={{ width: '100%', paddingHorizontal: 20 }}>
-                        {subSwitches.map((item, index) => (
-                            <View
-                                key={item.key}
-                                style={[styles.aboutRow, {
-                                    borderBottomWidth: index < subSwitches.length - 1 ? 1 : 0,
-                                    borderColor: colors.PRIMARY_BORDER_DARK,
-                                    paddingVertical: 14,
-                                    paddingHorizontal: 0,
-                                    backgroundColor: colors.SECONDARY_BACKGROUND
-                                }]}
-                            >
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                    <Ionicons name={item.icon} size={20} color={colors.PRIMARY_TEXT} style={{ opacity: 0.7 }} />
-                                    <StyledText style={[styles.aboutLabel, { color: colors.PRIMARY_TEXT, fontSize: 16 }]}>{item.label}</StyledText>
+                        <View style={styles.aboutContainer}>
+                            {subSwitches.map((item, index) => (
+                                <View
+                                    key={item.key}
+                                    style={[styles.aboutRow, {
+                                        borderBottomWidth: index < subSwitches.length - 1 ? 0.5 : 0,
+                                        paddingVertical: 14,
+                                        paddingHorizontal: 16,
+                                    }]}
+                                >
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                        <Ionicons name={item.icon} size={20} color={colors.PRIMARY_TEXT} style={{ opacity: 0.7 }} />
+                                        <StyledText style={styles.aboutLabel}>{item.label}</StyledText>
+                                    </View>
+                                    <CustomSwitch
+                                        onValueChange={(value) => toggleNotificationCategory(item.key as any, value)}
+                                        value={item.value}
+                                    />
                                 </View>
-                                <CustomSwitch
-                                    onValueChange={(value) => toggleNotificationCategory(item.key as any, value)}
-                                    value={item.value}
-                                />
-                            </View>
-                        ))}
+                            ))}
+                        </View>
                     </View>
 
-                    <View style={[modalStyles.buttonsContainer, { paddingHorizontal: 20, marginTop: 20 }]}>
+                    <View style={[modalThemeStyles.buttonsContainer, { paddingHorizontal: 20, marginTop: 24 }]}>
                         <StyledButton
                             label={t("close")}
                             onPress={() => setIsManageModalOpen(false)}
@@ -228,27 +222,27 @@ const NotificationSection: React.FC<NotificationSectionProps> = ({ visible }) =>
 
             {/* Notification Disable Confirmation Modal */}
             <StyledModal isOpen={isConfirmDisableOpen} onClose={() => setIsConfirmDisableOpen(false)}>
-                <View style={modalStyles.modalContainer}>
-                    <View style={[modalStyles.iconContainer, {
-                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                <View style={modalThemeStyles.modalContainer}>
+                    <View style={[modalThemeStyles.iconContainer, {
+                        backgroundColor: colors.TAB_BAR,
                         shadowColor: "#FF6B6B",
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: 0.3,
                         shadowRadius: 8,
                         elevation: 5
                     }]}>
-                        <Ionicons name="notifications-off" size={28} color={colors.ERROR_INPUT_TEXT} />
+                        <Ionicons name="notifications-off" size={28} color="#FF6B6B" />
                     </View>
 
-                    <StyledText style={modalStyles.headerText}>{t("notifications")}</StyledText>
+                    <StyledText style={modalThemeStyles.headerText}>{t("notifications")}</StyledText>
 
-                    <View style={modalStyles.divider} />
+                    <View style={[modalThemeStyles.divider, { opacity: 0.3 }]} />
 
-                    <StyledText style={modalStyles.messageText}>
+                    <StyledText style={modalThemeStyles.messageText}>
                         {t("disable_notifications_confirm")}
                     </StyledText>
 
-                    <View style={modalStyles.buttonsContainer}>
+                    <View style={modalThemeStyles.buttonsContainer}>
                         <StyledButton
                             label={t("cancel")}
                             onPress={() => setIsConfirmDisableOpen(false)}

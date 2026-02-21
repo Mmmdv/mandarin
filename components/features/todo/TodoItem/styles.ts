@@ -1,7 +1,6 @@
-import { COLORS } from "@/constants/ui"
-import { StyleSheet } from "react-native"
+import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const getStyles = (colors: any) => StyleSheet.create({
     container: {
         flexDirection: "row",
         alignContent: "center",
@@ -9,7 +8,7 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginVertical: 5,
         marginHorizontal: 0,
-        backgroundColor: COLORS.SECONDARY_BACKGROUND,
+        backgroundColor: colors.SECONDARY_BACKGROUND,
         borderRadius: 18,
         paddingHorizontal: 15,
         paddingVertical: 14,
@@ -18,12 +17,12 @@ export const styles = StyleSheet.create({
     },
     cardContainer: {
         width: '48.5%',
-        backgroundColor: COLORS.SECONDARY_BACKGROUND,
+        backgroundColor: colors.SECONDARY_BACKGROUND,
         borderRadius: 20,
         padding: 15,
         marginBottom: 10,
         borderWidth: 1,
-        borderColor: COLORS.PRIMARY_BORDER_DARK,
+        borderColor: colors.PRIMARY_BORDER_DARK,
         height: 160,
         justifyContent: 'space-between',
         shadowColor: "#000",
@@ -67,7 +66,7 @@ export const styles = StyleSheet.create({
         marginTop: 'auto',
         paddingTop: 10,
         borderTopWidth: 0.5,
-        borderTopColor: COLORS.PRIMARY_BORDER_DARK,
+        borderTopColor: colors.PRIMARY_BORDER_DARK,
     },
     cardMetadata: {
         flexDirection: 'row',
@@ -76,7 +75,7 @@ export const styles = StyleSheet.create({
     },
     cardTime: {
         fontSize: 7.5,
-        color: COLORS.PLACEHOLDER,
+        color: colors.PLACEHOLDER,
         fontWeight: '600',
     },
     cardTimeContainer: {
@@ -98,7 +97,7 @@ export const styles = StyleSheet.create({
         height: 22,
         borderRadius: 11,
         borderWidth: 2,
-        borderColor: COLORS.CHECKBOX_SUCCESS,
+        borderColor: colors.CHECKBOX_SUCCESS,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -106,7 +105,7 @@ export const styles = StyleSheet.create({
         width: 10,
         height: 10,
         borderRadius: 5,
-        backgroundColor: COLORS.CHECKBOX_SUCCESS,
+        backgroundColor: colors.CHECKBOX_SUCCESS,
     },
     controlsContainer: {
         flexDirection: "row",
@@ -133,10 +132,10 @@ export const styles = StyleSheet.create({
     },
     dateText: {
         fontSize: 12,
-        color: "#aaa",
+        color: colors.PLACEHOLDER,
         marginTop: 2,
     },
-})
+});
 
 export const celebrationStyles = StyleSheet.create({
     star: {
@@ -146,3 +145,7 @@ export const celebrationStyles = StyleSheet.create({
         zIndex: 1000,
     },
 })
+
+// Keep backward compatibility
+import { COLORS } from "@/constants/ui";
+export const styles = getStyles(COLORS);

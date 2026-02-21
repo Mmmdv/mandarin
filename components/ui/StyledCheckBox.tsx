@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants/ui"
+import { useTheme } from "@/hooks/useTheme"
 import { Ionicons } from "@expo/vector-icons"
 import React from "react"
 import { TouchableOpacity } from "react-native"
@@ -9,6 +9,7 @@ type StyledCheckBoxProps = {
 }
 
 const StyledCheckBox: React.FC<StyledCheckBoxProps> = ({ checked, onCheck }) => {
+    const { colors } = useTheme();
     const handlePress = () => {
         onCheck();
     }
@@ -18,9 +19,9 @@ const StyledCheckBox: React.FC<StyledCheckBoxProps> = ({ checked, onCheck }) => 
             <Ionicons
                 name={checked ? "checkbox" : "square-outline"}
                 size={20.5}
-                color={checked ? COLORS.CHECKBOX_DARK : COLORS.CHECKBOX_INACTIVE} />
+                color={checked ? colors.CHECKBOX_SUCCESS : colors.CHECKBOX_INACTIVE} />
         </TouchableOpacity>
     )
 }
 
-export default StyledCheckBox   
+export default StyledCheckBox

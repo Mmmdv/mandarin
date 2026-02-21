@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants/ui"
+import { useTheme } from "@/hooks/useTheme"
 import React, { useEffect, useState } from "react"
 import { Keyboard, KeyboardAvoidingView, LayoutAnimation, Modal, Platform, Pressable, ScrollView, StyleSheet, UIManager } from "react-native"
 
@@ -10,6 +10,7 @@ type StyledModalProps = {
 }
 
 const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, closeOnOverlayPress }) => {
+    const { colors, isDark } = useTheme();
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
     useEffect(() => {
@@ -61,7 +62,10 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
                     <Pressable
                         style={[
                             styles.modalBackgroundContainer,
-                            { paddingBottom: isKeyboardVisible ? 20 : 0 }
+                            {
+                                backgroundColor: isDark ? "rgba(0, 0, 0, 0.78)" : "rgba(0, 0, 0, 0.4)",
+                                paddingBottom: isKeyboardVisible ? 20 : 0
+                            }
                         ]}
                         onPress={() => {
                             Keyboard.dismiss()
@@ -70,7 +74,13 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
                             }
                         }}
                     >
-                        <Pressable style={styles.contentContainer} onPress={() => { }}>
+                        <Pressable
+                            style={[
+                                styles.contentContainer,
+                                { backgroundColor: 'transparent', padding: 0, width: 'auto' }
+                            ]}
+                            onPress={() => { }}
+                        >
                             {children}
                         </Pressable>
                     </Pressable>
@@ -86,15 +96,10 @@ const styles = StyleSheet.create({
     },
     modalBackgroundContainer: {
         flex: 1,
-        backgroundColor: "rgba(0, 0, 0, 0.78)",
-        justifyContent: "center", // Align to center
+        justifyContent: "center",
         alignItems: "center",
     },
     contentContainer: {
-        backgroundColor: COLORS.PRIMARY_BACKGROUND,
-        padding: 20,
-        borderRadius: 10,
-        width: "90%",
     }
 })
 

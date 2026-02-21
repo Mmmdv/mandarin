@@ -18,7 +18,7 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
     onAddBirthday,
     onAddMovie
 }) => {
-    const { colors, t } = useTheme();
+    const { colors, t, isDark } = useTheme();
     const { width } = Dimensions.get('window');
 
     const MenuItem = ({ icon, label, onPress, disabled = false, color }: { icon: keyof typeof Ionicons.glyphMap, label: string, onPress: () => void, disabled?: boolean, color?: string }) => (
@@ -31,11 +31,11 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                 {
                     opacity: disabled ? 0.3 : 1,
                     borderBottomColor: colors.PRIMARY_BORDER_DARK,
-                    borderBottomWidth: disabled ? 0 : 0.2,
+                    borderBottomWidth: disabled ? 0 : 0.5,
                 }
             ]}
         >
-            <View style={[styles.iconContainer, { backgroundColor: colors.PRIMARY_INACTIVE_BUTTON }]}>
+            <View style={[styles.iconContainer, { backgroundColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }]}>
                 <Ionicons name={icon} size={14} color={color || colors.PRIMARY_TEXT} />
             </View>
             <StyledText style={[styles.menuLabel, { color: colors.PRIMARY_TEXT }]}>{label}</StyledText>

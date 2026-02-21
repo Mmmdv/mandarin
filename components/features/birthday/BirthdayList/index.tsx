@@ -16,11 +16,12 @@ import DeleteBirthdayModal from "../modals/DeleteBirthdayModal";
 import GreetingModal from "../modals/GreetingModal";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
-const BIRTHDAY_PRIMARY = "#9D6506";        // Əsas qızılı (home card color)
-const BIRTHDAY_LIGHT = "#D4880F";          // Parlaq qızılı (icon/text)
-const BIRTHDAY_BG = "rgba(157, 101, 6, 0.10)";   // Arxa fon
-const BIRTHDAY_BG_STRONG = "rgba(157, 101, 6, 0.20)"; // Badge/vurğu
-const BIRTHDAY_BORDER = "rgba(157, 101, 6, 0.30)";    // Border
+// ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
+const BIRTHDAY_PRIMARY = "#9D6506";
+const BIRTHDAY_LIGHT = "#9D6506";
+const BIRTHDAY_BG_LIGHT = "rgba(157, 101, 6, 0.05)";
+const BIRTHDAY_BG_STRONG_LIGHT = "rgba(157, 101, 6, 0.12)";
+const BIRTHDAY_BORDER_LIGHT = "rgba(157, 101, 6, 0.15)";
 
 type BirthdayListProps = {
     birthdays: Birthday[];

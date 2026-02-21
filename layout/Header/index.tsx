@@ -90,7 +90,10 @@ const Header: React.FC = () => {
         <TouchableOpacity
           onPress={() => router.push("/settings")}
           activeOpacity={0.7}
-          style={[styles.iconButton, { opacity: isBreathingActive ? 0.3 : 1 }]}
+          style={[styles.iconButton, {
+            opacity: isBreathingActive ? 0.3 : 1,
+            backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)"
+          }]}
           disabled={isBreathingActive}
         >
           <Ionicons name="settings-outline" size={22} color={colors.PRIMARY_TEXT} />
@@ -98,7 +101,10 @@ const Header: React.FC = () => {
         <TouchableOpacity
           onPress={() => router.push("/admin")}
           activeOpacity={0.7}
-          style={[styles.iconButton, { opacity: isBreathingActive ? 0.3 : 1 }]}
+          style={[styles.iconButton, {
+            opacity: isBreathingActive ? 0.3 : 1,
+            backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)"
+          }]}
           disabled={isBreathingActive}
         >
           <Ionicons name="shield-outline" size={22} color={colors.PRIMARY_TEXT} />

@@ -1,7 +1,7 @@
 import BiometricGuard from "@/components/features/BiometricGuard/index";
-import ReducedMotionModal from "@/components/features/ReducedMotionModal";
 import { AppStatusBar } from "@/components/layout/AppStatusBar";
 import { useTheme } from "@/hooks/useTheme";
+import ReducedMotionModal from "@/layout/Modals/ReducedMotionModal";
 // Force reload comment 3
 import { registerForLocalNotificationsAsync } from '@/constants/notifications';
 import Header from "@/layout/Header/index";

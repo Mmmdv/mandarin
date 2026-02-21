@@ -11,34 +11,43 @@ export const DarkTheme = {
   PRIMARY_ACTIVE_BUTTON_TEXT: "#f7f8faff",
   SECONDARY_BACKGROUND: "#0d1422ff",
   CHECKBOX_SUCCESS: "#4ECDC4",
-  CHECKBOX_DARK: "#2B9E96", // Darker Teal for checked state
+  CHECKBOX_DARK: "#2B9E96",
   CHECKBOX_SUCCESS_ACTIVE: "#e5e8ecff",
   CHECKBOX_INACTIVE: "#e8e9ebff",
   PLACEHOLDER: "#cacdd39a",
   ERROR_INPUT_TEXT: "#d16b43ff",
   SECTION_TEXT: "#c9c9c9ff",
+  TINT: "#86cfeeff",
+  INACTIVE: "#e6e2e2ff",
+  TAB_BAR: "#0d1422ff", // Original secondary background
+  ADD_BUTTON: "#384864ff",
+  REMINDER: "#FFD166",
 };
 
 export const LightTheme = {
   PRIMARY_BACKGROUND: "#FFFFFF",
-  PRIMARY_BACKGROUND_WHITE: "#000000",
-  PRIMARY_TEXT: "#1A1A1A",
-  PRIMARY_TEXT_BLACK: "#FFFFFF",
-  PRIMARY_TEXT_WHITE: "#000000",
-  PRIMARY_BORDER: "#E0E0E0",
-  PRIMARY_BORDER_DARK: "#D1D1D1",
-  PRIMARY_ACTIVE_BUTTON: "#007AFF", // Blue for active actions
-  PRIMARY_INACTIVE_BUTTON: "#F0F0F0",
+  PRIMARY_BACKGROUND_WHITE: "#FFFFFF",
+  PRIMARY_TEXT: "#1C1C1E",
+  PRIMARY_TEXT_BLACK: "#1C1C1E",
+  PRIMARY_TEXT_WHITE: "#FFFFFF",
+  PRIMARY_BORDER: "#E5E5EA",
+  PRIMARY_BORDER_DARK: "#C7C7CC",
+  PRIMARY_ACTIVE_BUTTON: "#384864ff",
+  PRIMARY_INACTIVE_BUTTON: "#F2F2F7",
   PRIMARY_ACTIVE_BUTTON_TEXT: "#FFFFFF",
-  SECONDARY_BACKGROUND: "#F8F9FA",
-  CHECKBOX_SUCCESS: "#4ECDC4",
-  CHECKBOX_DARK: "#2B9E96",
-  CHECKBOX_SUCCESS_ACTIVE: "#3AAFA9",
-  CHECKBOX_INACTIVE: "#CCCCCC",
-  PLACEHOLDER: "#999999",
+  SECONDARY_BACKGROUND: "#F2F2F7",
+  CHECKBOX_SUCCESS: "#2B9E96", // Darker teal for light mode visibility
+  CHECKBOX_DARK: "#165E5A",
+  CHECKBOX_SUCCESS_ACTIVE: "#2B9E96",
+  CHECKBOX_INACTIVE: "#D1D1D6",
+  PLACEHOLDER: "#8E8E93",
   ERROR_INPUT_TEXT: "#FF3B30",
-  SECTION_TEXT: "#888888", // A slightly darker gray for better visibility on light background, or keep c9c9c9 if user insists
+  SECTION_TEXT: "#3A3A3C",
+  TINT: "#3e5a8bff",
+  INACTIVE: "#8E8E93",
+  TAB_BAR: "#F2F2F7",
+  ADD_BUTTON: "#3e5a8bff",
+  REMINDER: "#D97706", // Darker orange-yellow for light mode readability
 };
 
-// Default to DarkTheme for backward compatibility if needed, but components should use useTheme
 export const COLORS = DarkTheme;

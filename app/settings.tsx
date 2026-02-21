@@ -1,7 +1,6 @@
 import ApplicationSection from "@/components/features/settings/sections/ApplicationSection";
 import LanguageSection from "@/components/features/settings/sections/LanguageSection";
 import NotificationSection from "@/components/features/settings/sections/NotificationSection";
-import PermissionsSection from "@/components/features/settings/sections/PermissionsSection";
 import SecuritySection from "@/components/features/settings/sections/SecuritySection";
 import ThemeSection from "@/components/features/settings/sections/ThemeSection";
 import GestureWrapper from "@/components/layout/GestureWrapper";
@@ -25,19 +24,16 @@ export default function SettingsScreen() {
                     showsVerticalScrollIndicator={false}
                 >
                     <LanguageSection />
-                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER }]} />
+                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
 
                     <ThemeSection />
-                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER }]} />
+                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
 
                     <NotificationSection visible={true} />
-                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER }]} />
-
-                    <PermissionsSection />
-                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER }]} />
+                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
 
                     <SecuritySection />
-                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER }]} />
+                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
 
                     <ApplicationSection />
                 </ScrollView>
@@ -54,9 +50,9 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     divider: {
-        height: 0.4,
+        height: 0.5,
         width: '100%',
-        marginVertical: 20,
-        opacity: 0.4,
+        marginVertical: 12,
+        opacity: 0.5,
     },
 });

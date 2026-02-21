@@ -1,3 +1,4 @@
+import { COLORS } from "@/constants/ui";
 import { Dimensions, StyleSheet } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -6,10 +7,11 @@ export const PADDING = 20;
 export const COL_2_WIDTH = (width - (PADDING * 2) - GAP) / 2;
 export const COL_3_WIDTH = (width - (PADDING * 2) - (GAP * 2)) / 3;
 
-export const styles = StyleSheet.create({
+export const getStyles = (colors: any) => StyleSheet.create({
     container: {
         flex: 1,
         paddingBottom: 0,
+        backgroundColor: colors.PRIMARY_BACKGROUND,
     },
     header: {
         flexDirection: 'row',
@@ -24,7 +26,7 @@ export const styles = StyleSheet.create({
         fontSize: 24,
         marginBottom: 4,
         fontWeight: 'bold',
-        color: "#FFF"
+        color: colors.PRIMARY_TEXT,
     },
     scrollContent: {
         paddingHorizontal: PADDING,
@@ -90,6 +92,7 @@ export const styles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: colors.SECONDARY_BACKGROUND,
     },
     listContainer: {
         gap: 10,
@@ -105,6 +108,7 @@ export const styles = StyleSheet.create({
         shadowOpacity: 0.08,
         shadowRadius: 4,
         elevation: 2,
+        backgroundColor: colors.SECONDARY_BACKGROUND,
     },
     listIconContainer: {
         width: 44,
@@ -120,10 +124,12 @@ export const styles = StyleSheet.create({
     listTitle: {
         fontSize: 16,
         fontWeight: '600',
+        color: colors.PRIMARY_TEXT,
     },
     listDesc: {
         fontSize: 13,
         lineHeight: 18,
+        color: colors.SECTION_TEXT,
     },
     separatorContainer: {
         marginTop: 28,
@@ -134,6 +140,9 @@ export const styles = StyleSheet.create({
         width: 25,
         height: 1,
         borderRadius: 5,
-        backgroundColor: 'rgba(194, 210, 231, 0.9)',
+        backgroundColor: colors.PRIMARY_BORDER,
     },
 });
+
+// Export a default styles object to prevent crashes in files still using the old import
+export const styles = getStyles(COLORS);

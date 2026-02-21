@@ -1,6 +1,7 @@
 import StyledText from "@/components/ui/StyledText";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
 import { Modal, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View, useWindowDimensions } from "react-native";
 
 type TodoMenuModalProps = {
@@ -30,32 +31,34 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
     archiveTodoAvailable,
     anchorPosition,
 }) => {
-    const { colors, t } = useTheme();
+    const { colors, t, isDark } = useTheme();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
-    const MenuItem = ({ icon, label, onPress, color, disabled = false, isLast = false }: { icon: keyof typeof Ionicons.glyphMap, label: string, onPress?: () => void, color?: string, disabled?: boolean, isLast?: boolean }) => (
-        <TouchableOpacity
-            onPress={() => {
-                onPress && onPress();
-                onClose();
-            }}
-            disabled={disabled}
-            activeOpacity={0.7}
-            style={[
-                styles.menuItem,
-                {
-                    opacity: disabled ? 0.3 : 1,
-                    borderBottomColor: colors.PRIMARY_BORDER_DARK,
-                    borderBottomWidth: isLast ? 0 : 0.2,
-                }
-            ]}
-        >
-            <View style={[styles.iconContainer, { backgroundColor: colors.PRIMARY_INACTIVE_BUTTON }]}>
-                <Ionicons name={icon} size={16} color={color || colors.PRIMARY_TEXT} />
-            </View>
-            <StyledText style={[styles.menuLabel, { color: colors.PRIMARY_TEXT }]}>{label}</StyledText>
-        </TouchableOpacity>
-    );
+    const MenuItem = ({ icon, label, onPress, color, disabled = false, isLast = false }: { icon: keyof typeof Ionicons.glyphMap, label: string, onPress?: () => void, color?: string, disabled?: boolean, isLast?: boolean }) => {
+        return (
+            <TouchableOpacity
+                onPress={() => {
+                    onPress && onPress();
+                    onClose();
+                }}
+                disabled={disabled}
+                activeOpacity={0.7}
+                style={[
+                    styles.menuItem,
+                    {
+                        opacity: disabled ? 0.3 : 1,
+                        borderBottomColor: colors.PRIMARY_BORDER_DARK,
+                        borderBottomWidth: isLast ? 0 : 0.5,
+                    }
+                ]}
+            >
+                <View style={[styles.iconContainer, { backgroundColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }]}>
+                    <Ionicons name={icon} size={16} color={color || colors.PRIMARY_TEXT} />
+                </View>
+                <StyledText style={[styles.menuLabel, { color: colors.PRIMARY_TEXT }]}>{label}</StyledText>
+            </TouchableOpacity>
+        );
+    };
 
     const getMenuPosition = () => {
         if (!anchorPosition) return {};
@@ -93,15 +96,15 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
             onRequestClose={onClose}
         >
             <TouchableWithoutFeedback onPress={onClose}>
-                <View style={styles.overlay}>
+                <View style={[styles.overlay, { backgroundColor: isDark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.4)' }]}>
                     <View style={[
                         styles.menuContainer,
                         {
                             backgroundColor: colors.SECONDARY_BACKGROUND,
-                            opacity: 0.90,
                             borderColor: colors.PRIMARY_BORDER_DARK,
-                            width: windowWidth * 0.40,
-                            minWidth: 150,
+                            width: windowWidth * 0.45,
+                            minWidth: 160,
+                            shadowColor: "#000",
                         },
                         anchorPosition ? getMenuPosition() : {}
                     ]}>
@@ -138,15 +141,13 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.70)', // Lighter overlay for popover feel
     },
     menuContainer: {
-        borderRadius: 16, // Slightly rounder
-        borderWidth: 0.2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
+        borderRadius: 16,
+        borderWidth: 0.5,
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
-        shadowRadius: 8,
+        shadowRadius: 12,
         elevation: 10,
         overflow: 'hidden',
         paddingVertical: 1,
@@ -158,19 +159,19 @@ const styles = StyleSheet.create({
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
-        paddingHorizontal: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
     },
     iconContainer: {
-        width: 28,
-        height: 28,
+        width: 32,
+        height: 32,
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 10,
     },
     menuLabel: {
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: '600',
         flex: 1,
     }

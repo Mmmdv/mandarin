@@ -1,14 +1,13 @@
-import GestureWrapper from "@/components/layout/GestureWrapper";
-import { COLORS } from "@/constants/ui";
-import { useTheme } from "@/hooks/useTheme";
-import useTodo from "@/hooks/useTodo";
 import AddTodoModal from "@/components/features/todo/modals/AddTodoModal";
 import TodoList from "@/components/features/todo/TodoList";
+import GestureWrapper from "@/components/layout/GestureWrapper";
+import { useTheme } from "@/hooks/useTheme";
+import useTodo from "@/hooks/useTodo";
 import { useEffect, useState } from "react";
 import { Platform, StatusBar, StyleSheet, UIManager, View } from "react-native";
 
 export default function Index() {
-  const { t } = useTheme();
+  const { t, colors, isDark } = useTheme();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
@@ -38,8 +37,8 @@ export default function Index() {
 
   return (
     <GestureWrapper>
-      <View style={styles.container}>
-        <StatusBar barStyle={"light-content"}></StatusBar>
+      <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
+        <StatusBar barStyle={isDark ? "light-content" : "dark-content"}></StatusBar>
         <TodoList
           todos={todos}
           onDeleteTodo={onDeleteTodo}
@@ -70,7 +69,6 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.PRIMARY_BACKGROUND,
     paddingBottom: 0,
   },
 });

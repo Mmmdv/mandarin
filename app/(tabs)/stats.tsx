@@ -1,5 +1,5 @@
 import StyledText from "@/components/ui/StyledText";
-import { styles } from "@/constants/homeStyles";
+import { getStyles } from "@/constants/homeStyles";
 import { useTheme } from "@/hooks/useTheme";
 import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native";
@@ -16,10 +16,10 @@ import { WeightStats } from "@/components/features/stats/WeightStats";
 
 export default function Stats() {
     const { colors, t } = useTheme();
+    const styles = useMemo(() => getStyles(colors), [colors]);
     const [refreshing, setRefreshing] = useState(false);
     const [period, setPeriod] = useState<Period>("week");
 
-    // Logic separated into a custom hook
     const {
         isDark,
         todoData,
@@ -28,10 +28,8 @@ export default function Stats() {
         weightMetrics,
         weightChartData,
         ratingMetrics,
-        lang
     } = useStatsLogic(period);
 
-    // ─── Period chips data ───
     const filterChips = useMemo(() => [
         { key: "week" as Period, label: t("stats_week") },
         { key: "month" as Period, label: t("stats_month") },
@@ -46,18 +44,16 @@ export default function Stats() {
     }, []);
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 12 }]}>
+        <View style={styles.container}>
+            <View style={[styles.header, { paddingBottom: 12 }]}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("tab_stats")}
                     </StyledText>
                 </View>
-                {/* Placeholder View for alignment consistency with other headers having icons */}
                 <View style={{ width: 0, height: 40 }} />
             </View>
 
-            {/* ─── Period Chips ─── */}
             <View style={{ backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 12 }}>
                 <FlatList
                     horizontal
@@ -100,7 +96,6 @@ export default function Stats() {
                     />
                 }
             >
-                {/* Statistics Sections */}
                 <TodoStats todoData={todoData} colors={colors} isDark={isDark} t={t} />
                 <BreathingStats breathingData={breathingData} colors={colors} isDark={isDark} t={t} />
                 <MoodStats moodMetrics={moodMetrics} colors={colors} isDark={isDark} t={t} />

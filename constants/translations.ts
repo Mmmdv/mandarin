@@ -240,6 +240,9 @@ export const TRANSLATIONS = {
         permissions: "İcazələr",
         contacts_permission: "Kontaktlara giriş",
         contacts_permission_desc: "Ad günlərini kontakt siyahısından əlavə etmək üçün istifadə olunacaq",
+        mic_busy: "Mikrofon başqa tətbiq tərəfindən istifadə olunur",
+        listening: "Dinlənilir...",
+        processing: "Təhlil edilir...",
     },
     en: {
         welcome: "Welcome",
@@ -482,6 +485,9 @@ export const TRANSLATIONS = {
         permissions: "Permissions",
         contacts_permission: "Contacts Permission",
         contacts_permission_desc: "Will be used to add birthdays from your contact list",
+        mic_busy: "Microphone is busy or not available",
+        listening: "Listening...",
+        processing: "Processing...",
     },
     ru: {
         welcome: "Добро пожаловать",
@@ -724,6 +730,9 @@ export const TRANSLATIONS = {
         permissions: "Разрешения",
         contacts_permission: "Доступ к контактам",
         contacts_permission_desc: "Будет использоваться для добавления дней рождения из списка контактов",
+        mic_busy: "Микрофон занят или недоступен",
+        listening: "Слушаю...",
+        processing: "Обработка...",
     },
 };
 

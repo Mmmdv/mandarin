@@ -1,6 +1,6 @@
 import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
 import StyledText from "@/components/ui/StyledText";
-import { GAP, PADDING, styles } from "@/constants/homeStyles";
+import { GAP, PADDING, getStyles } from "@/constants/homeStyles";
 import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -15,6 +15,7 @@ type ViewMode = "card" | "list";
 
 export default function MoreScreen() {
     const { colors, t } = useTheme();
+    const styles = useMemo(() => getStyles(colors), [colors]);
     const router = useRouter();
     const { refreshing, onRefresh } = useRefresh();
     const [viewMode, setViewMode] = useState<ViewMode>("card");
@@ -29,7 +30,7 @@ export default function MoreScreen() {
             id: "mandarin_tree",
             title: t("mandarin_tree"),
             description: t("coming_soon"),
-            icon: "tree" as keyof typeof MaterialCommunityIcons.glyphMap, // İndi həqiqətən ağac ikonu var
+            icon: "tree" as keyof typeof MaterialCommunityIcons.glyphMap,
             route: "/more",
             color: "#1F8B4C",
             iconColor: "#FFF",
@@ -40,20 +41,21 @@ export default function MoreScreen() {
             id: "breathing",
             title: t("tab_breathing_title"),
             description: t("breathing_desc"),
-            icon: "leaf" as keyof typeof MaterialCommunityIcons.glyphMap, // Nəfəs / külək hissi
+            icon: "leaf" as keyof typeof MaterialCommunityIcons.glyphMap,
             route: "/breathing",
             color: "#978265",
             iconColor: "#FFF",
             backgroundImage: require("@/assets/images/MainPage/relaxBackground.png"),
             imageOpacity: 0.1
         },
-    ], [t, colors]);
+    ], [t]);
 
     const handlePress = useCallback((id: string, route: string) => {
         router.push(route as any);
     }, [router]);
 
-    const renderCard = useCallback((item: any, cardWidth: number, height: number = 150, isFullWidth: boolean = false) => {
+    const renderCard = (item: any, cardWidth: number, height: number = 150, isFullWidth: boolean = false) => {
+        if (!styles) return null;
         return (
             <Pressable
                 key={item.id}
@@ -101,9 +103,10 @@ export default function MoreScreen() {
                 )}
             </Pressable>
         );
-    }, [handlePress]);
+    };
 
-    const renderListItem = useCallback((item: any) => {
+    const renderListItem = (item: any) => {
+        if (!styles) return null;
         return (
             <Pressable
                 key={item.id}
@@ -127,14 +130,11 @@ export default function MoreScreen() {
                 <Ionicons name="chevron-forward" size={20} color={colors.PLACEHOLDER} />
             </Pressable>
         );
-    }, [handlePress, colors]);
+    };
 
     return (
-        <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <View style={[styles.header, { backgroundColor: colors.PRIMARY_BACKGROUND, paddingBottom: 10 }]}>
-                {/* <Pressable onPress={() => router.back()} style={{ justifyContent: 'center', paddingRight: 10 }}>
-                    <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
-                </Pressable> */}
+        <View style={styles.container}>
+            <View style={[styles.header, { paddingBottom: 10 }]}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <StyledText style={styles.greeting}>
                         {t("tab_more")}
@@ -145,7 +145,6 @@ export default function MoreScreen() {
                     style={({ pressed }) => [
                         styles.viewToggleButton,
                         {
-                            backgroundColor: colors.SECONDARY_BACKGROUND,
                             opacity: pressed ? 0.7 : 1,
                         }
                     ]}
@@ -171,7 +170,6 @@ export default function MoreScreen() {
             >
                 {viewMode === "card" ? (
                     <View style={{ gap: GAP, marginTop: 6 }}>
-                        {/* More screen uses full width cards for its few items */}
                         {menuItems.map(item => (
                             <View key={item.id} style={styles.row}>
                                 {renderCard(item, width - (PADDING * 2), 120, true)}
@@ -187,4 +185,3 @@ export default function MoreScreen() {
         </View>
     );
 }
-

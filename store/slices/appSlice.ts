@@ -33,7 +33,6 @@ export interface AppState {
     breathingStats: BreathingStats
     breathingHistory: Record<string, { sessions: number; durationSec: number }>
     reducedMotionDismissed: boolean
-    contactsEnabled: boolean
 }
 
 const initialState: AppState = {
@@ -62,8 +61,7 @@ const initialState: AppState = {
         totalDurationSec: 0,
     },
     breathingHistory: {},
-    reducedMotionDismissed: false,
-    contactsEnabled: false
+    reducedMotionDismissed: false
 }
 
 export interface UpdateAppSettingsPayload {
@@ -79,7 +77,6 @@ export interface UpdateAppSettingsPayload {
     username?: string
     biometricEnabled?: boolean
     reducedMotionDismissed?: boolean
-    contactsEnabled?: boolean
 }
 
 export const appSlice = createSlice({
@@ -103,7 +100,6 @@ export const appSlice = createSlice({
             if (username !== undefined) state.username = username
             if (biometricEnabled !== undefined) state.biometricEnabled = biometricEnabled
             if (action.payload.reducedMotionDismissed !== undefined) state.reducedMotionDismissed = action.payload.reducedMotionDismissed
-            if (action.payload.contactsEnabled !== undefined) state.contactsEnabled = action.payload.contactsEnabled
         },
         setBreathingActive: (state, action: PayloadAction<boolean>) => {
             state.isBreathingActive = action.payload;

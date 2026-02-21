@@ -1,24 +1,20 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { modalStyles } from "@/constants/modalStyles";
+import { getModalStyles, modalStyles } from "@/constants/modalStyles";
 import { schedulePushNotification } from "@/constants/notifications";
-import { COLORS } from "@/constants/ui";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
-import { useAppDispatch } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
-import { addNotification, updateNotificationStatus } from "@/store/slices/notificationSlice";
+import { addNotification, selectNotificationById, updateNotificationStatus } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Platform, Pressable, TextInput, TouchableOpacity, View } from "react-native";
-import { localStyles } from "./styles";
-
-import { useAppSelector } from "@/store";
-import { selectNotificationById } from "@/store/slices/notificationSlice";
+import { getEditStyles } from "./styles";
 
 type EditTodoModalProps = {
     isOpen: boolean
@@ -34,8 +30,11 @@ type EditTodoModalProps = {
 
 const EditTodoModal: React.FC<EditTodoModalProps> = ({
     isOpen, onClose, onUpdate, title, reminder, reminderCancelled, notificationId, categoryTitle, categoryIcon }) => {
-    const { t, colors, notificationsEnabled, todoNotifications } = useTheme();
+    const { t, colors, isDark, notificationsEnabled, todoNotifications, theme } = useTheme();
     const dispatch = useAppDispatch();
+
+    const themedModalStyles = useMemo(() => getModalStyles(colors), [colors]);
+    const themedLocalStyles = useMemo(() => getEditStyles(colors, isDark), [colors, isDark]);
 
     const notification = useAppSelector(state => notificationId ? selectNotificationById(state, notificationId) : undefined);
     const reminderStatus = notification?.status;
@@ -123,9 +122,9 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
 
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
-            <View style={modalStyles.modalContainer}>
+            <View style={themedLocalStyles.container}>
                 <View style={[modalStyles.iconContainer, {
-                    backgroundColor: colors.SECONDARY_BACKGROUND,
+                    backgroundColor: colors.TAB_BAR,
                     shadowColor: "#5BC0EB",
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.3,
@@ -135,15 +134,15 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     <Ionicons name="create-outline" size={28} color="#5BC0EB" />
                 </View>
 
-                <StyledText style={modalStyles.headerText}>{t("edit")}</StyledText>
+                <StyledText style={themedLocalStyles.headerText}>{t("edit")}</StyledText>
 
-                <View style={modalStyles.divider} />
+                <View style={[modalStyles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK, opacity: 0.3 }]} />
 
                 <Pressable onPress={() => inputRef.current?.focus()} style={{ width: '100%', alignItems: 'center', zIndex: 10 }}>
                     <Animated.View style={[
-                        localStyles.inputWrapper,
-                        isFocused && localStyles.inputFocused,
-                        inputError && localStyles.inputError,
+                        themedLocalStyles.inputWrapper,
+                        isFocused && themedLocalStyles.inputFocused,
+                        inputError && themedLocalStyles.inputError,
                         {
                             minHeight: scaleAnim.interpolate({
                                 inputRange: [1, 1.1],
@@ -162,9 +161,9 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     ]}>
                         <TextInput
                             ref={inputRef}
-                            style={[localStyles.textInput, { fontSize: updatedTitle ? 16 : 12 }]}
+                            style={[themedLocalStyles.textInput, { fontSize: updatedTitle ? 16 : 12 }]}
                             placeholder={t("todo_placeholder")}
-                            placeholderTextColor="#666"
+                            placeholderTextColor={colors.PLACEHOLDER}
                             value={updatedTitle}
                             onChangeText={setUpdateTitle}
                             onFocus={() => setIsFocused(true)}
@@ -175,32 +174,32 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                 </Pressable>
 
                 {/* Reminder Section */}
-                <View style={{ marginBottom: 10 }}>
+                <View style={{ marginBottom: 10, width: '100%' }}>
                     {!picker.reminderDate ? (
                         <TouchableOpacity
-                            style={localStyles.addReminderButton}
+                            style={themedLocalStyles.addReminderButton}
                             onPress={picker.startReminderFlow}
                             activeOpacity={0.7}
                         >
-                            <Ionicons name="notifications-outline" size={20} color="#888" />
-                            <StyledText style={localStyles.addReminderText}>{t("reminder")}</StyledText>
+                            <Ionicons name="notifications-outline" size={20} color={colors.PLACEHOLDER} />
+                            <StyledText style={themedLocalStyles.addReminderText}>{t("reminder")}</StyledText>
                             <Ionicons name="add-circle" size={20} color="#5BC0EB" style={{ marginLeft: 'auto' }} />
                         </TouchableOpacity>
                     ) : (
-                        <View style={localStyles.reminderChip}>
+                        <View style={themedLocalStyles.reminderChip}>
                             <TouchableOpacity
-                                style={localStyles.chipContent}
+                                style={themedLocalStyles.chipContent}
                                 onPress={picker.startReminderFlow}
                                 activeOpacity={0.7}
                             >
                                 <Ionicons name={(reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled) ? "notifications-off" : "calendar"} size={18} color="#fff" />
-                                <StyledText style={[localStyles.chipText, (reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled) && { textDecorationLine: 'line-through', opacity: 0.7 }]}>
+                                <StyledText style={[themedLocalStyles.chipText, (reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled) && { textDecorationLine: 'line-through', opacity: 0.7 }]}>
                                     {picker.formatFullDate(picker.reminderDate)}
                                 </StyledText>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => picker.setReminderDate(undefined)}
-                                style={localStyles.clearButton}
+                                style={themedLocalStyles.clearButton}
                             >
                                 <Ionicons name="close-circle" size={20} color="#fff" style={{ opacity: 0.8 }} />
                             </TouchableOpacity>
@@ -236,10 +235,10 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                         isOpen={picker.showDatePicker || picker.showTimePicker}
                         onClose={picker.closePickers}
                     >
-                        <View style={modalStyles.modalContainer}>
-                            <View style={[modalStyles.iconContainer, {
-                                backgroundColor: COLORS.SECONDARY_BACKGROUND,
-                                shadowColor: picker.showDatePicker ? "#5BC0EB" : "#FFD166",
+                        <View style={themedModalStyles.modalContainer}>
+                            <View style={[themedModalStyles.iconContainer, {
+                                backgroundColor: colors.TAB_BAR,
+                                shadowColor: picker.showDatePicker ? "#5BC0EB" : colors.REMINDER,
                                 shadowOffset: { width: 0, height: 4 },
                                 shadowOpacity: 0.3,
                                 shadowRadius: 8,
@@ -248,15 +247,15 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                                 <Ionicons
                                     name={picker.showDatePicker ? "calendar" : "time"}
                                     size={28}
-                                    color={picker.showDatePicker ? "#5BC0EB" : "#FFD166"}
+                                    color={picker.showDatePicker ? "#5BC0EB" : colors.REMINDER}
                                 />
                             </View>
 
-                            <StyledText style={modalStyles.headerText}>
+                            <StyledText style={themedModalStyles.headerText}>
                                 {picker.showDatePicker ? t("date") : t("time")}
                             </StyledText>
 
-                            <View style={modalStyles.divider} />
+                            <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
 
                             <View style={{ width: '100%', height: 150, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
                                 <DateTimePicker
@@ -266,13 +265,13 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                                     onChange={picker.showDatePicker ? picker.onChangeDate : picker.onChangeTime}
                                     minimumDate={picker.showDatePicker ? new Date() : undefined}
                                     locale={picker.getLocale()}
-                                    textColor={COLORS.PRIMARY_TEXT}
-                                    themeVariant={useTheme().theme}
+                                    textColor={colors.PRIMARY_TEXT}
+                                    themeVariant={theme}
                                     style={{ width: '100%', transform: [{ scale: 0.85 }] }}
                                 />
                             </View>
 
-                            <View style={[modalStyles.buttonsContainer, { marginTop: 20 }]}>
+                            <View style={[themedModalStyles.buttonsContainer, { marginTop: 20 }]}>
                                 <StyledButton
                                     label={picker.showTimePicker ? t("back") : t("close")}
                                     onPress={picker.showTimePicker ? picker.goBackToDatePicker : picker.closePickers}
@@ -290,7 +289,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     </StyledModal>
                 )}
 
-                <View style={modalStyles.buttonsContainer}>
+                <View style={[modalStyles.buttonsContainer, { marginTop: 8 }]}>
                     <StyledButton
                         label={t("cancel")}
                         onPress={onClose}
@@ -305,27 +304,27 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
 
                 {/* Permission Modal */}
                 <StyledModal isOpen={picker.showPermissionModal} onClose={() => picker.setShowPermissionModal(false)}>
-                    <View style={modalStyles.modalContainer}>
-                        <View style={[modalStyles.iconContainer, {
-                            backgroundColor: COLORS.SECONDARY_BACKGROUND,
-                            shadowColor: "#FFD166",
+                    <View style={themedModalStyles.modalContainer}>
+                        <View style={[themedModalStyles.iconContainer, {
+                            backgroundColor: colors.TAB_BAR,
+                            shadowColor: colors.REMINDER,
                             shadowOffset: { width: 0, height: 4 },
                             shadowOpacity: 0.3,
                             shadowRadius: 8,
                             elevation: 5
                         }]}>
-                            <Ionicons name="notifications" size={28} color="#FFD166" />
+                            <Ionicons name="notifications" size={28} color={colors.REMINDER} />
                         </View>
 
-                        <StyledText style={modalStyles.headerText}>{t("enable_notifications")}</StyledText>
+                        <StyledText style={themedModalStyles.headerText}>{t("enable_notifications")}</StyledText>
 
-                        <View style={modalStyles.divider} />
+                        <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
 
-                        <StyledText style={modalStyles.messageText}>
+                        <StyledText style={themedModalStyles.messageText}>
                             {t("enable_notifications_desc")}
                         </StyledText>
 
-                        <View style={modalStyles.buttonsContainer}>
+                        <View style={themedModalStyles.buttonsContainer}>
                             <StyledButton
                                 label={t("cancel")}
                                 onPress={() => picker.setShowPermissionModal(false)}
@@ -351,9 +350,9 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
 
                 {/* Past Date Alert Modal */}
                 <StyledModal isOpen={picker.showPastDateAlert} onClose={() => picker.setShowPastDateAlert(false)}>
-                    <View style={modalStyles.modalContainer}>
-                        <View style={[modalStyles.iconContainer, {
-                            backgroundColor: COLORS.SECONDARY_BACKGROUND,
+                    <View style={themedModalStyles.modalContainer}>
+                        <View style={[themedModalStyles.iconContainer, {
+                            backgroundColor: colors.TAB_BAR,
                             shadowColor: "#FFB74D",
                             shadowOffset: { width: 0, height: 4 },
                             shadowOpacity: 0.3,
@@ -363,15 +362,15 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                             <Ionicons name="alert-circle" size={28} color="#FFB74D" />
                         </View>
 
-                        <StyledText style={modalStyles.headerText}>{t("attention")}</StyledText>
+                        <StyledText style={themedModalStyles.headerText}>{t("attention")}</StyledText>
 
-                        <View style={modalStyles.divider} />
+                        <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
 
-                        <StyledText style={modalStyles.messageText}>
+                        <StyledText style={themedModalStyles.messageText}>
                             {t("past_reminder_error")}
                         </StyledText>
 
-                        <View style={modalStyles.buttonsContainer}>
+                        <View style={themedModalStyles.buttonsContainer}>
                             <StyledButton
                                 label={t("close")}
                                 onPress={picker.closePastDateAlert}
@@ -386,4 +385,4 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
     )
 }
 
-export default EditTodoModal
+export default EditTodoModal;

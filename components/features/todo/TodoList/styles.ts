@@ -1,7 +1,6 @@
-import { COLORS } from "@/constants/ui"
-import { StyleSheet } from "react-native"
+import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const getStyles = (colors: any) => StyleSheet.create({
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -9,14 +8,14 @@ export const styles = StyleSheet.create({
         paddingTop: 15,
         paddingBottom: 10,
         paddingHorizontal: 20,
-        backgroundColor: COLORS.PRIMARY_BACKGROUND,
+        backgroundColor: colors.PRIMARY_BACKGROUND,
         zIndex: 10,
     },
     greeting: {
         fontSize: 24,
         marginBottom: 4,
         fontWeight: 'bold',
-        color: "#FFF"
+        color: colors.PRIMARY_TEXT
     },
     container: {
         flex: 1,
@@ -45,12 +44,12 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 6,
-        width: 155, // Fixed width for titles to align subsequent icons
+        width: 155,
     },
     sectionTitle: {
         fontSize: 16,
         fontWeight: "600",
-        color: COLORS.PRIMARY_TEXT,
+        color: colors.PRIMARY_TEXT,
     },
     sectionControls: {
         flex: 1,
@@ -111,7 +110,7 @@ export const styles = StyleSheet.create({
     sectionTitleCard: {
         fontSize: 15,
         fontWeight: "600",
-        color: '#FFF',
+        color: colors.PRIMARY_TEXT,
     },
     cardBadge: {
         backgroundColor: 'rgba(255,255,255,0.2)',
@@ -122,7 +121,7 @@ export const styles = StyleSheet.create({
     },
     cardBadgeText: {
         fontSize: 12,
-        color: '#fff',
+        color: colors.PRIMARY_TEXT,
         fontWeight: 'bold',
     },
     decorativeCircle: {
@@ -149,3 +148,7 @@ export const styles = StyleSheet.create({
         marginBottom: 2,
     }
 })
+
+// Backward compatibility
+import { COLORS } from "@/constants/ui";
+export const styles = getStyles(COLORS);

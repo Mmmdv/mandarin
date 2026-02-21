@@ -1,12 +1,11 @@
 import StyledCheckBox from "@/components/ui/StyledCheckBox";
 import StyledText from "@/components/ui/StyledText";
-import { COLORS } from "@/constants/ui";
 import { formatDate } from "@/helpers/date";
 import { hyphenateText } from "@/helpers/text"; // Added
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, TouchableOpacity, View } from "react-native";
 import ArchiveTodoModal from "../modals/ArchiveTodoModal.tsx";
 import DeleteTodoModal from "../modals/DeleteTodoModal.tsx";
@@ -15,7 +14,7 @@ import RetryTodoModal from "../modals/RetryTodoModal.tsx";
 import TodoMenuModal from "../modals/TodoMenuModal";
 import ViewTodoModal from "../modals/ViewTodoModal.tsx";
 import CelebrationEffect, { CelebrationType, createCelebrationAnimations, playCelebration } from "./CelebrationEffect";
-import { styles } from "./styles";
+import { getStyles } from "./styles";
 
 import { useAppSelector } from "@/store";
 import { selectNotificationById } from "@/store/slices/notificationSlice";
@@ -71,9 +70,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
     }
 
     const onPressRetry = () => {
-        if (retryTodo) {
-            setIsRetryModalOpen(true);
-        }
+        setIsRetryModalOpen(true);
     }
 
     const onConfirmRetry = (delayType: 'hour' | 'day' | 'week' | 'month') => {
@@ -98,7 +95,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
     }
 
     const openMenu = () => {
-        menuButtonRef.current?.measure((x, y, width, height, pageX, pageY) => {
+        menuButtonRef.current?.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
             setMenuAnchor({ x: pageX, y: pageY, width, height });
             setIsMenuModalOpen(true);
         });
@@ -127,9 +124,11 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
         ]).start();
     }, []);
 
+    const styles = useMemo(() => getStyles(colors), [colors]);
+
     const backgroundColor = fadeAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [COLORS.PRIMARY_BORDER_DARK, COLORS.SECONDARY_BACKGROUND],
+        outputRange: [colors.PRIMARY_BORDER_DARK, colors.SECONDARY_BACKGROUND],
     });
 
     if (viewMode === 'card') {
@@ -184,8 +183,6 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                                     }
                                 ]}
                                 numberOfLines={3}
-                                textBreakStrategy="highQuality"
-                                hyphenationFrequency="full"
                             >
                                 {hyphenateText(title)}
                             </StyledText>
@@ -200,13 +197,13 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                                 <Ionicons
                                     name={reminderStatus === 'Ləğv olunub' || reminderCancelled ? "notifications-off" : "hourglass-outline"}
                                     size={11}
-                                    color={reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166"}
+                                    color={reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER}
                                 />
                                 <View style={styles.cardTimeContainer}>
-                                    <StyledText style={{ fontSize: 9.5, fontWeight: '600', color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166" }}>
+                                    <StyledText style={{ fontSize: 9.5, fontWeight: '600', color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER }}>
                                         {formatDate(reminder, lang).split(' ')[0]}
                                     </StyledText>
-                                    <StyledText style={[styles.cardTimeSmall, { fontSize: 9.5, color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : "#FFD166" }]}>
+                                    <StyledText style={[styles.cardTimeSmall, { fontSize: 9.5, color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER }]}>
                                         {formatDate(reminder, lang).split(' ')[1]}
                                     </StyledText>
                                 </View>
@@ -220,9 +217,8 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                             onPress={openMenu}
                             activeOpacity={0.7}
                             hitSlop={10}
-                            collapsable={false}
                         >
-                            <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
+                            <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={colors.PRIMARY_TEXT} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -278,7 +274,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     onArchive={archiveTodo ? onPressArchive : undefined}
                     onView={() => setIsViewModalOpen(true)}
                     isCompleted={isCompleted}
-                    isArchived={isArchived}
+                    isArchived={!!isArchived}
                     archiveTodoAvailable={!!archiveTodo}
                     anchorPosition={menuAnchor}
                 />
@@ -339,8 +335,6 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                                 textDecorationLine: (isCompleted && !isArchived) ? 'line-through' : 'none',
                                 color: (isCompleted && !isArchived) ? colors.PLACEHOLDER : colors.PRIMARY_TEXT,
                             }]}
-                            textBreakStrategy="highQuality"
-                            hyphenationFrequency="full"
                         >
                             {hyphenateText(title)}
                         </StyledText>
@@ -351,10 +345,10 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                                 <Ionicons
                                     name="alarm-outline"
                                     size={14}
-                                    color="#FFD166"
+                                    color={colors.REMINDER}
                                 />
                                 <StyledText style={{
-                                    color: "#FFD166",
+                                    color: colors.REMINDER,
                                     fontSize: 9.5,
                                     textDecorationLine: (reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled) ? 'line-through' : 'none'
                                 }}>
@@ -365,11 +359,11 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                             {reminderStatus && (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                     {reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled ? (
-                                        <Ionicons name="notifications-off" size={12} color={COLORS.ERROR_INPUT_TEXT} />
+                                        <Ionicons name="notifications-off" size={12} color={colors.ERROR_INPUT_TEXT} />
                                     ) : reminderStatus === 'Göndərilib' ? (
-                                        <Ionicons name="checkmark-done-circle-outline" size={12} color={COLORS.CHECKBOX_SUCCESS} />
+                                        <Ionicons name="checkmark-done-circle-outline" size={12} color={colors.CHECKBOX_SUCCESS} />
                                     ) : (
-                                        <Ionicons name="hourglass-outline" size={12} color="#FFB74D" />
+                                        <Ionicons name="hourglass-outline" size={12} color={colors.REMINDER} />
                                     )}
                                 </View>
                             )}
@@ -383,9 +377,8 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     onPress={openMenu}
                     activeOpacity={0.7}
                     hitSlop={10}
-                    collapsable={false}
                 >
-                    <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={COLORS.PRIMARY_TEXT} />
+                    <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>
                 <RetryTodoModal
                     isOpen={isRetryModalOpen}
@@ -436,7 +429,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     onArchive={archiveTodo ? onPressArchive : undefined}
                     onView={() => setIsViewModalOpen(true)}
                     isCompleted={isCompleted}
-                    isArchived={isArchived}
+                    isArchived={!!isArchived}
                     archiveTodoAvailable={!!archiveTodo}
                     anchorPosition={menuAnchor}
                 />

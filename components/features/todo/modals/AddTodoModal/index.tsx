@@ -1,9 +1,8 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { modalStyles } from "@/constants/modalStyles";
+import { getModalStyles, modalStyles } from "@/constants/modalStyles";
 import { schedulePushNotification } from "@/constants/notifications";
-import { COLORS } from "@/constants/ui";
 import { analyzeAudio } from "@/helpers/gemini";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
@@ -13,9 +12,9 @@ import { updateAppSetting } from "@/store/slices/appSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Animated, Keyboard, Platform, Pressable, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import { localStyles } from "./styles";
+import { getAddStyles } from "./styles";
 
 type AddTodoModalProps = {
     isOpen: boolean
@@ -27,8 +26,11 @@ type AddTodoModalProps = {
 
 const AddTodoModal: React.FC<AddTodoModalProps> = ({
     isOpen, onClose, onAdd, categoryTitle, categoryIcon }) => {
-    const { t, theme, notificationsEnabled, todoNotifications } = useTheme();
+    const { t, theme, colors, isDark, notificationsEnabled, todoNotifications } = useTheme();
     const dispatch = useAppDispatch();
+
+    const themedModalStyles = useMemo(() => getModalStyles(colors), [colors]);
+    const themedLocalStyles = useMemo(() => getAddStyles(colors, isDark), [colors, isDark]);
 
     const [isFocused, setIsFocused] = useState(false)
     const [title, setTitle] = useState("")
@@ -241,27 +243,27 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={modalStyles.modalContainer}>
+                <View style={themedLocalStyles.container}>
                     <View style={[modalStyles.iconContainer, {
-                        backgroundColor: COLORS.SECONDARY_BACKGROUND,
-                        shadowColor: COLORS.CHECKBOX_SUCCESS,
+                        backgroundColor: colors.TAB_BAR,
+                        shadowColor: colors.CHECKBOX_SUCCESS,
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: 0.3,
                         shadowRadius: 8,
                         elevation: 5
                     }]}>
-                        <Ionicons name="add" size={28} color={COLORS.CHECKBOX_SUCCESS} />
+                        <Ionicons name="add" size={28} color={colors.CHECKBOX_SUCCESS} />
                     </View>
 
-                    <StyledText style={modalStyles.headerText}>{t("add")}</StyledText>
+                    <StyledText style={themedLocalStyles.headerText}>{t("add")}</StyledText>
 
-                    <View style={modalStyles.divider} />
+                    <View style={[modalStyles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK, opacity: 0.3 }]} />
 
                     <Pressable onPress={() => inputRef.current?.focus()} style={{ width: '100%', alignItems: 'center', zIndex: 10 }} disabled={isRecording || isAnalyzing}>
                         <Animated.View style={[
-                            localStyles.inputWrapper,
-                            isFocused && localStyles.inputFocused,
-                            inputError && localStyles.inputError,
+                            themedLocalStyles.inputWrapper,
+                            isFocused && themedLocalStyles.inputFocused,
+                            inputError && themedLocalStyles.inputError,
                             {
                                 minHeight: scaleAnim.interpolate({
                                     inputRange: [1, 1.1],
@@ -280,9 +282,9 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                         ]}>
                             <TextInput
                                 ref={inputRef}
-                                style={[localStyles.textInput, { fontSize: title ? 16 : 12 }]}
+                                style={[themedLocalStyles.textInput, { fontSize: title ? 16 : 12 }]}
                                 placeholder={t("todo_placeholder")}
-                                placeholderTextColor="#666"
+                                placeholderTextColor={colors.PLACEHOLDER}
                                 value={title}
                                 onChangeText={setTitle}
                                 onFocus={() => setIsFocused(true)}
@@ -293,32 +295,32 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                     </Pressable>
 
                     {/* Action Row: Reminder & Voice */}
-                    <View style={localStyles.actionRow}>
+                    <View style={themedLocalStyles.actionRow}>
                         {!picker.reminderDate ? (
                             <TouchableOpacity
-                                style={localStyles.addReminderButton}
+                                style={themedLocalStyles.addReminderButton}
                                 onPress={picker.startReminderFlow}
                                 activeOpacity={0.7}
                             >
-                                <Ionicons name="notifications-outline" size={20} color="#888" />
-                                <StyledText style={localStyles.addReminderText}>{t("reminder")}</StyledText>
-                                <Ionicons name="add-circle" size={20} color={COLORS.CHECKBOX_SUCCESS} style={{ marginLeft: 'auto' }} />
+                                <Ionicons name="notifications-outline" size={20} color={colors.PLACEHOLDER} />
+                                <StyledText style={themedLocalStyles.addReminderText}>{t("reminder")}</StyledText>
+                                <Ionicons name="add-circle" size={20} color={colors.CHECKBOX_SUCCESS} style={{ marginLeft: 'auto' }} />
                             </TouchableOpacity>
                         ) : (
-                            <View style={[localStyles.reminderChip, { flex: 1 }]}>
+                            <View style={[themedLocalStyles.reminderChip, { flex: 1 }]}>
                                 <TouchableOpacity
-                                    style={localStyles.chipContent}
+                                    style={themedLocalStyles.chipContent}
                                     onPress={picker.startReminderFlow}
                                     activeOpacity={0.7}
                                 >
                                     <Ionicons name="calendar" size={18} color="#fff" />
-                                    <StyledText style={localStyles.chipText}>
+                                    <StyledText style={themedLocalStyles.chipText}>
                                         {picker.formatFullDate(picker.reminderDate)}
                                     </StyledText>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={() => picker.setReminderDate(undefined)}
-                                    style={localStyles.clearButton}
+                                    style={themedLocalStyles.clearButton}
                                 >
                                     <Ionicons name="close-circle" size={20} color="#fff" style={{ opacity: 0.8 }} />
                                 </TouchableOpacity>
@@ -326,7 +328,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                         )}
 
                         <TouchableOpacity
-                            style={[localStyles.voiceButton, isRecording && localStyles.voiceButtonActive]}
+                            style={[themedLocalStyles.voiceButton, isRecording && themedLocalStyles.voiceButtonActive]}
                             onPress={handleVoiceInput}
                             disabled={isAnalyzing}
                         >
@@ -340,15 +342,15 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
                     {/* Voice Interaction Modal */}
                     <StyledModal isOpen={isRecording || isAnalyzing} onClose={() => { }}>
-                        <View style={[modalStyles.modalContainer, { minHeight: 280, paddingVertical: 30 }]}>
-                            <View style={localStyles.visualizerContainer}>
+                        <View style={[themedModalStyles.modalContainer, { minHeight: 280, paddingVertical: 30 }]}>
+                            <View style={themedLocalStyles.visualizerContainer}>
                                 {isRecording ? (
-                                    <View style={localStyles.barsRow}>
+                                    <View style={themedLocalStyles.barsRow}>
                                         {barAnims.map((anim, i) => (
                                             <Animated.View
                                                 key={i}
                                                 style={[
-                                                    localStyles.visualizerBar,
+                                                    themedLocalStyles.visualizerBar,
                                                     {
                                                         transform: [{ scaleY: anim }],
                                                         opacity: anim.interpolate({
@@ -361,31 +363,31 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                         ))}
                                     </View>
                                 ) : (
-                                    <View style={localStyles.analyzingLoader}>
-                                        <ActivityIndicator color={COLORS.CHECKBOX_SUCCESS} size="large" />
+                                    <View style={themedLocalStyles.analyzingLoader}>
+                                        <ActivityIndicator color={colors.CHECKBOX_SUCCESS} size="large" />
                                     </View>
                                 )}
                             </View>
 
                             <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                                <View style={[localStyles.micCircle, isRecording && { borderColor: '#ea4335' }]}>
+                                <View style={[themedLocalStyles.micCircle, isRecording && { borderColor: '#ea4335' }]}>
                                     <Ionicons
                                         name={isRecording ? "mic" : "cloud-upload"}
                                         size={32}
-                                        color={isRecording ? "#ea4335" : COLORS.CHECKBOX_SUCCESS}
+                                        color={isRecording ? "#ea4335" : colors.CHECKBOX_SUCCESS}
                                     />
                                 </View>
-                                <StyledText style={localStyles.voiceModalStatusText}>
+                                <StyledText style={themedLocalStyles.voiceModalStatusText}>
                                     {isRecording ? t("listening") : t("processing")}
                                 </StyledText>
                             </View>
 
                             {isRecording && (
-                                <View style={localStyles.timerContainer}>
-                                    <View style={localStyles.progressBarBackground}>
+                                <View style={themedLocalStyles.timerContainer}>
+                                    <View style={themedLocalStyles.progressBarBackground}>
                                         <Animated.View
                                             style={[
-                                                localStyles.progressBarFill,
+                                                themedLocalStyles.progressBarFill,
                                                 {
                                                     width: progressAnim.interpolate({
                                                         inputRange: [0, 1],
@@ -395,7 +397,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                             ]}
                                         />
                                     </View>
-                                    <StyledText style={localStyles.timerText}>
+                                    <StyledText style={themedLocalStyles.timerText}>
                                         00:{recordingTime < 10 ? `0${recordingTime}` : recordingTime} / 00:30
                                     </StyledText>
                                 </View>
@@ -404,10 +406,10 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                             {isRecording && (
                                 <TouchableOpacity
                                     onPress={handleVoiceInput}
-                                    style={localStyles.stopRecordingButton}
+                                    style={themedLocalStyles.stopRecordingButton}
                                 >
-                                    <View style={localStyles.stopIcon} />
-                                    <StyledText style={localStyles.stopButtonText}>{t("close")}</StyledText>
+                                    <View style={themedLocalStyles.stopIcon} />
+                                    <StyledText style={themedLocalStyles.stopButtonText}>{t("close")}</StyledText>
                                 </TouchableOpacity>
                             )}
                         </View>
@@ -442,10 +444,10 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                             isOpen={picker.showDatePicker || picker.showTimePicker}
                             onClose={picker.closePickers}
                         >
-                            <View style={modalStyles.modalContainer}>
-                                <View style={[modalStyles.iconContainer, {
-                                    backgroundColor: COLORS.SECONDARY_BACKGROUND,
-                                    shadowColor: picker.showDatePicker ? "#5BC0EB" : "#FFD166",
+                            <View style={themedModalStyles.modalContainer}>
+                                <View style={[themedModalStyles.iconContainer, {
+                                    backgroundColor: colors.TAB_BAR,
+                                    shadowColor: picker.showDatePicker ? "#5BC0EB" : colors.REMINDER,
                                     shadowOffset: { width: 0, height: 4 },
                                     shadowOpacity: 0.3,
                                     shadowRadius: 8,
@@ -454,15 +456,15 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                     <Ionicons
                                         name={picker.showDatePicker ? "calendar" : "time"}
                                         size={28}
-                                        color={picker.showDatePicker ? "#5BC0EB" : "#FFD166"}
+                                        color={picker.showDatePicker ? "#5BC0EB" : colors.REMINDER}
                                     />
                                 </View>
 
-                                <StyledText style={modalStyles.headerText}>
+                                <StyledText style={themedModalStyles.headerText}>
                                     {picker.showDatePicker ? t("date") : t("time")}
                                 </StyledText>
 
-                                <View style={modalStyles.divider} />
+                                <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
 
                                 <View style={{ width: '100%', height: 150, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
                                     <DateTimePicker
@@ -472,13 +474,13 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                         onChange={picker.showDatePicker ? picker.onChangeDate : picker.onChangeTime}
                                         minimumDate={picker.showDatePicker ? new Date() : undefined}
                                         locale={picker.getLocale()}
-                                        textColor={COLORS.PRIMARY_TEXT}
+                                        textColor={colors.PRIMARY_TEXT}
                                         themeVariant={theme}
                                         style={{ width: '100%', transform: [{ scale: 0.85 }] }}
                                     />
                                 </View>
 
-                                <View style={[modalStyles.buttonsContainer, { marginTop: 20 }]}>
+                                <View style={[themedModalStyles.buttonsContainer, { marginTop: 20 }]}>
                                     <StyledButton
                                         label={picker.showTimePicker ? t("back") : t("close")}
                                         onPress={picker.showTimePicker ? picker.goBackToDatePicker : picker.closePickers}
@@ -496,7 +498,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                         </StyledModal>
                     )}
 
-                    <View style={modalStyles.buttonsContainer}>
+                    <View style={[modalStyles.buttonsContainer, { marginTop: 8 }]}>
                         <StyledButton
                             label={t("cancel")}
                             onPress={onClose}
@@ -512,27 +514,27 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
                     {/* Permission Modal */}
                     <StyledModal isOpen={picker.showPermissionModal} onClose={() => picker.setShowPermissionModal(false)}>
-                        <View style={modalStyles.modalContainer}>
-                            <View style={[modalStyles.iconContainer, {
-                                backgroundColor: COLORS.SECONDARY_BACKGROUND,
-                                shadowColor: "#FFD166",
+                        <View style={themedModalStyles.modalContainer}>
+                            <View style={[themedModalStyles.iconContainer, {
+                                backgroundColor: colors.TAB_BAR,
+                                shadowColor: colors.REMINDER,
                                 shadowOffset: { width: 0, height: 4 },
                                 shadowOpacity: 0.3,
                                 shadowRadius: 8,
                                 elevation: 5
                             }]}>
-                                <Ionicons name="notifications" size={28} color="#FFD166" />
+                                <Ionicons name="notifications" size={28} color={colors.REMINDER} />
                             </View>
 
-                            <StyledText style={modalStyles.headerText}>{t("enable_notifications")}</StyledText>
+                            <StyledText style={themedModalStyles.headerText}>{t("enable_notifications")}</StyledText>
 
-                            <View style={modalStyles.divider} />
+                            <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
 
-                            <StyledText style={modalStyles.messageText}>
+                            <StyledText style={themedModalStyles.messageText}>
                                 {t("enable_notifications_desc")}
                             </StyledText>
 
-                            <View style={modalStyles.buttonsContainer}>
+                            <View style={themedModalStyles.buttonsContainer}>
                                 <StyledButton
                                     label={t("cancel")}
                                     onPress={() => picker.setShowPermissionModal(false)}
@@ -558,9 +560,9 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
                     {/* Past Date Alert Modal */}
                     <StyledModal isOpen={picker.showPastDateAlert} onClose={() => picker.setShowPastDateAlert(false)}>
-                        <View style={modalStyles.modalContainer}>
-                            <View style={[modalStyles.iconContainer, {
-                                backgroundColor: COLORS.SECONDARY_BACKGROUND,
+                        <View style={themedModalStyles.modalContainer}>
+                            <View style={[themedModalStyles.iconContainer, {
+                                backgroundColor: colors.TAB_BAR,
                                 shadowColor: "#FFB74D",
                                 shadowOffset: { width: 0, height: 4 },
                                 shadowOpacity: 0.3,
@@ -570,15 +572,15 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                 <Ionicons name="alert-circle" size={28} color="#FFB74D" />
                             </View>
 
-                            <StyledText style={modalStyles.headerText}>{t("attention")}</StyledText>
+                            <StyledText style={themedModalStyles.headerText}>{t("attention")}</StyledText>
 
-                            <View style={modalStyles.divider} />
+                            <View style={[themedModalStyles.divider, { opacity: 0.3 }]} />
 
-                            <StyledText style={modalStyles.messageText}>
+                            <StyledText style={themedModalStyles.messageText}>
                                 {t("past_reminder_error")}
                             </StyledText>
 
-                            <View style={modalStyles.buttonsContainer}>
+                            <View style={themedModalStyles.buttonsContainer}>
                                 <StyledButton
                                     label={t("close")}
                                     onPress={picker.closePastDateAlert}
@@ -594,4 +596,4 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     )
 }
 
-export default AddTodoModal
+export default AddTodoModal;

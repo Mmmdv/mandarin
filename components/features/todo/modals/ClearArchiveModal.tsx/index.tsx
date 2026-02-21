@@ -1,9 +1,10 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { modalStyles } from "@/constants/modalStyles";
+import { getModalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useMemo } from "react";
 import { View } from "react-native";
 
 type ClearArchiveModalProps = {
@@ -18,6 +19,7 @@ const ClearArchiveModal: React.FC<ClearArchiveModalProps> = ({
     onClear,
 }) => {
     const { colors, t } = useTheme();
+    const styles = useMemo(() => getModalStyles(colors), [colors]);
 
     const handleClear = () => {
         onClear()
@@ -26,9 +28,9 @@ const ClearArchiveModal: React.FC<ClearArchiveModalProps> = ({
 
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
-            <View style={[modalStyles.modalContainer, { backgroundColor: colors.SECONDARY_BACKGROUND, borderColor: colors.PRIMARY_BORDER_DARK, borderWidth: 1 }]}>
-                <View style={[modalStyles.iconContainer, {
-                    backgroundColor: useTheme().colors.SECONDARY_BACKGROUND,
+            <View style={styles.modalContainer}>
+                <View style={[styles.iconContainer, {
+                    backgroundColor: colors.TAB_BAR,
                     shadowColor: "#FF6B6B",
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.3,
@@ -38,15 +40,15 @@ const ClearArchiveModal: React.FC<ClearArchiveModalProps> = ({
                     <Ionicons name="trash-outline" size={28} color="#FF6B6B" />
                 </View>
 
-                <StyledText style={[modalStyles.headerText, { color: colors.PRIMARY_TEXT }]}>{t("clear_archive_title")}</StyledText>
+                <StyledText style={styles.headerText}>{t("clear_archive_title")}</StyledText>
 
-                <View style={[modalStyles.divider, { backgroundColor: colors.PRIMARY_BORDER_DARK }]} />
+                <View style={[styles.divider, { opacity: 0.3 }]} />
 
-                <StyledText style={[modalStyles.messageText, { color: colors.PRIMARY_TEXT }]}>
+                <StyledText style={styles.messageText}>
                     {t("clear_archive_message")}
                 </StyledText>
 
-                <View style={modalStyles.buttonsContainer}>
+                <View style={styles.buttonsContainer}>
                     <StyledButton
                         label={t("cancel")}
                         onPress={onClose}
@@ -63,4 +65,4 @@ const ClearArchiveModal: React.FC<ClearArchiveModalProps> = ({
     );
 };
 
-export default ClearArchiveModal
+export default ClearArchiveModal;

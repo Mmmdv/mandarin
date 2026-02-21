@@ -1,10 +1,10 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { modalStyles } from "@/constants/modalStyles";
+import { getModalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
 
 type TaskSuccessModalProps = {
@@ -19,30 +19,31 @@ const TaskSuccessModal: React.FC<TaskSuccessModalProps> = ({
     message,
 }) => {
     const { colors, t } = useTheme();
+    const styles = useMemo(() => getModalStyles(colors), [colors]);
 
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
-            <View style={modalStyles.modalContainer}>
-                <View style={[modalStyles.iconContainer, {
-                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                    shadowColor: "#4CAF50",
+            <View style={styles.modalContainer}>
+                <View style={[styles.iconContainer, {
+                    backgroundColor: colors.TAB_BAR,
+                    shadowColor: colors.CHECKBOX_SUCCESS,
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.3,
                     shadowRadius: 8,
                     elevation: 5
                 }]}>
-                    <Ionicons name="checkmark-circle" size={28} color="#4CAF50" />
+                    <Ionicons name="checkmark-circle" size={28} color={colors.CHECKBOX_SUCCESS} />
                 </View>
 
-                <StyledText style={modalStyles.headerText}>{t("success")}</StyledText>
+                <StyledText style={styles.headerText}>{t("success")}</StyledText>
 
-                <View style={modalStyles.divider} />
+                <View style={[styles.divider, { opacity: 0.3 }]} />
 
-                <StyledText style={modalStyles.messageText}>
+                <StyledText style={styles.messageText}>
                     {message || t("task_added_success")}
                 </StyledText>
 
-                <View style={[modalStyles.buttonsContainer, { width: '100%' }]}>
+                <View style={[styles.buttonsContainer, { width: '100%' }]}>
                     <StyledButton
                         label={t("close")}
                         onPress={onClose}

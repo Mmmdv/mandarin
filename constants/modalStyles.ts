@@ -1,12 +1,12 @@
-import { StyleSheet } from "react-native"
-import { COLORS } from "./ui"
+import { StyleSheet } from "react-native";
+import { DarkTheme } from "./ui";
 
-export const modalStyles = StyleSheet.create({
+export const getModalStyles = (colors: any) => StyleSheet.create({
     modalContainer: {
-        backgroundColor: COLORS.SECONDARY_BACKGROUND,
+        backgroundColor: colors.SECONDARY_BACKGROUND,
         borderRadius: 15,
         borderWidth: 0.5,
-        borderColor: "#3a3f47",
+        borderColor: colors.PRIMARY_BORDER_DARK,
         padding: 20,
         minWidth: 280,
         alignItems: "center",
@@ -22,18 +22,27 @@ export const modalStyles = StyleSheet.create({
     headerText: {
         fontSize: 18,
         fontWeight: "600",
-        color: COLORS.PRIMARY_TEXT,
+        color: colors.PRIMARY_TEXT,
         textAlign: "center",
     },
     divider: {
-        height: 0.5,
-        backgroundColor: "#3a3f47",
+        height: 0.3,
+        backgroundColor: colors.PRIMARY_BORDER_DARK,
         width: "100%",
+        opacity: 0.15,
     },
     messageText: {
         fontSize: 14,
-        color: "#888",
+        color: colors.PLACEHOLDER,
         textAlign: "center",
+    },
+    button: {
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 100,
     },
     buttonsContainer: {
         flexDirection: "row",
@@ -42,3 +51,5 @@ export const modalStyles = StyleSheet.create({
         marginTop: 8,
     },
 })
+
+export const modalStyles = getModalStyles(DarkTheme);

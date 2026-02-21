@@ -1,32 +1,54 @@
-import { COLORS } from "@/constants/ui";
 import { StyleSheet } from "react-native";
 
-export const localStyles = StyleSheet.create({
+export const getEditStyles = (colors: any, isDark: boolean) => StyleSheet.create({
+    container: {
+        borderRadius: 24,
+        borderWidth: 1,
+        padding: 24,
+        minWidth: 340,
+        gap: 12,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: isDark ? 0.3 : 0.2,
+        shadowRadius: isDark ? 20 : 15,
+        elevation: 10,
+        backgroundColor: colors.SECONDARY_BACKGROUND,
+        borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: "bold",
+        textAlign: 'center',
+        opacity: 0.8,
+        color: colors.PRIMARY_TEXT,
+    },
     inputWrapper: {
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
+        backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.03)",
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: "rgba(255, 255, 255, 0.1)",
+        borderColor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
         paddingHorizontal: 16,
         paddingVertical: 12,
         minHeight: 60,
         width: "100%",
     },
     inputFocused: {
-        backgroundColor: "rgba(255, 255, 255, 0.05)",
-        borderColor: "rgba(255, 255, 255, 0.3)",
-        borderWidth: 1,
-        shadowColor: "rgba(255, 255, 255, 0.5)",
+        backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.02)",
+        borderColor: colors.CHECKBOX_SUCCESS,
+        borderWidth: 1.5,
+        shadowColor: colors.CHECKBOX_SUCCESS,
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.2,
         shadowRadius: 10,
         elevation: 5,
     },
     inputError: {
-        borderColor: COLORS.ERROR_INPUT_TEXT,
+        borderColor: colors.ERROR_INPUT_TEXT,
+        borderWidth: 1.5,
     },
     textInput: {
-        color: COLORS.PRIMARY_TEXT,
+        color: colors.PRIMARY_TEXT,
         fontSize: 16,
         minHeight: 40,
         textAlign: 'left',
@@ -36,7 +58,7 @@ export const localStyles = StyleSheet.create({
     },
     sectionLabel: {
         fontSize: 12,
-        color: "#888",
+        color: colors.PLACEHOLDER,
         marginBottom: 8,
         marginLeft: 4,
         fontWeight: "600",
@@ -53,11 +75,11 @@ export const localStyles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#151616ff",
+        backgroundColor: colors.TAB_BAR,
         paddingVertical: 12,
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: "#3a3f47",
+        borderColor: colors.PRIMARY_BORDER_DARK,
         gap: 8,
     },
     pickerButtonActive: {
@@ -65,7 +87,7 @@ export const localStyles = StyleSheet.create({
         backgroundColor: "rgba(91, 192, 235, 0.05)"
     },
     pickerText: {
-        color: "#888",
+        color: colors.PLACEHOLDER,
         fontSize: 14,
         fontWeight: "500"
     },
@@ -73,14 +95,14 @@ export const localStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         padding: 12,
-        backgroundColor: "#151616ff",
+        backgroundColor: colors.TAB_BAR,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: "#3a3f47",
+        borderColor: colors.PRIMARY_BORDER_DARK,
         gap: 10,
     },
     addReminderText: {
-        color: "#888",
+        color: colors.PLACEHOLDER,
         fontSize: 14,
         fontWeight: "500",
     },
@@ -111,7 +133,7 @@ export const localStyles = StyleSheet.create({
         padding: 4,
     },
     iosPickerContainer: {
-        backgroundColor: COLORS.SECONDARY_BACKGROUND,
+        backgroundColor: colors.SECONDARY_BACKGROUND,
         borderRadius: 20,
         paddingBottom: 20,
         width: '100%',
@@ -124,13 +146,13 @@ export const localStyles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.05)',
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+        backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.02)',
     },
     iosTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: COLORS.PRIMARY_TEXT,
+        color: colors.PRIMARY_TEXT,
     },
     iconButton: {
         padding: 4,
@@ -143,6 +165,6 @@ export const localStyles = StyleSheet.create({
         overflow: 'hidden',
         borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
     }
 });

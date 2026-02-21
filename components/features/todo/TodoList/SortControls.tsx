@@ -1,5 +1,4 @@
 import StyledText from "@/components/ui/StyledText"
-import { COLORS } from "@/constants/ui"
 import { useTheme } from "@/hooks/useTheme"
 import { Ionicons } from "@expo/vector-icons"
 import React from "react"
@@ -21,25 +20,31 @@ const SortControls: React.FC<SortControlsProps> = ({
     onToggleSortBy,
     onToggleSortOrder,
 }) => {
-    const { t } = useTheme()
+    const { t, colors, isDark } = useTheme()
 
     return (
         <View style={sortStyles.sortContainer}>
-            <TouchableOpacity style={sortStyles.sortButton} onPress={onToggleSortBy}>
+            <TouchableOpacity
+                style={[sortStyles.sortButton, { backgroundColor: isDark ? colors.PRIMARY_ACTIVE_BUTTON : colors.PRIMARY_INACTIVE_BUTTON }]}
+                onPress={onToggleSortBy}
+            >
                 <Ionicons
                     name={sortBy === "date" ? "calendar" : "text"}
                     size={14}
-                    color={COLORS.PRIMARY_TEXT}
+                    color={colors.PRIMARY_TEXT}
                 />
-                <StyledText style={sortStyles.sortText}>
+                <StyledText style={[sortStyles.sortText, { color: colors.PRIMARY_TEXT }]}>
                     {sortBy === "date" ? t("sort_date") : t("sort_text")}
                 </StyledText>
             </TouchableOpacity>
-            <TouchableOpacity style={sortStyles.sortButton} onPress={onToggleSortOrder}>
+            <TouchableOpacity
+                style={[sortStyles.sortButton, { backgroundColor: isDark ? colors.PRIMARY_ACTIVE_BUTTON : colors.PRIMARY_INACTIVE_BUTTON }]}
+                onPress={onToggleSortOrder}
+            >
                 <Ionicons
                     name={sortOrder === "asc" ? "arrow-up" : "arrow-down"}
                     size={14}
-                    color={COLORS.PRIMARY_TEXT}
+                    color={colors.PRIMARY_TEXT}
                 />
             </TouchableOpacity>
         </View>
@@ -55,7 +60,6 @@ const sortStyles = StyleSheet.create({
     sortButton: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#2a2f37",
         paddingHorizontal: 8,
         paddingVertical: 6,
         borderRadius: 12,
@@ -63,7 +67,6 @@ const sortStyles = StyleSheet.create({
     },
     sortText: {
         fontSize: 10,
-        color: COLORS.PRIMARY_TEXT,
     },
 })
 

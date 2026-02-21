@@ -7,13 +7,13 @@ import { useTheme } from "@/hooks/useTheme"
 import { Todo } from "@/types/todo"
 import { Ionicons } from "@expo/vector-icons"
 import { useNavigation, useRouter } from "expo-router"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Animated, LayoutAnimation, Platform, ScrollView, TouchableOpacity, UIManager, View } from "react-native"
 import ArchiveAllModal from "../modals/ArchiveAllModal.tsx"
 import ClearArchiveModal from "../modals/ClearArchiveModal.tsx"
 import TodoItem from "../TodoItem"
 import SortControls, { SortBy, SortOrder } from "./SortControls"
-import { styles } from "./styles"
+import { getStyles } from "./styles"
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -35,7 +35,7 @@ type TodoListProps = {
 }
 
 const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, onEditTodo, onArchiveTodo, onRetryTodo, onClearArchive, archivedTodos, onArchiveAll, onAddRequest, categoryTitle, categoryIcon }) => {
-    const { colors, t, lang } = useTheme()
+    const { colors, t, lang, isDark } = useTheme()
     const router = useRouter();
     const navigation = useNavigation();
     const [todoSortBy, setTodoSortBy] = useState<SortBy>("date")
@@ -58,6 +58,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
 
     const { refreshing, onRefresh } = useRefresh();
+    const styles = useMemo(() => getStyles(colors), [colors]);
 
     const pendingTodos = todos.filter(todo => !todo.isCompleted && !todo.isArchived)
     const completedTodos = todos.filter(todo => todo.isCompleted && !todo.isArchived)
@@ -310,7 +311,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
             {/* Todo sticky: hər hansı bölmə açıq olanda görünür */}
             {(todoExpanded || doneExpanded || archiveExpanded) && (
                 <TouchableOpacity
-                    style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: 'rgba(79, 70, 229, 0.15)', borderWidth: 0.2, borderColor: 'rgba(79, 70, 229, 0.3)' }]}
+                    style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.1)', borderWidth: 0.2, borderColor: isDark ? 'rgba(79, 70, 229, 0.3)' : 'rgba(79, 70, 229, 0.2)' }]}
                     onPress={() => toggleSection(setTodoExpanded, todoAnimation, 'todo')}
                     disabled={sortedPendingTodos.length === 0}
                 >
@@ -352,7 +353,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
             {/* Done sticky: Done və ya Arxiv açıq olanda görünür */}
             {(doneExpanded || archiveExpanded) && (
                 <TouchableOpacity
-                    style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 0.2, borderColor: 'rgba(16, 185, 129, 0.3)' }]}
+                    style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.1)', borderWidth: 0.2, borderColor: isDark ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.2)' }]}
                     onPress={() => toggleSection(setDoneExpanded, doneAnimation, 'done')}
                     disabled={sortedCompletedTodos.length === 0}
                 >
@@ -399,7 +400,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
             {/* Archive sticky: yalnız Arxiv özü açıq olanda görünür */}
             {archiveExpanded && (
                 <TouchableOpacity
-                    style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderWidth: 0.2, borderColor: 'rgba(139, 92, 246, 0.3)' }]}
+                    style={[styles.sectionHeaderCard, styles.stickyTodoHeader, { backgroundColor: isDark ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.1)', borderWidth: 0.2, borderColor: isDark ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)' }]}
                     onPress={() => toggleSection(setArchiveExpanded, archiveAnimation, 'archive')}
                     disabled={sortedArchivedTodos.length === 0}
                 >
@@ -467,7 +468,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     <View style={styles.sectionContainer}>
                         {!todoExpanded && (
                             <TouchableOpacity
-                                style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(79, 70, 229, 0.15)', borderWidth: 0.2, borderColor: 'rgba(79, 70, 229, 0.3)', elevation: 0, zIndex: 0 }]}
+                                style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.1)', borderWidth: 0.2, borderColor: isDark ? 'rgba(79, 70, 229, 0.3)' : 'rgba(79, 70, 229, 0.2)', elevation: 0, zIndex: 0 }]}
                                 onPress={() => toggleSection(setTodoExpanded, todoAnimation, 'todo')}
                                 disabled={sortedPendingTodos.length === 0}
                             >
@@ -525,7 +526,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     <View style={styles.sectionContainer}>
                         {!doneExpanded && (
                             <TouchableOpacity
-                                style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 0.2, borderColor: 'rgba(16, 185, 129, 0.3)', elevation: 0, zIndex: 0 }]}
+                                style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.1)', borderWidth: 0.2, borderColor: isDark ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.2)', elevation: 0, zIndex: 0 }]}
                                 onPress={() => toggleSection(setDoneExpanded, doneAnimation, 'done')}
                                 disabled={sortedCompletedTodos.length === 0}
                             >
@@ -588,7 +589,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 <View style={styles.sectionContainer}>
                     {!archiveExpanded && (
                         <TouchableOpacity
-                            style={[styles.sectionHeaderCard, { backgroundColor: 'rgba(139, 92, 246, 0.15)', borderWidth: 0.2, borderColor: 'rgba(139, 92, 246, 0.3)', elevation: 0, zIndex: 0 }]}
+                            style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(139, 92, 246, 0.15)' : 'rgba(139, 92, 246, 0.1)', borderWidth: 0.2, borderColor: isDark ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)', elevation: 0, zIndex: 0 }]}
                             onPress={() => toggleSection(setArchiveExpanded, archiveAnimation, 'archive')}
                             disabled={sortedArchivedTodos.length === 0}
                         >
