@@ -159,6 +159,9 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                         const date = new Date(result.date);
                         if (!isNaN(date.getTime())) {
                             picker.setReminderDate(date);
+                            if (!notificationsEnabled || !todoNotifications) {
+                                setTimeout(() => picker.setShowPermissionModal(true), 500);
+                            }
                         }
                     }
                     setIsAnalyzing(false);
@@ -335,7 +338,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                             <Ionicons
                                 name={isRecording ? "stop" : "mic"}
                                 size={24}
-                                color={isRecording ? "#ea4335" : "#fff"}
+                                color={isRecording ? "#ea4335" : (isDark ? "#fff" : colors.PRIMARY_TEXT)}
                             />
                         </TouchableOpacity>
                     </View>
@@ -537,7 +540,10 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                             <View style={themedModalStyles.buttonsContainer}>
                                 <StyledButton
                                     label={t("cancel")}
-                                    onPress={() => picker.setShowPermissionModal(false)}
+                                    onPress={() => {
+                                        picker.setShowPermissionModal(false);
+                                        picker.setReminderDate(undefined);
+                                    }}
                                     variant="dark_button"
                                 />
                                 <StyledButton

@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { styles } from './styles';
 
 export default function RatingTracker() {
-    const { colors, t } = useTheme();
+    const { colors, t, isDark } = useTheme();
     const dispatch = useDispatch();
     const today = new Date().toISOString().split('T')[0];
     const dayData: any = useSelector(selectDayData(today));
@@ -105,9 +105,9 @@ export default function RatingTracker() {
                 style={[
                     homeStyles.card,
                     {
-                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        backgroundColor: isDark ? 'rgba(79, 70, 229, 0.2)' : 'rgba(79, 70, 229, 0.1)',
                         borderWidth: 0.3,
-                        borderColor: 'rgba(100, 116, 139, 0.3)',
+                        borderColor: isDark ? 'rgba(100, 116, 139, 0.3)' : 'rgba(100, 116, 139, 0.15)',
                         borderRadius: 20,
                         paddingVertical: 13,
                         paddingHorizontal: 10,
@@ -121,8 +121,8 @@ export default function RatingTracker() {
                     }
                 ]}
             >
-                <View style={[styles.iconContainer, { backgroundColor: `${theme?.color || '#F59E0B'}55`, zIndex: 2 }]}>
-                    <Ionicons name={(theme?.icon as any) || "star"} size={17} color={colors.SECTION_TEXT} />
+                <View style={[styles.iconContainer, { backgroundColor: `${theme?.color || '#F59E0B'}${isDark ? '55' : '33'}`, zIndex: 2 }]}>
+                    <Ionicons name={(theme?.icon as any) || "star"} size={17} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
                 </View>
                 <StyledText
                     style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, flex: 1, marginBottom: 0, zIndex: 2 }]}
@@ -167,9 +167,9 @@ export default function RatingTracker() {
             {isExpanded && (
                 <View style={{
                     marginTop: 10,
-                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.08)',
                     borderWidth: 0.3,
-                    borderColor: 'rgba(100, 116, 139, 0.3)',
+                    borderColor: isDark ? 'rgba(100, 116, 139, 0.3)' : 'rgba(100, 116, 139, 0.15)',
                     borderRadius: 20,
                     padding: 20,
                     minHeight: 100,

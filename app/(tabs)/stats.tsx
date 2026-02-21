@@ -77,7 +77,7 @@ export default function Stats() {
                                 ]}>
                                     {item.label}
                                 </StyledText>
-                                {isSelected && <View style={statsStyles.chipDot} />}
+                                {isSelected && <View style={[statsStyles.chipDot, { backgroundColor: '#fff' }]} />}
                             </TouchableOpacity>
                         );
                     }}

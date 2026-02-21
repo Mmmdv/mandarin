@@ -4,15 +4,15 @@ import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     ScrollView,
     Share,
-    StyleSheet,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
+import { getStyles } from "./styles";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
 const BIRTHDAY_PRIMARY = "#9D6506";
@@ -43,7 +43,8 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
     personName,
     nickname,
 }) => {
-    const { t, colors } = useTheme();
+    const { t, colors, isDark } = useTheme();
+    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
     const [customMessage, setCustomMessage] = useState("");
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
@@ -73,29 +74,29 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
 
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
-            <View style={modalStyles.modalContainer}>
+            <View style={styles.container}>
                 <View
                     style={[
                         modalStyles.iconContainer,
                         {
                             backgroundColor: colors.SECONDARY_BACKGROUND,
                             shadowColor: BIRTHDAY_PRIMARY,
-                            shadowOffset: { width: 0, height: 4 },
+                            shadowOffset: { width: 0, height: 2 },
                             shadowOpacity: 0.3,
-                            shadowRadius: 8,
-                            elevation: 5,
+                            shadowRadius: 2,
+                            elevation: 2
                         },
                     ]}
                 >
                     <StyledText style={{ fontSize: 28 }}>🎂</StyledText>
                 </View>
 
-                <StyledText style={modalStyles.headerText}>
+                <StyledText style={styles.headerText}>
                     {t("birthday_select_greeting")}
                 </StyledText>
 
                 <StyledText
-                    style={[modalStyles.messageText, { fontWeight: "600", color: BIRTHDAY_LIGHT }]}
+                    style={[styles.messageText, { fontWeight: "600", color: BIRTHDAY_LIGHT }]}
                 >
                     {displayName}
                 </StyledText>
@@ -182,63 +183,5 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
         </StyledModal>
     );
 };
-
-const styles = StyleSheet.create({
-    greetingsScroll: {
-        width: "100%",
-        maxHeight: 300,
-    },
-    greetingCard: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 12,
-        borderRadius: 10,
-        borderWidth: 1,
-        marginBottom: 8,
-        gap: 10,
-    },
-    greetingEmoji: {
-        fontSize: 24,
-    },
-    greetingText: {
-        flex: 1,
-        fontSize: 13,
-        lineHeight: 18,
-    },
-    copyIcon: {
-        padding: 4,
-    },
-    customContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderRadius: 10,
-        borderWidth: 1,
-        marginBottom: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-    },
-    customInput: {
-        flex: 1,
-        fontSize: 13,
-        minHeight: 44,
-        textAlignVertical: "top",
-    },
-    sendButton: {
-        padding: 8,
-    },
-    closeButton: {
-        width: "100%",
-        height: 40,
-        borderRadius: 10,
-        borderWidth: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 4,
-    },
-    closeText: {
-        fontSize: 14,
-        fontWeight: "500",
-    },
-});
 
 export default React.memo(GreetingModal);

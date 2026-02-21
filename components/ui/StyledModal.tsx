@@ -9,7 +9,7 @@ type StyledModalProps = {
     closeOnOverlayPress?: boolean
 }
 
-const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, closeOnOverlayPress }) => {
+const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, closeOnOverlayPress = true }) => {
     const { colors, isDark } = useTheme();
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 

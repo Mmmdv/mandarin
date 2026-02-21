@@ -123,7 +123,7 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
                         {isCompleted && !isArchived && (
                             <>
                                 {onRetry && <MenuItem icon="sync-outline" label={t("retry")} onPress={onRetry} color={colors.PRIMARY_TEXT} />}
-                                {archiveTodoAvailable && onArchive && <MenuItem icon="archive-outline" label={t("archive")} onPress={onArchive} color={colors.PRIMARY_TEXT} />}
+                                {archiveTodoAvailable && onArchive && <MenuItem icon="archive-outline" label={t("archive_action")} onPress={onArchive} color={colors.PRIMARY_TEXT} />}
                             </>
                         )}
 

@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 import { styles } from './styles';
 
 export default function ImportantTasksToday() {
-    const { colors, t, lang } = useTheme();
+    const { colors, t, lang, isDark } = useTheme();
     const todos = useSelector(selectTodos);
     const router = useRouter();
     const [isExpanded, setIsExpanded] = useState(true);
@@ -112,9 +112,9 @@ export default function ImportantTasksToday() {
                 style={[
                     homeStyles.card,
                     {
-                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        backgroundColor: isDark ? 'rgba(79, 70, 229, 0.2)' : 'rgba(79, 70, 229, 0.1)',
                         borderWidth: 0.3,
-                        borderColor: 'rgba(100, 116, 139, 0.3)',
+                        borderColor: isDark ? 'rgba(100, 116, 139, 0.3)' : 'rgba(100, 116, 139, 0.15)',
                         borderRadius: 20,
                         paddingVertical: 13,
                         paddingHorizontal: 10,
@@ -125,14 +125,14 @@ export default function ImportantTasksToday() {
                     }
                 ]}
             >
-                <View style={[styles.iconContainer, { backgroundColor: 'rgba(35, 78, 148, 0.55)', zIndex: 2 }]}>
-                    <Ionicons name="notifications" size={17} color={colors.SECTION_TEXT} />
+                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(35, 78, 148, 0.55)' : 'rgba(35, 78, 148, 0.2)', zIndex: 2 }]}>
+                    <Ionicons name="notifications" size={17} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
                 </View>
                 <StyledText style={[homeStyles.cardTitle, { color: colors.SECTION_TEXT, fontSize: 14, marginBottom: 0, zIndex: 2 }]}>
                     {selectedDate === new Date().toISOString().split('T')[0] ? t('today_tasks_header') : t('tasks')}
                 </StyledText>
                 {selectedTasks.length > 0 && (
-                    <View style={[styles.badge, { backgroundColor: 'rgba(35, 78, 148, 0.15)', zIndex: 2 }]}>
+                    <View style={[styles.badge, { backgroundColor: isDark ? 'rgba(35, 78, 148, 0.15)' : 'rgba(35, 78, 148, 0.1)', zIndex: 2 }]}>
                         <StyledText style={[styles.badgeText, { color: colors.SECTION_TEXT }]}>{selectedTasks.length}</StyledText>
                     </View>
                 )}
@@ -146,7 +146,7 @@ export default function ImportantTasksToday() {
                     style={[
                         homeStyles.decorativeCircle,
                         {
-                            backgroundColor: 'rgba(35, 78, 148, 0.3)',
+                            backgroundColor: isDark ? 'rgba(35, 78, 148, 0.3)' : 'rgba(35, 78, 148, 0.15)',
                             width: 80,
                             height: 80,
                             borderRadius: 40,
@@ -185,7 +185,7 @@ export default function ImportantTasksToday() {
                                             width: 53,
                                             height: 60,
                                             borderRadius: 18,
-                                            backgroundColor: isSelected ? '#234E94' : 'rgba(100, 116, 139, 0.1)',
+                                            backgroundColor: isSelected ? '#234E94' : (isDark ? 'rgba(100, 116, 139, 0.1)' : 'rgba(100, 116, 139, 0.05)'),
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             borderWidth: 1,
@@ -270,9 +270,9 @@ export default function ImportantTasksToday() {
                         <View style={[
                             homeStyles.card,
                             {
-                                backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                                backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.08)',
                                 borderWidth: 0.3,
-                                borderColor: 'rgba(100, 116, 139, 0.2)',
+                                borderColor: isDark ? 'rgba(100, 116, 139, 0.2)' : 'rgba(100, 116, 139, 0.1)',
                                 borderRadius: 20,
                                 padding: 20,
                                 alignItems: 'center',
@@ -283,7 +283,7 @@ export default function ImportantTasksToday() {
                             <View style={[styles.emptyIconContainer, { backgroundColor: "#8591acff" }]}>
                                 <Ionicons name="checkmark-done-circle" size={35} color="#fefeffff" />
                             </View>
-                            <StyledText style={[styles.emptyText, { color: colors.PRIMARY_BORDER }]}>
+                            <StyledText style={[styles.emptyText, { color: isDark ? colors.PRIMARY_BORDER : colors.SECTION_TEXT }]}>
                                 {selectedTasks.length === 0
                                     ? (selectedDate === new Date().toISOString().split('T')[0] ? t('today_no_tasks') : t('selected_date_no_tasks'))
                                     : filter === 'past'
@@ -292,7 +292,7 @@ export default function ImportantTasksToday() {
                                             ? (selectedDate === new Date().toISOString().split('T')[0] ? t('today_no_pending_tasks') : t('selected_date_no_pending_tasks'))
                                             : (selectedDate === new Date().toISOString().split('T')[0] ? t('today_no_tasks') : t('selected_date_no_tasks'))}
                             </StyledText>
-                            <StyledText style={[styles.emptySubtext, { color: colors.PRIMARY_BORDER }]}>
+                            <StyledText style={[styles.emptySubtext, { color: isDark ? colors.PRIMARY_BORDER : colors.PLACEHOLDER }]}>
                                 {t('today_have_nice_day')}
                             </StyledText>
                         </View>
@@ -307,9 +307,9 @@ export default function ImportantTasksToday() {
                                         style={({ pressed }) => [
                                             styles.taskItem,
                                             {
-                                                backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                                                backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.08)',
                                                 borderWidth: 0.3,
-                                                borderColor: 'rgba(167, 171, 177, 0.3)',
+                                                borderColor: isDark ? 'rgba(167, 171, 177, 0.3)' : 'rgba(167, 171, 177, 0.15)',
                                                 borderRadius: 12,
                                                 borderLeftWidth: 15,
                                                 borderTopLeftRadius: 25,
@@ -343,17 +343,17 @@ export default function ImportantTasksToday() {
                                     style={({ pressed }) => [
                                         styles.viewAllButton,
                                         {
-                                            backgroundColor: 'rgba(35, 78, 148, 0.9)',
+                                            backgroundColor: isDark ? 'rgba(35, 78, 148, 0.9)' : 'rgba(35, 78, 148, 0.1)',
                                             opacity: pressed ? 0.7 : 1,
                                             transform: [{ scale: pressed ? 0.98 : 1 }]
                                         }
                                     ]}
                                     onPress={handleViewAll}
                                 >
-                                    <StyledText style={[styles.viewAllText, { color: colors.SECTION_TEXT }]}>
+                                    <StyledText style={[styles.viewAllText, { color: isDark ? '#FFF' : colors.PRIMARY_TEXT }]}>
                                         {t('today_view_more')} ({filteredTasks.length - 3})
                                     </StyledText>
-                                    <Ionicons name="arrow-forward" size={14} color={colors.SECTION_TEXT} />
+                                    <Ionicons name="arrow-forward" size={14} color={isDark ? '#FFF' : colors.PRIMARY_TEXT} />
                                 </Pressable>
                             )}
                         </View>

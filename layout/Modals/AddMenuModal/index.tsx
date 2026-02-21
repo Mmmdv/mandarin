@@ -35,7 +35,14 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                 }
             ]}
         >
-            <View style={[styles.iconContainer, { backgroundColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }]}>
+            <View style={[
+                styles.iconContainer,
+                {
+                    backgroundColor: isDark
+                        ? "rgba(255,255,255,0.12)"
+                        : (color ? `${color}15` : "rgba(0,0,0,0.06)")
+                }
+            ]}>
                 <Ionicons name={icon} size={14} color={color || colors.PRIMARY_TEXT} />
             </View>
             <StyledText style={[styles.menuLabel, { color: colors.PRIMARY_TEXT }]}>{label}</StyledText>
@@ -65,14 +72,14 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                             icon="checkbox-outline"
                             label={t("menu_add_task")}
                             onPress={onAddTask}
-                            color="#4ECDC4"
+                            color={isDark ? "#4ECDC4" : "#168B83"}
                         />
                         <MenuItem
                             icon="gift-outline"
                             label={t("menu_add_birthday")}
                             onPress={onAddBirthday}
                             disabled={false}
-                            color="#9D6506"
+                            color={isDark ? "#9D6506" : "#A67C00"}
                         />
                         <View style={{ marginBottom: 0 }}>
                             <MenuItem
@@ -80,6 +87,7 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                                 label={t("menu_add_movie")}
                                 onPress={onAddMovie}
                                 disabled={true}
+                                color={isDark ? colors.PRIMARY_TEXT : "#90122E"}
                             />
                         </View>
                     </View>

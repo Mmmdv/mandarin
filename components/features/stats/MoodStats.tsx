@@ -33,7 +33,7 @@ export function MoodStats({ moodMetrics, colors, isDark, t }: MoodStatsProps) {
                             </View>
                         </View>
 
-                        <View style={statsStyles.moodSpectrum}>
+                        <View style={[statsStyles.moodSpectrum, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
                             {moodMetrics.counts.map((count, i) => {
                                 const width = moodMetrics.total > 0 ? (count / moodMetrics.total) * 100 : 0;
                                 if (width === 0) return null;
@@ -71,7 +71,7 @@ export function MoodStats({ moodMetrics, colors, isDark, t }: MoodStatsProps) {
                     </View>
                 </View>
             ) : (
-                <StyledText style={statsStyles.emptyText}>{t("stats_no_data")}</StyledText>
+                <StyledText style={[statsStyles.emptyText, { color: colors.PLACEHOLDER }]}>{t("stats_no_data")}</StyledText>
             )}
         </View>
     );

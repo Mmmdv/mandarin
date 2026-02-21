@@ -75,7 +75,7 @@ export function RatingStats({ ratingMetrics, colors, isDark, t }: RatingStatsPro
                     </View>
                 </View>
             ) : (
-                <StyledText style={statsStyles.emptyText}>{t("stats_no_data")}</StyledText>
+                <StyledText style={[statsStyles.emptyText, { color: colors.PLACEHOLDER }]}>{t("stats_no_data")}</StyledText>
             )}
         </View>
     );

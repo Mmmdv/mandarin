@@ -15,10 +15,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { COLORS_THEME, PHASE_DURATIONS, Phase, SOUNDS, getMotivationalMessages } from './constants';
-import { styles } from './styles';
+import { getStyles } from './styles';
 
 export default function BreathingExercise() {
-    const { colors, t } = useTheme();
+    const { colors, t, isDark } = useTheme();
+    const styles = getStyles(isDark, colors);
     const dispatch = useDispatch();
     const { width: screenWidth } = useWindowDimensions();
     const [isActive, setIsActive] = useState(false);
@@ -409,7 +410,7 @@ export default function BreathingExercise() {
                     <Ionicons
                         name={isSoundEnabled ? "volume-medium" : "volume-mute"}
                         size={18}
-                        color={isSoundEnabled ? '#FFF' : COLORS_THEME.textMuted}
+                        color={isSoundEnabled ? '#FFF' : (isDark ? COLORS_THEME.textMuted : colors.SECTION_TEXT)}
                     />
                 </TouchableOpacity>
 
@@ -423,7 +424,7 @@ export default function BreathingExercise() {
                     <MaterialCommunityIcons
                         name="waves"
                         size={18}
-                        color={isSeaEnabled ? '#FFF' : COLORS_THEME.textMuted}
+                        color={isSeaEnabled ? '#FFF' : (isDark ? COLORS_THEME.textMuted : colors.SECTION_TEXT)}
                     />
                 </TouchableOpacity>
             </View>
@@ -461,7 +462,7 @@ export default function BreathingExercise() {
                         {isActive && (
                             <>
                                 <Animated.View style={{ opacity: textOpacity, alignItems: 'center' }}>
-                                    <StyledText style={[styles.phaseText, { fontSize: animationSize * 0.1, color: COLORS_THEME.text }]}>
+                                    <StyledText style={[styles.phaseText, { fontSize: animationSize * 0.1, color: isDark ? COLORS_THEME.text : colors.PRIMARY_TEXT }]}>
                                         {getPhaseText()}
                                     </StyledText>
                                     <StyledText style={[styles.phaseCounterText, { fontSize: animationSize * 0.15, color: COLORS_THEME.primary }]}>
@@ -526,7 +527,7 @@ export default function BreathingExercise() {
                         </TouchableOpacity>
                     ) : (
                         <View style={{ alignItems: 'center', gap: 12, marginTop: -30 }}>
-                            <StyledText style={{ color: COLORS_THEME.textMuted, fontSize: 16, fontWeight: '500' }}>
+                            <StyledText style={{ color: isDark ? COLORS_THEME.textMuted : colors.SECTION_TEXT, fontSize: 16, fontWeight: '500' }}>
                                 {t("breathing_get_ready")}...
                             </StyledText>
                             <TouchableOpacity

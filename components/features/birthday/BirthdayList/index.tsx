@@ -173,10 +173,10 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                     styles.card,
                     {
                         backgroundColor: isToday
-                            ? BIRTHDAY_BG
+                            ? BIRTHDAY_BG_LIGHT
                             : colors.SECONDARY_BACKGROUND,
                         borderColor: isToday
-                            ? BIRTHDAY_BORDER
+                            ? BIRTHDAY_BORDER_LIGHT
                             : colors.PRIMARY_BORDER_DARK,
                     },
                 ]}
@@ -187,7 +187,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                         styles.avatar,
                         {
                             backgroundColor: isToday
-                                ? BIRTHDAY_BG_STRONG
+                                ? BIRTHDAY_BG_STRONG_LIGHT
                                 : "rgba(157, 101, 6, 0.12)",
                         },
                     ]}
@@ -240,7 +240,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                                 {
                                     backgroundColor: alreadyGreeted
                                         ? "rgba(78, 205, 196, 0.15)"
-                                        : BIRTHDAY_BG,
+                                        : BIRTHDAY_BG_LIGHT,
                                 },
                             ]}
                         >
@@ -299,13 +299,13 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                 {todayBirthdays.length > 0 && (
                     <View style={styles.section}>
                         <View style={styles.sectionHeader}>
-                            <View style={[styles.sectionIcon, { backgroundColor: BIRTHDAY_BG }]}>
+                            <View style={[styles.sectionIcon, { backgroundColor: BIRTHDAY_BG_LIGHT }]}>
                                 <StyledText style={{ fontSize: 14 }}>🎂</StyledText>
                             </View>
                             <StyledText style={[styles.sectionTitle, { color: colors.SECTION_TEXT }]}>
                                 {t("birthday_today")}
                             </StyledText>
-                            <View style={[styles.badge, { backgroundColor: BIRTHDAY_BG_STRONG }]}>
+                            <View style={[styles.badge, { backgroundColor: BIRTHDAY_BG_STRONG_LIGHT }]}>
                                 <StyledText style={[styles.badgeText, { color: BIRTHDAY_LIGHT }]}>
                                     {todayBirthdays.length}
                                 </StyledText>
@@ -338,13 +338,13 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                 {/* All birthdays */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <View style={[styles.sectionIcon, { backgroundColor: BIRTHDAY_BG }]}>
+                        <View style={[styles.sectionIcon, { backgroundColor: BIRTHDAY_BG_LIGHT }]}>
                             <Ionicons name="people-outline" size={14} color={BIRTHDAY_LIGHT} />
                         </View>
                         <StyledText style={[styles.sectionTitle, { color: colors.SECTION_TEXT }]}>
                             {t("birthday_all")}
                         </StyledText>
-                        <View style={[styles.badge, { backgroundColor: BIRTHDAY_BG_STRONG }]}>
+                        <View style={[styles.badge, { backgroundColor: BIRTHDAY_BG_STRONG_LIGHT }]}>
                             <StyledText style={[styles.badgeText, { color: BIRTHDAY_LIGHT }]}>
                                 {birthdays.length}
                             </StyledText>

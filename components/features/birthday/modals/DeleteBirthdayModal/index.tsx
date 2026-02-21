@@ -4,8 +4,9 @@ import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
+import { getStyles } from "./styles";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
 const BIRTHDAY_PRIMARY = "#9D6506";
@@ -24,40 +25,41 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
     onDelete,
     name,
 }) => {
-    const { t, colors } = useTheme();
+    const { t, colors, isDark } = useTheme();
+    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
-            <View style={modalStyles.modalContainer}>
+            <View style={styles.container}>
                 <View
                     style={[
                         modalStyles.iconContainer,
                         {
                             backgroundColor: colors.SECONDARY_BACKGROUND,
                             shadowColor: "#FF6B6B",
-                            shadowOffset: { width: 0, height: 4 },
+                            shadowOffset: { width: 0, height: 2 },
                             shadowOpacity: 0.3,
-                            shadowRadius: 8,
-                            elevation: 5,
+                            shadowRadius: 2,
+                            elevation: 2
                         },
                     ]}
                 >
                     <Ionicons name="trash" size={28} color="#FF6B6B" />
                 </View>
 
-                <StyledText style={modalStyles.headerText}>
+                <StyledText style={styles.headerText}>
                     {t("birthday_delete_title")}
                 </StyledText>
 
                 <View style={modalStyles.divider} />
 
-                <StyledText style={modalStyles.messageText}>
+                <StyledText style={styles.messageText}>
                     {t("birthday_delete_message")}
                 </StyledText>
 
                 {name && (
                     <StyledText
-                        style={[modalStyles.messageText, { fontWeight: "600", color: BIRTHDAY_LIGHT }]}
+                        style={[styles.messageText, { fontWeight: "600", color: BIRTHDAY_LIGHT }]}
                     >
                         {name}
                     </StyledText>

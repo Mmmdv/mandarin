@@ -6,17 +6,17 @@ import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Animated,
     Keyboard,
     Platform,
     ScrollView,
-    StyleSheet,
     TextInput,
     TouchableWithoutFeedback,
     View
 } from "react-native";
+import { getStyles } from "./styles";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
 const BIRTHDAY_PRIMARY = "#9D6506";
@@ -39,7 +39,8 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     onClose,
     onAdd,
 }) => {
-    const { t, colors, theme } = useTheme();
+    const { t, colors, theme, isDark } = useTheme();
+    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
     const router = useRouter();
     const [name, setName] = useState("");
     const [nickname, setNickname] = useState("");
@@ -110,24 +111,24 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={modalStyles.modalContainer}>
+                <View style={styles.container}>
                     <View
                         style={[
                             modalStyles.iconContainer,
                             {
                                 backgroundColor: colors.SECONDARY_BACKGROUND,
                                 shadowColor: BIRTHDAY_PRIMARY,
-                                shadowOffset: { width: 0, height: 4 },
+                                shadowOffset: { width: 0, height: 2 },
                                 shadowOpacity: 0.3,
-                                shadowRadius: 8,
-                                elevation: 5,
+                                shadowRadius: 2,
+                                elevation: 2
                             },
                         ]}
                     >
                         <Ionicons name="gift" size={28} color={BIRTHDAY_LIGHT} />
                     </View>
 
-                    <StyledText style={modalStyles.headerText}>
+                    <StyledText style={styles.headerText}>
                         {t("birthday_add")}
                     </StyledText>
 
@@ -295,44 +296,5 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
         </StyledModal>
     );
 };
-
-const styles = StyleSheet.create({
-    inputGroup: {
-        width: "100%",
-        gap: 4,
-    },
-    label: {
-        fontSize: 12,
-        fontWeight: "500",
-        marginLeft: 4,
-    },
-    input: {
-        width: "100%",
-        height: 44,
-        borderRadius: 10,
-        borderWidth: 1,
-        paddingHorizontal: 14,
-        fontSize: 14,
-    },
-    noteInput: {
-        height: 60,
-        textAlignVertical: "top",
-        paddingTop: 10,
-    },
-    dateButton: {
-        width: "100%",
-        height: 44,
-        borderRadius: 10,
-        borderWidth: 1,
-        paddingHorizontal: 14,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-    },
-    dateText: {
-        fontSize: 14,
-        flex: 1,
-    },
-});
 
 export default AddBirthdayModal;
