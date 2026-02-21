@@ -34,8 +34,8 @@ export default function WeightTracker() {
     const initialWeight = lastWeight || 70;
     const [localWeight, setLocalWeight] = useState<number>(dayData?.weight || initialWeight);
     const [containerWidth, setContainerWidth] = useState(0);
-    const [isExpanded, setIsExpanded] = useState(false);
-    const expandAnim = useRef(new Animated.Value(0)).current;
+    const [isExpanded, setIsExpanded] = useState(true);
+    const expandAnim = useRef(new Animated.Value(1)).current;
 
     const toggleExpanded = () => {
         setIsExpanded(prev => {

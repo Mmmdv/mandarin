@@ -2,8 +2,10 @@ import { useTheme } from "@/hooks/useTheme";
 import { incrementUsage } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
 // import analytics from "@react-native-firebase/analytics";
+import AddBirthdayModal from "@/components/features/birthday/modals/AddBirthdayModal";
 import AddTodoModal from "@/components/features/todo/modals/AddTodoModal";
 import TaskSuccessModal from "@/components/features/todo/modals/TaskSuccessModal";
+import useBirthday from "@/hooks/useBirthday";
 import useTodo from "@/hooks/useTodo";
 import AddMenuModal from "@/layout/Modals/AddMenuModal";
 import { selectIsBreathingActive } from "@/store/slices/appSlice";
@@ -22,9 +24,11 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const routes = state.routes;
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isAddBirthdayModalOpen, setIsAddBirthdayModalOpen] = useState(false);
     const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const { onAddTodo } = useTodo();
+    const { onAddBirthday } = useBirthday();
     const isBreathingActive = useSelector(selectIsBreathingActive);
 
     const VISIBLE_ROUTES = ["index", "today", "stats", "more"];
@@ -201,8 +205,17 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                     setIsAddMenuOpen(false);
                     setTimeout(() => setIsAddModalOpen(true), 300);
                 }}
-                onAddBirthday={() => { }}
+                onAddBirthday={() => {
+                    setIsAddMenuOpen(false);
+                    setTimeout(() => setIsAddBirthdayModalOpen(true), 300);
+                }}
                 onAddMovie={() => { }}
+            />
+
+            <AddBirthdayModal
+                isOpen={isAddBirthdayModalOpen}
+                onClose={() => setIsAddBirthdayModalOpen(false)}
+                onAdd={onAddBirthday}
             />
 
             <TaskSuccessModal

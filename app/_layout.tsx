@@ -1,4 +1,5 @@
 import BiometricGuard from "@/components/features/BiometricGuard/index";
+import ReducedMotionModal from "@/components/features/ReducedMotionModal";
 import { AppStatusBar } from "@/components/layout/AppStatusBar";
 import { useTheme } from "@/hooks/useTheme";
 // Force reload comment 3
@@ -65,6 +66,7 @@ function RootLayoutNav() {
             <Stack.Screen name="(tabs)" options={{ header: () => <Header />, headerShown: true }} />
           </Stack>
         </BiometricGuard>
+        <ReducedMotionModal />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

@@ -71,7 +71,8 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                             icon="gift-outline"
                             label={t("menu_add_birthday")}
                             onPress={onAddBirthday}
-                            disabled={true}
+                            disabled={false}
+                            color="#9D6506"
                         />
                         <View style={{ marginBottom: 0 }}>
                             <MenuItem

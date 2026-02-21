@@ -21,8 +21,8 @@ export default function RatingTracker() {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const shakeAnim = useRef(new Animated.Value(0)).current;
 
-    const [isExpanded, setIsExpanded] = useState(false);
-    const expandAnim = useRef(new Animated.Value(0)).current;
+    const [isExpanded, setIsExpanded] = useState(true);
+    const expandAnim = useRef(new Animated.Value(1)).current;
 
     const toggleExpanded = () => {
         setIsExpanded(prev => {

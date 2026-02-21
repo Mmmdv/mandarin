@@ -4,12 +4,14 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit"
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
 import { createTransform, FLUSH, PAUSE, PERSIST, PersistConfig, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from "redux-persist"
 import appReducer from "./slices/appSlice"
+import birthdayReducer from "./slices/birthdaySlice"
 import notificationReducer from "./slices/notificationSlice"
 import todayReducer from "./slices/todaySlice"
 import todoReducer from "./slices/todoSlice"
 
 const reducers = combineReducers({
     app: appReducer,
+    birthday: birthdayReducer,
     todo: todoReducer,
     notification: notificationReducer,
     today: todayReducer,

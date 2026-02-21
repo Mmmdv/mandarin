@@ -174,64 +174,89 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     if (todos.length === 0 && archivedTodos.length === 0) {
         return (
-            <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={[styles.scrollContent, { flexGrow: 1, justifyContent: 'center' }]}
-                refreshControl={
-                    <StyledRefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                    />
-                }
-            >
-                <View style={styles.emptyContainer}>
-                    <View style={{
-                        width: 120,
-                        height: 120,
-                        backgroundColor: colors.SECONDARY_BACKGROUND,
-                        borderRadius: 60,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: 24,
-                        shadowColor: colors.CHECKBOX_SUCCESS,
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 8,
-                        elevation: 5
-                    }}>
-                        <Ionicons name="add-outline" size={64} color={colors.CHECKBOX_SUCCESS} />
-                    </View>
-                    <StyledText style={{ fontSize: 22, fontWeight: 'bold', color: colors.PRIMARY_TEXT, marginBottom: 8 }}>
-                        {t("start_journey")}
-                    </StyledText>
-                    <StyledText style={{ fontSize: 16, color: colors.PLACEHOLDER, textAlign: 'center', marginBottom: 32, paddingHorizontal: 40 }}>
-                        {t("empty_desc")}
-                    </StyledText>
+            <View style={{ flex: 1 }}>
+                {/* Header */}
+                <View style={[styles.header, { zIndex: 10 }]}>
                     <TouchableOpacity
-                        onPress={onAddRequest}
-                        activeOpacity={0.8}
-                        style={{
+                        onPress={() => {
+                            if (navigation.canGoBack()) {
+                                navigation.goBack();
+                            } else {
+                                router.replace('/');
+                            }
+                        }}
+                        style={{ marginRight: 10, zIndex: 20 }}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 60 }}
+                    >
+                        <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
+                    </TouchableOpacity>
+                    <View style={{ flex: 1, justifyContent: 'center' }} pointerEvents="none">
+                        <StyledText style={styles.greeting}>
+                            {t("tab_todo")}
+                        </StyledText>
+                    </View>
+                    {/* Right spacer to match filled state layout (width and height must match viewToggleButton) */}
+                    <View style={{ width: 40, height: 40 }} />
+                </View>
+                <ScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={[styles.scrollContent, { flexGrow: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 80 }]}
+                    refreshControl={
+                        <StyledRefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    }
+                >
+                    <View style={styles.emptyContainer}>
+                        <View style={{
+                            width: 120,
+                            height: 120,
                             backgroundColor: colors.SECONDARY_BACKGROUND,
-                            paddingVertical: 16,
-                            paddingHorizontal: 32,
-                            borderRadius: 15,
-                            borderWidth: 1,
-                            borderColor: colors.PRIMARY_BORDER_DARK,
-                            flexDirection: 'row',
+                            borderRadius: 60,
                             alignItems: 'center',
-                            gap: 8,
+                            justifyContent: 'center',
+                            marginBottom: 24,
                             shadowColor: colors.CHECKBOX_SUCCESS,
                             shadowOffset: { width: 0, height: 4 },
                             shadowOpacity: 0.3,
                             shadowRadius: 8,
                             elevation: 5
-                        }}
-                    >
-                        <Ionicons name="add" size={24} color={colors.CHECKBOX_SUCCESS} />
-                        <StyledText style={{ color: colors.CHECKBOX_SUCCESS, fontSize: 16, fontWeight: 'bold' }}>{t("create_task")}</StyledText>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView >
+                        }}>
+                            <Ionicons name="add-outline" size={64} color={colors.CHECKBOX_SUCCESS} />
+                        </View>
+                        <StyledText style={{ fontSize: 22, fontWeight: 'bold', color: colors.PRIMARY_TEXT, marginBottom: 8 }}>
+                            {t("start_journey")}
+                        </StyledText>
+                        <StyledText style={{ fontSize: 16, color: colors.PLACEHOLDER, textAlign: 'center', marginBottom: 32, paddingHorizontal: 40 }}>
+                            {t("empty_desc")}
+                        </StyledText>
+                        <TouchableOpacity
+                            onPress={onAddRequest}
+                            activeOpacity={0.8}
+                            style={{
+                                backgroundColor: colors.SECONDARY_BACKGROUND,
+                                paddingVertical: 16,
+                                paddingHorizontal: 32,
+                                borderRadius: 15,
+                                borderWidth: 1,
+                                borderColor: colors.PRIMARY_BORDER_DARK,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 8,
+                                shadowColor: colors.CHECKBOX_SUCCESS,
+                                shadowOffset: { width: 0, height: 4 },
+                                shadowOpacity: 0.3,
+                                shadowRadius: 8,
+                                elevation: 5
+                            }}
+                        >
+                            <Ionicons name="add" size={24} color={colors.CHECKBOX_SUCCESS} />
+                            <StyledText style={{ color: colors.CHECKBOX_SUCCESS, fontSize: 16, fontWeight: 'bold' }}>{t("create_task")}</StyledText>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </View>
         )
     }
 
@@ -251,7 +276,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 >
                     <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>
-                <View style={{ flex: 1, justifyContent: 'center' }}>
+                <View style={{ flex: 1, justifyContent: 'center' }} pointerEvents="none">
                     <StyledText style={styles.greeting}>
                         {t("tab_todo")}
                     </StyledText>

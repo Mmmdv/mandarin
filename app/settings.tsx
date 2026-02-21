@@ -1,6 +1,7 @@
 import ApplicationSection from "@/components/features/settings/sections/ApplicationSection";
 import LanguageSection from "@/components/features/settings/sections/LanguageSection";
 import NotificationSection from "@/components/features/settings/sections/NotificationSection";
+import PermissionsSection from "@/components/features/settings/sections/PermissionsSection";
 import SecuritySection from "@/components/features/settings/sections/SecuritySection";
 import ThemeSection from "@/components/features/settings/sections/ThemeSection";
 import GestureWrapper from "@/components/layout/GestureWrapper";
@@ -30,6 +31,9 @@ export default function SettingsScreen() {
                     <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER }]} />
 
                     <NotificationSection visible={true} />
+                    <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER }]} />
+
+                    <PermissionsSection />
                     <View style={[styles.divider, { backgroundColor: colors.PRIMARY_BORDER }]} />
 
                     <SecuritySection />
