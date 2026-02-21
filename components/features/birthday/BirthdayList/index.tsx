@@ -16,12 +16,11 @@ import DeleteBirthdayModal from "../modals/DeleteBirthdayModal";
 import GreetingModal from "../modals/GreetingModal";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
-// ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
-const BIRTHDAY_PRIMARY = "#9D6506";
-const BIRTHDAY_LIGHT = "#9D6506";
-const BIRTHDAY_BG_LIGHT = "rgba(157, 101, 6, 0.05)";
-const BIRTHDAY_BG_STRONG_LIGHT = "rgba(157, 101, 6, 0.12)";
-const BIRTHDAY_BORDER_LIGHT = "rgba(157, 101, 6, 0.15)";
+const BIRTHDAY_PRIMARY = "#4F46E5";
+const BIRTHDAY_LIGHT = "#6366F1";
+const BIRTHDAY_BG_LIGHT = "rgba(79, 70, 229, 0.08)";
+const BIRTHDAY_BG_STRONG_LIGHT = "rgba(79, 70, 229, 0.15)";
+const BIRTHDAY_BORDER_LIGHT = "rgba(79, 70, 229, 0.15)";
 
 type BirthdayListProps = {
     birthdays: Birthday[];
@@ -44,7 +43,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
     getDaysUntilBirthday,
     getAge,
 }) => {
-    const { colors, t } = useTheme();
+    const { colors, t, isDark } = useTheme(); // Fixed isDark not found error
     const router = useRouter();
     const navigation = useNavigation();
     const { refreshing, onRefresh } = useRefresh();
@@ -141,14 +140,15 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                             style={[
                                 styles.emptyButton,
                                 {
-                                    backgroundColor: colors.SECONDARY_BACKGROUND,
-                                    borderColor: colors.PRIMARY_BORDER_DARK,
+                                    backgroundColor: isDark ? colors.SECONDARY_BACKGROUND : colors.PRIMARY_BACKGROUND,
+                                    borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
                                     shadowColor: BIRTHDAY_PRIMARY,
+                                    shadowOpacity: isDark ? 0.3 : 0.1,
                                 },
                             ]}
                         >
-                            <Ionicons name="add" size={24} color={BIRTHDAY_LIGHT} />
-                            <StyledText style={{ color: BIRTHDAY_LIGHT, fontSize: 16, fontWeight: "bold" }}>
+                            <Ionicons name="add" size={24} color={BIRTHDAY_PRIMARY} />
+                            <StyledText style={{ color: BIRTHDAY_PRIMARY, fontSize: 16, fontWeight: "bold" }}>
                                 {t("birthday_add")}
                             </StyledText>
                         </TouchableOpacity>
@@ -173,11 +173,13 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                     styles.card,
                     {
                         backgroundColor: isToday
-                            ? BIRTHDAY_BG_LIGHT
+                            ? (isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.08)')
                             : colors.SECONDARY_BACKGROUND,
                         borderColor: isToday
-                            ? BIRTHDAY_BORDER_LIGHT
-                            : colors.PRIMARY_BORDER_DARK,
+                            ? 'rgba(79, 70, 229, 0.3)'
+                            : (isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER),
+                        shadowOpacity: isDark ? 0.2 : 0.05,
+                        shadowColor: isToday ? BIRTHDAY_PRIMARY : "#000",
                     },
                 ]}
             >
@@ -187,12 +189,12 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                         styles.avatar,
                         {
                             backgroundColor: isToday
-                                ? BIRTHDAY_BG_STRONG_LIGHT
-                                : "rgba(157, 101, 6, 0.12)",
+                                ? (isDark ? 'rgba(79, 70, 229, 0.3)' : 'rgba(79, 70, 229, 0.15)')
+                                : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'),
                         },
                     ]}
                 >
-                    <StyledText style={styles.avatarText}>
+                    <StyledText style={[styles.avatarText, { color: isToday ? BIRTHDAY_PRIMARY : colors.PRIMARY_TEXT }]}>
                         {isToday ? "🎂" : item.name.charAt(0).toUpperCase()}
                     </StyledText>
                 </View>
@@ -441,9 +443,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 14,
         borderRadius: 14,
-        borderWidth: 0.5,
-        marginBottom: 8,
+        borderWidth: 1,
+        marginBottom: 10,
         gap: 12,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+        elevation: 2,
     },
     avatar: {
         width: 48,

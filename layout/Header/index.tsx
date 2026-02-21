@@ -47,7 +47,10 @@ const Header: React.FC = () => {
         <TouchableOpacity
           onPress={onShare}
           activeOpacity={0.7}
-          style={[styles.iconButton, { opacity: isBreathingActive ? 0.3 : 1 }]}
+          style={[styles.iconButton, {
+            opacity: isBreathingActive ? 0.3 : 1,
+            backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"
+          }]}
           disabled={isBreathingActive}
         >
           <Ionicons name="share-outline" size={22} color={colors.PRIMARY_TEXT} />
@@ -55,7 +58,10 @@ const Header: React.FC = () => {
         <TouchableOpacity
           onPress={() => router.push("/notifications")}
           activeOpacity={0.7}
-          style={[styles.iconButton, { opacity: isBreathingActive ? 0.3 : 1 }]}
+          style={[styles.iconButton, {
+            opacity: isBreathingActive ? 0.3 : 1,
+            backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"
+          }]}
           disabled={isBreathingActive}
         >
           <View>
@@ -92,7 +98,7 @@ const Header: React.FC = () => {
           activeOpacity={0.7}
           style={[styles.iconButton, {
             opacity: isBreathingActive ? 0.3 : 1,
-            backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)"
+            backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"
           }]}
           disabled={isBreathingActive}
         >
@@ -103,7 +109,7 @@ const Header: React.FC = () => {
           activeOpacity={0.7}
           style={[styles.iconButton, {
             opacity: isBreathingActive ? 0.3 : 1,
-            backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)"
+            backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"
           }]}
           disabled={isBreathingActive}
         >
@@ -152,7 +158,7 @@ const styles = StyleSheet.create({
   iconButton: {
     padding: 8,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: "transparent",
   },
 });
 

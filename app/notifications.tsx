@@ -2,7 +2,7 @@ import StyledButton from "@/components/ui/StyledButton";
 import StyledHeader from "@/components/ui/StyledHeader";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { modalStyles } from "@/constants/modalStyles";
+import { getModalStyles } from "@/constants/modalStyles";
 import { formatDate, translateReminderStatus } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/store";
@@ -13,14 +13,15 @@ import React, { useCallback, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const NotificationsPage = () => {
-    const { colors, t, lang } = useTheme();
+    const { colors, t, lang, isDark } = useTheme();
     const dispatch = useAppDispatch();
     const router = useRouter();
     const notifications = useAppSelector(selectNotifications);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
-    const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
+    const [selectedPeriod, setSelectedPeriod] = useState<string>('day');
+    const themedModalStyles = React.useMemo(() => getModalStyles(colors), [colors]);
 
     const filteredNotifications = React.useMemo(() => {
         let result = notifications;
@@ -115,7 +116,12 @@ const NotificationsPage = () => {
                     {
                         backgroundColor: colors.SECONDARY_BACKGROUND,
                         borderColor: colors.PRIMARY_BORDER_DARK,
-                        opacity: isUnread ? 1 : 0.8
+                        opacity: isUnread ? 1 : 0.8,
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: isDark ? 0 : 0.1,
+                        shadowRadius: 2,
+                        elevation: isDark ? 0 : 2
                     }
                 ]}
             >
@@ -137,7 +143,7 @@ const NotificationsPage = () => {
                         numberOfLines={2}
                         ellipsizeMode="tail"
                     >{item.body}</StyledText>
-                    <StyledText style={styles.itemDate}>
+                    <StyledText style={[styles.itemDate, { color: isDark ? "#c2c1c1ff" : colors.PLACEHOLDER }]}>
                         {formatDate(item.date, lang)}
                     </StyledText>
 
@@ -181,10 +187,10 @@ const NotificationsPage = () => {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     data={[
-                        { key: 'all', label: t('all') || 'Hamısı' },
                         { key: 'day', label: t('tab_today') || 'Bugün' },
                         { key: 'week', label: t('stats_week') || 'Həftəlik' },
                         { key: 'month', label: t('stats_month') || 'Aylıq' },
+                        { key: 'all', label: t('all') || 'Hamısı' },
                     ]}
                     keyExtractor={(item) => item.key}
                     contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 16, paddingBottom: 4, flexGrow: 1, justifyContent: 'center' }}
@@ -197,7 +203,7 @@ const NotificationsPage = () => {
                                     paddingHorizontal: 12,
                                     paddingVertical: 6,
                                     borderRadius: 16,
-                                    backgroundColor: isSelected ? '#234E94' : 'transparent',
+                                    backgroundColor: isSelected ? '#234E94' : (isDark ? 'transparent' : 'rgba(0, 0, 0, 0.05)'),
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                 }}
@@ -246,7 +252,7 @@ const NotificationsPage = () => {
                                     paddingHorizontal: 12,
                                     paddingVertical: 6,
                                     borderRadius: 16,
-                                    backgroundColor: isSelected ? '#234E94' : 'transparent',
+                                    backgroundColor: isSelected ? '#234E94' : (isDark ? 'transparent' : 'rgba(0, 0, 0, 0.05)'),
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                 }}
@@ -297,21 +303,30 @@ const NotificationsPage = () => {
 
             {/* Custom Delete Confirmation Modal */}
             <StyledModal isOpen={isDeleteConfirmOpen} onClose={() => setIsDeleteConfirmOpen(false)}>
-                <View style={modalStyles.modalContainer}>
-                    <View style={[modalStyles.iconContainer, {
-                        backgroundColor: colors.SECONDARY_BACKGROUND,
-                        shadowColor: "#FF6B6B",
-                        shadowOffset: { width: 0, height: 4 },
+                <View style={[themedModalStyles.modalContainer, {
+                    borderRadius: 24,
+                    padding: 24,
+                    borderWidth: 0.2,
+                    shadowOpacity: isDark ? 0.3 : 0.2,
+                    shadowRadius: isDark ? 20 : 15,
+                    borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+                    width: 340,
+                    maxWidth: "90%",
+                }]}>
+                    <View style={[themedModalStyles.iconContainer, {
+                        backgroundColor: colors.TAB_BAR,
+                        shadowColor: colors.ERROR_INPUT_TEXT,
+                        shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.3,
-                        shadowRadius: 8,
-                        elevation: 5
+                        shadowRadius: 2,
+                        elevation: 2
                     }]}>
-                        <Ionicons name="trash-outline" size={28} color="#FF6B6B" />
+                        <Ionicons name="trash-outline" size={28} color={colors.ERROR_INPUT_TEXT} />
                     </View>
-                    <StyledText style={modalStyles.headerText}>{t("confirm_delete")}</StyledText>
-                    <View style={modalStyles.divider} />
-                    <StyledText style={modalStyles.messageText}>{t("clear_history_confirm")}</StyledText>
-                    <View style={modalStyles.buttonsContainer}>
+                    <StyledText style={[themedModalStyles.headerText, { fontWeight: 'bold', opacity: 0.8 }]}>{t("confirm_delete")}</StyledText>
+                    <View style={[themedModalStyles.divider, { backgroundColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_TEXT }]} />
+                    <StyledText style={themedModalStyles.messageText}>{t("clear_history_confirm")}</StyledText>
+                    <View style={[themedModalStyles.buttonsContainer, { marginTop: 8 }]}>
                         <StyledButton label={t("cancel")} onPress={() => setIsDeleteConfirmOpen(false)} variant="dark_button" />
                         <StyledButton label={t("delete")} onPress={confirmClearAll} variant="dark_button" />
                     </View>
@@ -350,7 +365,6 @@ const styles = StyleSheet.create({
     },
     itemDate: {
         fontSize: 12,
-        color: "#c2c1c1ff",
         marginBottom: 5,
     },
     emptyContainer: {

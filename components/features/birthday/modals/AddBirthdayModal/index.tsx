@@ -5,6 +5,7 @@ import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as Contacts from 'expo-contacts';
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -13,13 +14,14 @@ import {
     Platform,
     ScrollView,
     TextInput,
+    TouchableOpacity,
     TouchableWithoutFeedback,
     View
 } from "react-native";
 import { getStyles } from "./styles";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
-const BIRTHDAY_PRIMARY = "#9D6506";
+const BIRTHDAY_PRIMARY = "#D4880F";
 const BIRTHDAY_LIGHT = "#D4880F";
 
 type AddBirthdayModalProps = {
@@ -50,6 +52,8 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [nameError, setNameError] = useState(false);
     const [dateError, setDateError] = useState(false);
+    const [contactSelected, setContactSelected] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
 
     const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -62,6 +66,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
             setDate(undefined);
             setNameError(false);
             setDateError(false);
+            setContactSelected(false);
         }
     }, [isOpen]);
 
@@ -84,21 +89,48 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
         onAdd(
             name.trim(),
             date!.toISOString(),
-            nickname.trim() || undefined,
+            undefined,
             phone.trim() || undefined,
-            note.trim() || undefined
+            undefined
         );
         onClose();
     };
 
+    const handleOpenDatePicker = () => {
+        setShowDatePicker(true);
+    };
+
     const onDateChange = (_event: any, selectedDate?: Date) => {
-        if (Platform.OS === "android") {
-            setShowDatePicker(false);
-        }
         if (selectedDate) {
             setDate(selectedDate);
             setDateError(false);
         }
+        if (Platform.OS === "android") {
+            setShowDatePicker(false);
+        }
+    };
+
+    const handlePickContact = async () => {
+        const { status } = await Contacts.requestPermissionsAsync();
+        if (status === 'granted') {
+            const contact = await Contacts.presentContactPickerAsync();
+            if (contact) {
+                const contactName = contact.name ||
+                    [contact.firstName, contact.lastName].filter(Boolean).join(' ') ||
+                    "";
+                setName(contactName);
+                if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+                    setPhone(contact.phoneNumbers[0].number || "");
+                }
+                setContactSelected(true);
+            }
+        }
+    };
+
+    const handleClearContact = () => {
+        setName("");
+        setPhone("");
+        setContactSelected(false);
     };
 
     const formatDate = (d: Date) => {
@@ -117,7 +149,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                             modalStyles.iconContainer,
                             {
                                 backgroundColor: colors.SECONDARY_BACKGROUND,
-                                shadowColor: BIRTHDAY_PRIMARY,
+                                shadowColor: "#9D6506",
                                 shadowOffset: { width: 0, height: 2 },
                                 shadowOpacity: 0.3,
                                 shadowRadius: 2,
@@ -125,7 +157,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                             },
                         ]}
                     >
-                        <Ionicons name="gift" size={28} color={BIRTHDAY_LIGHT} />
+                        <Ionicons name="gift" size={28} color={BIRTHDAY_PRIMARY} />
                     </View>
 
                     <StyledText style={styles.headerText}>
@@ -141,30 +173,37 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                     >
                         {/* 1. Name Input */}
                         <View style={styles.inputGroup}>
-                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                {t("birthday_name")} *
-                            </StyledText>
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    {
-                                        color: colors.PRIMARY_TEXT,
-                                        backgroundColor: colors.PRIMARY_BACKGROUND,
-                                        borderColor: nameError ? "#FF6B6B" : colors.PRIMARY_BORDER_DARK,
-                                    },
-                                ]}
-                                placeholder={t("birthday_name_placeholder")}
-                                placeholderTextColor={colors.PLACEHOLDER}
-                                value={name}
-                                onChangeText={setName}
-                            />
-                        </View>
-
-                        {/* 2. Phone Input (Optional) */}
-                        <View style={styles.inputGroup}>
-                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                {t("birthday_phone")}
-                            </StyledText>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 4 }}>
+                                <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
+                                    {t("birthday_name")} *
+                                </StyledText>
+                                <TouchableOpacity
+                                    onPress={contactSelected ? handleClearContact : handlePickContact}
+                                    activeOpacity={0.7}
+                                    style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: 4,
+                                        backgroundColor: contactSelected ? (isDark ? 'rgba(255, 107, 107, 0.1)' : 'rgba(255, 107, 107, 0.05)') : 'transparent',
+                                        paddingHorizontal: 8,
+                                        paddingVertical: 4,
+                                        borderRadius: 8
+                                    }}
+                                >
+                                    <Ionicons
+                                        name={contactSelected ? "close-circle" : "person-add-outline"}
+                                        size={16}
+                                        color={contactSelected ? "#FF6B6B" : BIRTHDAY_PRIMARY}
+                                    />
+                                    <StyledText style={{
+                                        fontSize: 11,
+                                        fontWeight: '700',
+                                        color: contactSelected ? "#FF6B6B" : BIRTHDAY_PRIMARY
+                                    }}>
+                                        {contactSelected ? t("clear") || "Təmizlə" : t("birthday_pick_contact")}
+                                    </StyledText>
+                                </TouchableOpacity>
+                            </View>
                             <TextInput
                                 style={[
                                     styles.input,
@@ -173,97 +212,87 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                                         backgroundColor: colors.PRIMARY_BACKGROUND,
                                         borderColor: colors.PRIMARY_BORDER_DARK,
                                     },
+                                    isFocused && styles.inputFocused,
+                                    nameError && styles.inputError,
                                 ]}
-                                placeholder="+994 -- --- -- --"
+                                placeholder={t("birthday_name_placeholder")}
                                 placeholderTextColor={colors.PLACEHOLDER}
-                                value={phone}
-                                onChangeText={setPhone}
-                                keyboardType="phone-pad"
+                                value={name}
+                                onChangeText={setName}
+                                onFocus={() => {
+                                    setIsFocused(true);
+                                    setNameError(false);
+                                }}
+                                onBlur={() => setIsFocused(false)}
                             />
                         </View>
+
+                        {/* 2. Phone Input - ONLY visible if contact picked */}
+                        {contactSelected && (
+                            <View style={styles.inputGroup}>
+                                <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
+                                    {t("birthday_phone")}
+                                </StyledText>
+                                <View style={{ position: 'relative', justifyContent: 'center' }}>
+                                    <TextInput
+                                        style={[
+                                            styles.input,
+                                            {
+                                                color: colors.PLACEHOLDER,
+                                                backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                                                borderColor: colors.PRIMARY_BORDER_DARK,
+                                                paddingRight: 40, // Space for the lock icon
+                                            },
+                                        ]}
+                                        placeholder="+994 -- --- -- --"
+                                        placeholderTextColor={colors.PLACEHOLDER}
+                                        value={phone}
+                                        editable={false}
+                                    />
+                                    <View style={{ position: 'absolute', right: 14 }}>
+                                        <Ionicons name="lock-closed" size={16} color={colors.PLACEHOLDER} style={{ opacity: 0.5 }} />
+                                    </View>
+                                </View>
+                            </View>
+                        )}
 
                         {/* 3. Date Picker (Mandatory) */}
                         <View style={styles.inputGroup}>
                             <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
                                 {t("birthday_date")} *
                             </StyledText>
-                            <View
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={handleOpenDatePicker}
                                 style={[
                                     styles.dateButton,
                                     {
                                         backgroundColor: colors.PRIMARY_BACKGROUND,
-                                        borderColor: dateError ? "#FF6B6B" : colors.PRIMARY_BORDER_DARK,
+                                        borderColor: colors.PRIMARY_BORDER_DARK,
                                     },
+                                    dateError && styles.inputError,
                                 ]}
                             >
-                                {Platform.OS === "android" ? (
-                                    <StyledText
-                                        style={[
-                                            styles.dateText,
-                                            { color: date ? colors.PRIMARY_TEXT : colors.PLACEHOLDER },
-                                        ]}
-                                        onPress={() => setShowDatePicker(true)}
-                                    >
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                    <View style={{
+                                        width: 34,
+                                        height: 34,
+                                        borderRadius: 12,
+                                        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }}>
+                                        <Ionicons name="calendar-clear" size={18} color={BIRTHDAY_PRIMARY} />
+                                    </View>
+                                    <StyledText style={{
+                                        fontSize: 14,
+                                        color: date ? colors.PRIMARY_TEXT : colors.PLACEHOLDER
+                                    }}>
                                         {date ? formatDate(date) : t("birthday_date")}
                                     </StyledText>
-                                ) : (
-                                    <DateTimePicker
-                                        value={date || new Date(2000, 0, 1)}
-                                        mode="date"
-                                        display="compact"
-                                        onChange={onDateChange}
-                                        maximumDate={new Date()}
-                                        themeVariant={theme}
-                                        style={{ flex: 1 }}
-                                    />
-                                )}
-                                <Ionicons name="calendar-outline" size={20} color={BIRTHDAY_LIGHT} />
-                            </View>
-                        </View>
-
-                        {/* 4. Nickname Input (Müraciət forması) */}
-                        <View style={styles.inputGroup}>
-                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                {t("birthday_nickname")}
-                            </StyledText>
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    {
-                                        color: colors.PRIMARY_TEXT,
-                                        backgroundColor: colors.PRIMARY_BACKGROUND,
-                                        borderColor: colors.PRIMARY_BORDER_DARK,
-                                    },
-                                ]}
-                                placeholder={t("birthday_nickname_placeholder")}
-                                placeholderTextColor={colors.PLACEHOLDER}
-                                value={nickname}
-                                onChangeText={setNickname}
-                            />
-                        </View>
-
-                        {/* 5. Note Input (Qeyd) */}
-                        <View style={styles.inputGroup}>
-                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                {t("birthday_note")}
-                            </StyledText>
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    styles.noteInput,
-                                    {
-                                        color: colors.PRIMARY_TEXT,
-                                        backgroundColor: colors.PRIMARY_BACKGROUND,
-                                        borderColor: colors.PRIMARY_BORDER_DARK,
-                                    },
-                                ]}
-                                placeholder={t("birthday_note_placeholder")}
-                                placeholderTextColor={colors.PLACEHOLDER}
-                                value={note}
-                                onChangeText={setNote}
-                                multiline
-                                numberOfLines={2}
-                            />
+                                </View>
+                                <Ionicons name="chevron-expand-outline" size={18} color={colors.PLACEHOLDER} />
+                            </TouchableOpacity>
                         </View>
 
                         {/* Android Date Picker */}
@@ -271,10 +300,59 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                             <DateTimePicker
                                 value={date || new Date(2000, 0, 1)}
                                 mode="date"
-                                display="default"
+                                display="spinner"
                                 onChange={onDateChange}
                                 maximumDate={new Date()}
                             />
+                        )}
+
+                        {/* iOS Date Picker Modal */}
+                        {Platform.OS === "ios" && (
+                            <StyledModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)}>
+                                <View style={[modalStyles.modalContainer, {
+                                    backgroundColor: colors.SECONDARY_BACKGROUND,
+                                    borderRadius: 30,
+                                    padding: 24,
+                                    width: 340,
+                                    maxWidth: '90%',
+                                    alignItems: 'center'
+                                }]}>
+                                    <View style={[modalStyles.iconContainer, {
+                                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                                        shadowColor: "#D4880F",
+                                        shadowOffset: { width: 0, height: 2 },
+                                        shadowOpacity: 0.3,
+                                        shadowRadius: 2,
+                                        elevation: 2
+                                    }]}>
+                                        <Ionicons name="time" size={28} color={BIRTHDAY_PRIMARY} />
+                                    </View>
+                                    <StyledText style={styles.headerText}>{t("birthday_date")}</StyledText>
+                                    <View style={modalStyles.divider} />
+                                    <DateTimePicker
+                                        value={date || new Date(2000, 0, 1)}
+                                        mode="date"
+                                        display="spinner"
+                                        onChange={onDateChange}
+                                        maximumDate={new Date()}
+                                        themeVariant={theme}
+                                        style={{ height: 180, width: '100%' }}
+                                    />
+                                    <View style={[modalStyles.buttonsContainer, { marginTop: 20 }]}>
+                                        <StyledButton
+                                            label={t("save")}
+                                            onPress={() => {
+                                                if (!date) {
+                                                    setDate(new Date(2000, 0, 1));
+                                                    setDateError(false);
+                                                }
+                                                setShowDatePicker(false);
+                                            }}
+                                            variant="dark_button"
+                                        />
+                                    </View>
+                                </View>
+                            </StyledModal>
                         )}
                     </ScrollView>
 
@@ -288,12 +366,11 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                             label={t("add")}
                             onPress={onPressAdd}
                             variant="dark_button"
-                            disabled={!name || !date}
                         />
                     </View>
                 </View>
             </TouchableWithoutFeedback>
-        </StyledModal>
+        </StyledModal >
     );
 };
 

@@ -41,23 +41,27 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     },
     input: {
         width: "100%",
-        height: 44,
-        borderRadius: 10,
-        borderWidth: 1,
-        paddingHorizontal: 14,
+        height: 48,
+        borderRadius: 16,
+        borderWidth: 0.2,
+        paddingHorizontal: 16,
         fontSize: 14,
     },
-    noteInput: {
-        height: 60,
-        textAlignVertical: "top",
-        paddingTop: 10,
+    inputFocused: {
+        borderColor: "#4F46E5",
+        borderWidth: 0.2,
+    },
+    inputError: {
+        borderColor: "#FF6B6B",
+        borderWidth: 0.2,
+        backgroundColor: isDark ? "rgba(255, 107, 107, 0.05)" : "rgba(255, 107, 107, 0.02)",
     },
     dateButton: {
         width: "100%",
-        height: 44,
-        borderRadius: 10,
-        borderWidth: 1,
-        paddingHorizontal: 14,
+        height: 48,
+        borderRadius: 16,
+        borderWidth: 0.2,
+        paddingHorizontal: 16,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -66,4 +70,5 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         fontSize: 14,
         flex: 1,
     },
+
 })

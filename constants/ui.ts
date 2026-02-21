@@ -22,7 +22,7 @@ export const DarkTheme = {
   TAB_BAR: "#0d1422ff", // Original secondary background
   ADD_BUTTON: "#384864ff",
   REMINDER: "#FFD166",
-  DARK_BUTTON_BACKGROUND: "#0d1422ff",
+  DARK_BUTTON_BACKGROUND: "#234E94",
   DARK_BUTTON_BORDER: "#3a3f47",
   DARK_BUTTON_SHADOW: "#4ECDC4",
 };
