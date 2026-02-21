@@ -4,7 +4,9 @@ import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useMemo } from "react";
 import { View } from "react-native";
+import { getStyles } from "./styles";
 
 type ResetAppModalProps = {
     isOpen: boolean;
@@ -17,31 +19,32 @@ const ResetAppModal: React.FC<ResetAppModalProps> = ({
     onClose,
     onReset,
 }) => {
-    const { colors, t } = useTheme();
+    const { colors, t, isDark } = useTheme();
+    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
     return (
-        <StyledModal isOpen={isOpen} onClose={onClose}>
-            <View style={modalStyles.modalContainer}>
+        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
+            <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
-                    backgroundColor: colors.SECONDARY_BACKGROUND,
+                    backgroundColor: colors.TAB_BAR,
                     shadowColor: "#FF6B6B",
-                    shadowOffset: { width: 0, height: 4 },
+                    shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 5
+                    shadowRadius: 2,
+                    elevation: 2
                 }]}>
                     <Ionicons name="trash-bin" size={28} color="#FF6B6B" />
                 </View>
 
-                <StyledText style={modalStyles.headerText}>{t("reset_factory_confirm_title")}</StyledText>
+                <StyledText style={styles.headerText}>{t("reset_factory_confirm_title")}</StyledText>
 
                 <View style={modalStyles.divider} />
 
-                <StyledText style={modalStyles.messageText}>
+                <StyledText style={styles.messageText}>
                     {t("reset_factory_confirm_message")}
                 </StyledText>
 
-                <View style={modalStyles.buttonsContainer}>
+                <View style={[modalStyles.buttonsContainer, { marginTop: 10 }]}>
                     <StyledButton
                         label={t("cancel")}
                         onPress={onClose}
