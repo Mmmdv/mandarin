@@ -17,6 +17,7 @@ export default function Birthday() {
         onAddBirthday,
         onDeleteBirthday,
         onMarkGreetingSent,
+        onRescheduleBirthdayNotification,
         getDaysUntilBirthday,
         getAge,
     } = useBirthday();
@@ -30,6 +31,7 @@ export default function Birthday() {
                     upcomingBirthdays={upcomingBirthdays}
                     onDelete={onDeleteBirthday}
                     onMarkGreetingSent={onMarkGreetingSent}
+                    onRescheduleBirthday={onRescheduleBirthdayNotification}
                     onAddRequest={() => setIsAddModalOpen(true)}
                     getDaysUntilBirthday={getDaysUntilBirthday}
                     getAge={getAge}

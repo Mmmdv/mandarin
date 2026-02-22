@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export const getStyles = (colors: any) => StyleSheet.create({
+export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -113,7 +113,7 @@ export const getStyles = (colors: any) => StyleSheet.create({
         color: colors.PRIMARY_TEXT,
     },
     cardBadge: {
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0, 0, 0, 0.06)',
         paddingHorizontal: 10,
         paddingVertical: 2,
         borderRadius: 10,
@@ -131,14 +131,13 @@ export const getStyles = (colors: any) => StyleSheet.create({
         borderRadius: 40,
         bottom: -20,
         right: -20,
-        backgroundColor: 'rgba(255,255,255,0.1)',
         zIndex: 1,
     },
     iconContainer: {
         width: 30,
         height: 30,
         borderRadius: 8,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0, 0, 0, 0.05)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -151,4 +150,4 @@ export const getStyles = (colors: any) => StyleSheet.create({
 
 // Backward compatibility
 import { COLORS } from "@/constants/ui";
-export const styles = getStyles(COLORS);
+export const styles = getStyles(COLORS, false);

@@ -158,6 +158,41 @@ const useBirthday = () => {
         return days > 0 && days <= 30;
     }).sort((a, b) => getDaysUntilBirthday(a.date) - getDaysUntilBirthday(b.date));
 
+    const onRescheduleBirthdayNotification = async (birthdayId: string, newDate: Date) => {
+        const birthday = birthdays.find(b => b.id === birthdayId);
+        if (!birthday) return;
+
+        // Cancel old notification if it exists
+        if (birthday.notificationId) {
+            try {
+                await Notifications.cancelScheduledNotificationAsync(birthday.notificationId);
+            } catch (error) {
+                // ignore
+            }
+            dispatch(updateNotificationStatus({ id: birthday.notificationId, status: "Dəyişdirilib və ləğv olunub" }));
+        }
+
+        // Schedule new notification
+        const displayName = birthday.nickname ? `${birthday.nickname} ${birthday.name}` : birthday.name;
+        const notificationId = await schedulePushNotification(
+            "🎂 Ad günü!",
+            `Bugün ${displayName} ad günüdür!`,
+            newDate,
+            "gift"
+        );
+
+        if (notificationId) {
+            dispatch(addNotification({
+                id: notificationId,
+                title: "🎂 Ad günü!",
+                body: `Bugün ${displayName} ad günüdür!`,
+                date: newDate.toISOString(),
+                categoryIcon: "gift",
+            }));
+            dispatch(editBirthday({ id: birthdayId, notificationId }));
+        }
+    };
+
     return {
         birthdays: sortedBirthdays,
         todayBirthdays,
@@ -166,6 +201,7 @@ const useBirthday = () => {
         onDeleteBirthday,
         onEditBirthday,
         onMarkGreetingSent,
+        onRescheduleBirthdayNotification,
         onResetGreetings,
         getDaysUntilBirthday,
         getAge,

@@ -58,7 +58,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
 
     const { refreshing, onRefresh } = useRefresh();
-    const styles = useMemo(() => getStyles(colors), [colors]);
+    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
     const pendingTodos = todos.filter(todo => !todo.isCompleted && !todo.isArchived)
     const completedTodos = todos.filter(todo => todo.isCompleted && !todo.isArchived)
@@ -168,7 +168,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
             ],
             opacity: anim.interpolate({
                 inputRange: [0, 1],
-                outputRange: [1, 0.4]
+                outputRange: [0.6, 1]
             })
         }
     }
@@ -346,7 +346,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             </Animated.View>
                         </View>
                     </View>
-                    <Animated.View style={[styles.decorativeCircle, getCircleTransform(todoAnimation)]} />
+                    <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(79, 70, 229, 0.12)' }, getCircleTransform(todoAnimation)]} />
                 </TouchableOpacity>
             )}
 
@@ -393,7 +393,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             </Animated.View>
                         </View>
                     </View>
-                    <Animated.View style={[styles.decorativeCircle, getCircleTransform(doneAnimation)]} />
+                    <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(16, 185, 129, 0.12)' }, getCircleTransform(doneAnimation)]} />
                 </TouchableOpacity>
             )}
 
@@ -441,7 +441,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             </Animated.View>
                         </View>
                     </View>
-                    <Animated.View style={[styles.decorativeCircle, getCircleTransform(archiveAnimation)]} />
+                    <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(139, 92, 246, 0.12)' }, getCircleTransform(archiveAnimation)]} />
                 </TouchableOpacity>
             )}
 
@@ -494,7 +494,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                         </Animated.View>
                                     </View>
                                 </View>
-                                <Animated.View style={[styles.decorativeCircle, getCircleTransform(todoAnimation)]} />
+                                <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(79, 70, 229, 0.12)' }, getCircleTransform(todoAnimation)]} />
                             </TouchableOpacity>
                         )}
                         {todoExpanded && (
@@ -557,7 +557,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                         </Animated.View>
                                     </View>
                                 </View>
-                                <Animated.View style={[styles.decorativeCircle, getCircleTransform(doneAnimation)]} />
+                                <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(16, 185, 129, 0.12)' }, getCircleTransform(doneAnimation)]} />
                             </TouchableOpacity>
                         )}
                         {doneExpanded && (
@@ -621,7 +621,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                     </Animated.View>
                                 </View>
                             </View>
-                            <Animated.View style={[styles.decorativeCircle, getCircleTransform(archiveAnimation)]} />
+                            <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(139, 92, 246, 0.12)' }, getCircleTransform(archiveAnimation)]} />
                         </TouchableOpacity>
                     )}
                     {archiveExpanded && (

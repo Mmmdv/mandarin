@@ -4,32 +4,28 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View, useWindowDimensions } from "react-native";
 
-type TodoMenuModalProps = {
+type BirthdayMenuModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    onEdit?: () => void;
-    onRetry?: () => void;
     onDelete?: () => void;
-    onArchive?: () => void;
-    onView?: () => void;
-    isCompleted: boolean;
-    isArchived: boolean;
-    archiveTodoAvailable: boolean;
+    onGreet?: () => void;
+    isToday: boolean;
+    alreadyGreeted: boolean;
+    isCancelled: boolean;
     anchorPosition?: { x: number, y: number, width: number, height: number };
+    onReschedule?: () => void;
 };
 
-const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
+const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
     isOpen,
     onClose,
-    onEdit,
-    onRetry,
     onDelete,
-    onArchive,
-    onView,
-    isCompleted,
-    isArchived,
-    archiveTodoAvailable,
+    onGreet,
+    isToday,
+    alreadyGreeted,
+    isCancelled,
     anchorPosition,
+    onReschedule,
 }) => {
     const { colors, t, isDark } = useTheme();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
@@ -63,27 +59,22 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
     const getMenuPosition = () => {
         if (!anchorPosition) return {};
 
-        // Calculate position
-        const top = anchorPosition.y + anchorPosition.height + 5; // 5px gap
-
-        // Check if the button is on the left or right side of the screen
+        const top = anchorPosition.y + anchorPosition.height + 5;
         const isLeft = anchorPosition.x + (anchorPosition.width / 2) < windowWidth / 2;
 
         if (isLeft) {
-            // Position bottom-right of button (align left edge of menu with left edge of button)
             const left = anchorPosition.x;
             return {
                 position: 'absolute' as const,
                 top: top,
-                left: left < 10 ? 10 : left, // Keep at least 10px from edge
+                left: left < 10 ? 10 : left,
             };
         } else {
-            // Position bottom-left of button (align right edge of menu with right edge of button)
             const right = windowWidth - (anchorPosition.x + anchorPosition.width);
             return {
                 position: 'absolute' as const,
                 top: top,
-                right: right < 10 ? 10 : right, // Keep at least 10px from edge
+                right: right < 10 ? 10 : right,
             };
         }
     };
@@ -108,28 +99,31 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
                         },
                         anchorPosition ? getMenuPosition() : {}
                     ]}>
-                        {/* Common Actions */}
-                        {onView && <MenuItem icon="information-circle-outline" label={t("task_details_modal")} onPress={onView} color={colors.PRIMARY_TEXT} />}
-
-                        {/* Active Todo Actions */}
-                        {!isCompleted && !isArchived && (
-                            <>
-                                {onEdit && <MenuItem icon="create-outline" label={t("edit")} onPress={onEdit} color={colors.PRIMARY_TEXT} />}
-                                {onRetry && <MenuItem icon="sync-outline" label={t("retry")} onPress={onRetry} color={colors.PRIMARY_TEXT} />}
-                            </>
+                        {isToday && onGreet && (
+                            <MenuItem
+                                icon={alreadyGreeted ? "checkmark-circle" : "paper-plane-outline"}
+                                label={alreadyGreeted ? t("birthday_greeting_sent") : t("birthday_send_greeting")}
+                                onPress={alreadyGreeted ? undefined : onGreet}
+                                color={alreadyGreeted ? "#4ECDC4" : undefined}
+                                disabled={alreadyGreeted}
+                            />
                         )}
-
-                        {/* Completed Todo Actions */}
-                        {isCompleted && !isArchived && (
-                            <>
-                                {onRetry && <MenuItem icon="sync-outline" label={t("retry")} onPress={onRetry} color={colors.PRIMARY_TEXT} />}
-                                {archiveTodoAvailable && onArchive && <MenuItem icon="archive-outline" label={t("archive_action")} onPress={onArchive} color={colors.PRIMARY_TEXT} />}
-                            </>
+                        {onReschedule && (
+                            <MenuItem
+                                icon="notifications-outline"
+                                label={t("reschedule")}
+                                onPress={onReschedule}
+                                color={colors.REMINDER}
+                            />
                         )}
-
-                        {/* Common Delete Action */}
-                        {!isCompleted && !isArchived && onDelete && (
-                            <MenuItem icon="trash-outline" label={t("delete")} onPress={onDelete} color={colors.ERROR_INPUT_TEXT} isLast={true} />
+                        {onDelete && (
+                            <MenuItem
+                                icon="trash-outline"
+                                label={t("delete")}
+                                onPress={onDelete}
+                                color={colors.ERROR_INPUT_TEXT}
+                                isLast={true}
+                            />
                         )}
                     </View>
                 </View>
@@ -151,7 +145,6 @@ const styles = StyleSheet.create({
         elevation: 10,
         overflow: 'hidden',
         paddingVertical: 1,
-        // Center if no position
         alignSelf: 'center',
         marginTop: 'auto',
         marginBottom: 'auto',
@@ -177,4 +170,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default TodoMenuModal;
+export default BirthdayMenuModal;

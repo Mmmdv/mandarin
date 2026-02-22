@@ -1,6 +1,8 @@
 import StyledText from "@/components/ui/StyledText";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
+import { usePathname } from "expo-router";
+import React, { useMemo } from "react";
 import { Dimensions, Modal, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 
 type AddMenuModalProps = {
@@ -20,6 +22,45 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
 }) => {
     const { colors, t, isDark } = useTheme();
     const { width } = Dimensions.get('window');
+    const pathname = usePathname();
+
+    const menuItems = useMemo(() => {
+        const items = [
+            {
+                id: 'task',
+                icon: "checkbox-outline" as const,
+                label: t("menu_add_task"),
+                onPress: onAddTask,
+                color: isDark ? "#4ECDC4" : "#168B83",
+                disabled: false
+            },
+            {
+                id: 'birthday',
+                icon: "gift-outline" as const,
+                label: t("menu_add_birthday"),
+                onPress: onAddBirthday,
+                color: isDark ? "#9D6506" : "#A67C00",
+                disabled: false
+            },
+            {
+                id: 'movie',
+                icon: "film-outline" as const,
+                label: t("menu_add_movie"),
+                onPress: onAddMovie,
+                color: isDark ? colors.PRIMARY_TEXT : "#90122E",
+                disabled: true
+            }
+        ];
+
+        if (pathname.includes('todo')) {
+            return items;
+        } else if (pathname.includes('birthday')) {
+            const task = items[0];
+            const birthday = items[1];
+            return [birthday, task, items[2]];
+        }
+        return items;
+    }, [pathname, t, isDark, colors, onAddTask, onAddBirthday, onAddMovie]);
 
     const MenuItem = ({ icon, label, onPress, disabled = false, color }: { icon: keyof typeof Ionicons.glyphMap, label: string, onPress: () => void, disabled?: boolean, color?: string }) => (
         <TouchableOpacity
@@ -68,28 +109,16 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                             left: width / 2 + 20,
                         }
                     ]}>
-                        <MenuItem
-                            icon="checkbox-outline"
-                            label={t("menu_add_task")}
-                            onPress={onAddTask}
-                            color={isDark ? "#4ECDC4" : "#168B83"}
-                        />
-                        <MenuItem
-                            icon="gift-outline"
-                            label={t("menu_add_birthday")}
-                            onPress={onAddBirthday}
-                            disabled={false}
-                            color={isDark ? "#9D6506" : "#A67C00"}
-                        />
-                        <View style={{ marginBottom: 0 }}>
+                        {menuItems.map((item, index) => (
                             <MenuItem
-                                icon="film-outline"
-                                label={t("menu_add_movie")}
-                                onPress={onAddMovie}
-                                disabled={true}
-                                color={isDark ? colors.PRIMARY_TEXT : "#90122E"}
+                                key={item.id}
+                                icon={item.icon}
+                                label={item.label}
+                                onPress={item.onPress}
+                                color={item.color}
+                                disabled={item.disabled}
                             />
-                        </View>
+                        ))}
                     </View>
                 </View>
             </TouchableWithoutFeedback>

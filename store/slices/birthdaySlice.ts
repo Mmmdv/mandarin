@@ -28,10 +28,10 @@ export const birthdaySlice = createSlice({
                 nickname?: string;
                 phone?: string;
                 note?: string;
-                notificationId?: string;
+                notificationId?: string | null;
             }>
         ) => {
-            const { id, ...updates } = action.payload;
+            const { id, notificationId, ...updates } = action.payload;
             state.birthdays = state.birthdays.map(b =>
                 b.id === id
                     ? {
@@ -39,6 +39,7 @@ export const birthdaySlice = createSlice({
                         ...Object.fromEntries(
                             Object.entries(updates).filter(([_, v]) => v !== undefined)
                         ),
+                        notificationId: notificationId === null ? undefined : (notificationId ?? b.notificationId),
                         updatedAt: new Date().toISOString(),
                     }
                     : b

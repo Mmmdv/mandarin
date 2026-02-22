@@ -36,7 +36,7 @@ type TodoItemProps = Todo & {
 import { useTheme } from "@/hooks/useTheme";
 
 const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived, createdAt, completedAt, updatedAt, archivedAt, reminder, reminderCancelled, notificationId, checkTodo, deleteTodo, editTodo, retryTodo, archiveTodo, categoryTitle, categoryIcon, category, viewMode = 'list' }) => {
-    const { t, colors, notificationsEnabled, lang } = useTheme();
+    const { t, colors, isDark, notificationsEnabled, lang } = useTheme();
 
     // Look up status from notification history centralized data
     const notification = useAppSelector(state => notificationId ? selectNotificationById(state, notificationId) : undefined);
@@ -138,14 +138,15 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 {
                     opacity: fadeAnim,
                     transform: [{ scale: scaleAnim }, { translateY: translateAnim }],
-                    backgroundColor: category === 'todo' ? 'rgba(79, 70, 229, 0.07)' :
+                    backgroundColor: category === 'todo' ? (isDark ? colors.SECONDARY_BACKGROUND : 'rgba(79, 70, 229, 0.07)') :
                         category === 'done' ? 'rgba(16, 185, 129, 0.05)' :
                             category === 'archive' ? 'rgba(139, 92, 246, 0.07)' :
                                 colors.SECONDARY_BACKGROUND,
-                    borderColor: category === 'todo' ? 'rgba(79, 70, 229, 0.15)' :
+                    borderColor: category === 'todo' ? (isDark ? colors.PRIMARY_BORDER_DARK : 'rgba(79, 70, 229, 0.15)') :
                         category === 'done' ? 'rgba(16, 185, 129, 0.08)' :
                             category === 'archive' ? 'rgba(139, 92, 246, 0.15)' :
                                 colors.PRIMARY_BORDER_DARK,
+                    borderWidth: isDark ? 0.2 : 1,
                 }
             ]}>
                 <View style={[styles.cardOverlay, {
@@ -288,15 +289,15 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
             {
                 opacity: fadeAnim,
                 transform: [{ scale: scaleAnim }, { translateY: translateAnim }],
-                backgroundColor: category === 'todo' ? 'rgba(79, 70, 229, 0.07)' :
+                backgroundColor: category === 'todo' ? (isDark ? colors.SECONDARY_BACKGROUND : 'rgba(79, 70, 229, 0.07)') :
                     category === 'done' ? 'rgba(16, 185, 129, 0.05)' :
                         category === 'archive' ? 'rgba(139, 92, 246, 0.07)' :
                             colors.SECONDARY_BACKGROUND,
-                borderColor: category === 'todo' ? 'rgba(79, 70, 229, 0.15)' :
+                borderColor: category === 'todo' ? (isDark ? colors.PRIMARY_BORDER_DARK : 'rgba(79, 70, 229, 0.15)') :
                     category === 'done' ? 'rgba(16, 185, 129, 0.08)' :
                         category === 'archive' ? 'rgba(139, 92, 246, 0.15)' :
                             colors.PRIMARY_BORDER_DARK,
-                borderWidth: 1,
+                borderWidth: isDark ? 0.2 : 1,
             }
         ]}>
             <View style={[styles.cardOverlay, {

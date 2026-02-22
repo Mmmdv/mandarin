@@ -77,11 +77,14 @@ export const notificationSlice = createSlice({
                     }
                 }
             });
+        },
+        removeNotification: (state, action: PayloadAction<string>) => {
+            state.notifications = state.notifications.filter(n => n.id !== action.payload);
         }
     },
 });
 
-export const { addNotification, markAllAsRead, clearNotifications, deleteNotification, markAsRead, cancelAllNotifications, updateNotificationStatus } = notificationSlice.actions;
+export const { addNotification, markAllAsRead, clearNotifications, deleteNotification, markAsRead, cancelAllNotifications, updateNotificationStatus, removeNotification } = notificationSlice.actions;
 
 export const selectNotifications = (state: { notification: NotificationState }) => state.notification.notifications;
 export const selectNotificationById = (state: { notification: NotificationState }, id: string) =>
