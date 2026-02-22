@@ -14,6 +14,7 @@ type BirthdayMenuModalProps = {
     isCancelled: boolean;
     anchorPosition?: { x: number, y: number, width: number, height: number };
     onReschedule?: () => void;
+    onViewDetails?: () => void;
 };
 
 const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
@@ -26,6 +27,7 @@ const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
     isCancelled,
     anchorPosition,
     onReschedule,
+    onViewDetails,
 }) => {
     const { colors, t, isDark } = useTheme();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
@@ -59,7 +61,32 @@ const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
     const getMenuPosition = () => {
         if (!anchorPosition) return {};
 
-        const top = anchorPosition.y + anchorPosition.height + 5;
+        // Estimate menu height based on number of items
+        let itemCount = 0;
+        if (onViewDetails) itemCount++;
+        if (isToday && onGreet) itemCount++;
+        if (onReschedule) itemCount++;
+        if (onDelete) itemCount++;
+
+        const ESTIMATED_HEIGHT = itemCount * 54 + 2; // padding + borders
+        const MARGIN = 10;
+
+        // Determine if menu should open upwards or downwards
+        const spaceBelow = windowHeight - (anchorPosition.y + anchorPosition.height + MARGIN);
+        const shouldOpenUpwards = spaceBelow < ESTIMATED_HEIGHT && anchorPosition.y > ESTIMATED_HEIGHT;
+
+        let top = anchorPosition.y + anchorPosition.height + 5;
+        if (shouldOpenUpwards) {
+            top = anchorPosition.y - ESTIMATED_HEIGHT - 5;
+        }
+
+        // Final safety check for top boundary
+        if (top < MARGIN) top = MARGIN;
+        // Final safety check for bottom boundary
+        if (top + ESTIMATED_HEIGHT > windowHeight - MARGIN) {
+            top = windowHeight - ESTIMATED_HEIGHT - MARGIN;
+        }
+
         const isLeft = anchorPosition.x + (anchorPosition.width / 2) < windowWidth / 2;
 
         if (isLeft) {
@@ -67,14 +94,14 @@ const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
             return {
                 position: 'absolute' as const,
                 top: top,
-                left: left < 10 ? 10 : left,
+                left: left < MARGIN ? MARGIN : left,
             };
         } else {
             const right = windowWidth - (anchorPosition.x + anchorPosition.width);
             return {
                 position: 'absolute' as const,
                 top: top,
-                right: right < 10 ? 10 : right,
+                right: right < MARGIN ? MARGIN : right,
             };
         }
     };
@@ -99,6 +126,14 @@ const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
                         },
                         anchorPosition ? getMenuPosition() : {}
                     ]}>
+                        {onViewDetails && (
+                            <MenuItem
+                                icon="eye-outline"
+                                label={t("task_details_modal")}
+                                onPress={onViewDetails}
+                                color={colors.PRIMARY_TEXT}
+                            />
+                        )}
                         {isToday && onGreet && (
                             <MenuItem
                                 icon={alreadyGreeted ? "checkmark-circle" : "paper-plane-outline"}
@@ -113,7 +148,7 @@ const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
                                 icon="notifications-outline"
                                 label={t("reschedule")}
                                 onPress={onReschedule}
-                                color={colors.REMINDER}
+                                color={colors.PRIMARY_TEXT}
                             />
                         )}
                         {onDelete && (

@@ -1,0 +1,103 @@
+import { StyleSheet } from "react-native";
+
+export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
+    container: {
+        borderRadius: 24,
+        borderWidth: 1,
+        padding: 24,
+        width: 340,
+        maxWidth: "90%",
+        gap: 12,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: isDark ? 0.3 : 0.2,
+        shadowRadius: isDark ? 20 : 15,
+        elevation: 10,
+        backgroundColor: colors.SECONDARY_BACKGROUND,
+        borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: "bold",
+        textAlign: 'center',
+        opacity: 0.8,
+        color: colors.PRIMARY_TEXT,
+    },
+    titleSection: {
+        width: '100%',
+        paddingVertical: 12,
+        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+        borderRadius: 16,
+        marginBottom: 8,
+        alignItems: 'center',
+    },
+    titleValue: {
+        fontSize: 20,
+        color: colors.PRIMARY_TEXT,
+        fontWeight: "bold",
+        textAlign: 'center',
+        paddingHorizontal: 16,
+    },
+    nicknameValue: {
+        fontSize: 14,
+        color: colors.SECTION_TEXT,
+        fontWeight: "600",
+        marginTop: 4,
+    },
+    tableContainer: {
+        width: "100%",
+        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+        borderRadius: 16,
+        padding: 4,
+        overflow: 'hidden',
+    },
+    tableRow: {
+        flexDirection: 'row',
+        paddingVertical: 14,
+        paddingHorizontal: 12,
+        alignItems: 'center',
+    },
+    tableRowBorder: {
+        borderTopWidth: 1,
+        borderTopColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+    },
+    tableLabelColumn: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    tableLabelText: {
+        fontSize: 12,
+        color: isDark ? "#aca9a9ff" : "#666",
+        fontWeight: "500",
+    },
+    tableValueColumn: {
+        flex: 1.5,
+        alignItems: 'flex-end',
+    },
+    tableValueText: {
+        fontSize: 12,
+        color: colors.PRIMARY_TEXT,
+        fontWeight: "600",
+    },
+    noteSection: {
+        width: '100%',
+        padding: 12,
+        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+        borderRadius: 12,
+        marginTop: 8,
+    },
+    noteLabel: {
+        fontSize: 12,
+        color: colors.SECTION_TEXT,
+        fontWeight: "bold",
+        marginBottom: 4,
+    },
+    noteValue: {
+        fontSize: 13,
+        color: colors.PRIMARY_TEXT,
+        lineHeight: 18,
+    },
+});

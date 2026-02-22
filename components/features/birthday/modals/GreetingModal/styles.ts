@@ -3,19 +3,19 @@ import { StyleSheet } from "react-native"
 export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     container: {
         borderRadius: 24,
-        borderWidth: 0.2,
+        borderWidth: 1,
         padding: 24,
         width: 340,
         maxWidth: "90%",
-        gap: 12,
+        gap: 8,
         alignItems: 'center',
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: isDark ? 0.3 : 0.2, // Increased opacity for light mode definition
-        shadowRadius: isDark ? 20 : 15,    // Tighter shadow for light mode
+        shadowOpacity: isDark ? 0.3 : 0.2,
+        shadowRadius: isDark ? 20 : 15,
         elevation: 10,
         backgroundColor: colors.SECONDARY_BACKGROUND,
-        borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER, // More distinct border in light mode
+        borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
     },
     headerText: {
         fontSize: 18,
@@ -84,5 +84,53 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     closeText: {
         fontSize: 14,
         fontWeight: "500",
+    },
+    nameBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 30,
+        gap: 8,
+        marginBottom: 12,
+        borderWidth: 1,
+    },
+    recipientLabel: {
+        fontSize: 11,
+        fontWeight: '500',
+        opacity: 0.8,
+        marginBottom: 2,
+    },
+    nameBadgeText: {
+        fontSize: 15,
+        fontWeight: '800',
+    },
+    recipientCard: {
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 12,
+        borderRadius: 16,
+        borderWidth: 1,
+        marginBottom: 0,
+        gap: 12,
+        width: '100%',
+    },
+    recipientAvatar: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    recipientAvatarText: {
+        fontSize: 20,
+        fontWeight: "700",
+    },
+    recipientInfo: {
+        flex: 1,
+    },
+    recipientName: {
+        fontSize: 15,
+        fontWeight: "600",
     },
 })

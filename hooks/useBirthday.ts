@@ -25,9 +25,7 @@ const useBirthday = () => {
     const onAddBirthday = async (
         name: string,
         date: string,
-        nickname?: string,
-        phone?: string,
-        note?: string
+        phone?: string
     ) => {
         const id = generateId();
         let notificationId: string | undefined;
@@ -48,10 +46,9 @@ const useBirthday = () => {
                 notifDate.setFullYear(notifDate.getFullYear() + 1);
             }
 
-            const displayName = nickname ? `${nickname} ${name}` : name;
             notificationId = await schedulePushNotification(
                 "🎂 Ad günü!",
-                `Bugün ${displayName} ad günüdür!`,
+                `Bugün ${name} ad günüdür!`,
                 notifDate,
                 "gift"
             );
@@ -60,7 +57,7 @@ const useBirthday = () => {
                 dispatch(addNotification({
                     id: notificationId,
                     title: "🎂 Ad günü!",
-                    body: `Bugün ${displayName} ad günüdür!`,
+                    body: `Bugün ${name} ad günüdür!`,
                     date: notifDate.toISOString(),
                     categoryIcon: "gift",
                 }));
@@ -71,9 +68,7 @@ const useBirthday = () => {
             id,
             name,
             date,
-            nickname,
             phone,
-            note,
             createdAt: new Date().toISOString(),
             notificationId,
         }));
@@ -99,15 +94,27 @@ const useBirthday = () => {
         id: string,
         name?: string,
         date?: string,
-        nickname?: string,
-        phone?: string,
-        note?: string
+        phone?: string
     ) => {
-        dispatch(editBirthday({ id, name, date, nickname, phone, note }));
+        dispatch(editBirthday({ id, name, date, phone }));
     };
 
-    const onMarkGreetingSent = (id: string) => {
+    const onMarkGreetingSent = async (id: string) => {
         const year = new Date().getFullYear();
+        const birthday = birthdays.find(b => b.id === id);
+
+        if (birthday?.notificationId) {
+            const notification = notifications.find(n => n.id === birthday.notificationId);
+            if (notification && notification.status === "Gözlənilir") {
+                try {
+                    await Notifications.cancelScheduledNotificationAsync(birthday.notificationId);
+                } catch (error) {
+                    // silently ignore
+                }
+                dispatch(updateNotificationStatus({ id: birthday.notificationId, status: "Göndərilib" }));
+            }
+        }
+
         dispatch(markGreetingSent({ id, year }));
     };
 
@@ -173,7 +180,7 @@ const useBirthday = () => {
         }
 
         // Schedule new notification
-        const displayName = birthday.nickname ? `${birthday.nickname} ${birthday.name}` : birthday.name;
+        const displayName = birthday.name;
         const notificationId = await schedulePushNotification(
             "🎂 Ad günü!",
             `Bugün ${displayName} ad günüdür!`,

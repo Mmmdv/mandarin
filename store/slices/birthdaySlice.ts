@@ -25,9 +25,7 @@ export const birthdaySlice = createSlice({
                 id: string;
                 name?: string;
                 date?: string;
-                nickname?: string;
                 phone?: string;
-                note?: string;
                 notificationId?: string | null;
             }>
         ) => {

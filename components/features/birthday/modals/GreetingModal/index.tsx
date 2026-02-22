@@ -1,3 +1,4 @@
+import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
@@ -6,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
 import {
+    Platform,
     ScrollView,
     Share,
     TextInput,
@@ -15,15 +17,13 @@ import {
 import { getStyles } from "./styles";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
-const BIRTHDAY_PRIMARY = "#9D6506";
-const BIRTHDAY_LIGHT = "#D4880F";
+const BIRTHDAY_PRIMARY = "#D4880F";
 
 type GreetingModalProps = {
     isOpen: boolean;
     onClose: () => void;
     onSend: (message: string) => void;
     personName: string;
-    nickname?: string;
 };
 
 const GREETING_KEYS = [
@@ -34,32 +34,59 @@ const GREETING_KEYS = [
     "birthday_greeting_5",
 ] as const;
 
-const GREETING_EMOJIS = ["🎉", "🎈", "🥳", "🎊", "❤️"];
-
 const GreetingModal: React.FC<GreetingModalProps> = ({
     isOpen,
     onClose,
     onSend,
     personName,
-    nickname,
 }) => {
     const { t, colors, isDark } = useTheme();
     const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
     const [customMessage, setCustomMessage] = useState("");
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-    const displayName = nickname ? `${nickname} ${personName}` : personName;
+    const displayName = personName;
 
     const handleShareAndSend = async (message: string, index: number) => {
         try {
             setCopiedIndex(index);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            await Share.share({ message });
-            onSend(message);
-            setTimeout(() => {
+            const result = await Share.share({ message });
+
+            if (result.action === Share.sharedAction) {
+                let isAllowedApp = true;
+
+                // iOS-da hansı tətbiqin seçildiyini yoxlaya bilirik
+                if (Platform.OS === 'ios' && result.activityType) {
+                    const messengerApps = [
+                        'com.apple.UIKit.activity.Message', // iMessage / SMS
+                        'com.apple.UIKit.activity.PostToTwitter', // Twitter
+                        'net.whatsapp.WhatsApp.ShareExtension', // WhatsApp
+                        'ph.telegra.Telegraph.Share', // Telegram
+                        'org.telegram.Telegram-iOS.Share', // Telegram (alt)
+                        'com.facebook.Messenger.ShareExtension', // Facebook Messenger
+                        'com.apple.UIKit.activity.PostToFacebook', // Facebook
+                        'com.google.chat.share-extension', // Google Chat
+                    ];
+                    isAllowedApp = messengerApps.some(app => result.activityType?.includes(app));
+                }
+                // Qeyd: Android platforması gizlilik səbəbi ilə hansı tətbiqin seçildiyi məlumatını tətbiqə ötürmür.
+                // Bu səbəbdən Android-də istənilən paylaşım (Waze daxil) uğurlu sayılacaq.
+
+                if (isAllowedApp) {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    onSend(message);
+                    setTimeout(() => {
+                        setCopiedIndex(null);
+                        onClose();
+                    }, 500);
+                } else {
+                    // Paylaşım edildi, amma seçilən tətbiq (məs: Waze) təbrik tətbiqi sayılmadı
+                    setCopiedIndex(null);
+                }
+            } else {
+                // İstifadəçi paylaşımı ləğv etdi
                 setCopiedIndex(null);
-                onClose();
-            }, 500);
+            }
         } catch (e) {
             setCopiedIndex(null);
         }
@@ -73,7 +100,7 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
     };
 
     return (
-        <StyledModal isOpen={isOpen} onClose={onClose}>
+        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
                 <View
                     style={[
@@ -88,20 +115,37 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
                         },
                     ]}
                 >
-                    <StyledText style={{ fontSize: 28 }}>🎂</StyledText>
+                    <Ionicons name="paper-plane-outline" size={28} color={BIRTHDAY_PRIMARY} />
                 </View>
 
                 <StyledText style={styles.headerText}>
                     {t("birthday_select_greeting")}
                 </StyledText>
 
-                <StyledText
-                    style={[styles.messageText, { fontWeight: "600", color: BIRTHDAY_LIGHT }]}
-                >
-                    {displayName}
-                </StyledText>
-
                 <View style={modalStyles.divider} />
+
+                <View style={[
+                    styles.recipientCard,
+                    {
+                        backgroundColor: isDark ? 'rgba(212, 136, 15, 0.08)' : 'rgba(212, 136, 15, 0.05)',
+                        borderColor: isDark ? 'rgba(212, 136, 15, 0.3)' : 'rgba(212, 136, 15, 0.2)',
+                    }
+                ]}>
+                    <View style={[
+                        styles.recipientAvatar,
+                        { backgroundColor: isDark ? 'rgba(212, 136, 15, 0.2)' : 'rgba(212, 136, 15, 0.1)' }
+                    ]}>
+                        <Ionicons name="gift" size={24} color={BIRTHDAY_PRIMARY} />
+                    </View>
+                    <View style={styles.recipientInfo}>
+                        <StyledText style={[styles.recipientLabel, { color: BIRTHDAY_PRIMARY }]}>
+                            {t("birthday_recipient_label")}
+                        </StyledText>
+                        <StyledText style={[styles.recipientName, { color: colors.PRIMARY_TEXT }]}>
+                            {personName}
+                        </StyledText>
+                    </View>
+                </View>
 
                 <ScrollView
                     style={styles.greetingsScroll}
@@ -113,21 +157,18 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
                             style={[
                                 styles.greetingCard,
                                 {
-                                    backgroundColor: colors.PRIMARY_BACKGROUND,
+                                    backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                                     borderColor: copiedIndex === index
                                         ? "#4ECDC4"
-                                        : colors.PRIMARY_BORDER_DARK,
+                                        : isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
                                 },
                             ]}
                             onPress={() => handleShareAndSend(t(key as any), index)}
                             activeOpacity={0.7}
                         >
-                            <StyledText style={styles.greetingEmoji}>
-                                {GREETING_EMOJIS[index]}
-                            </StyledText>
                             <StyledText
                                 style={[styles.greetingText, { color: colors.PRIMARY_TEXT }]}
-                                numberOfLines={3}
+                                numberOfLines={4}
                             >
                                 {t(key as any)}
                             </StyledText>
@@ -146,8 +187,8 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
                         style={[
                             styles.customContainer,
                             {
-                                backgroundColor: colors.PRIMARY_BACKGROUND,
-                                borderColor: colors.PRIMARY_BORDER_DARK,
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                                borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
                             },
                         ]}
                     >
@@ -165,20 +206,19 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
                                 onPress={handleCustomSend}
                                 style={styles.sendButton}
                             >
-                                <Ionicons name="send" size={20} color={BIRTHDAY_LIGHT} />
+                                <Ionicons name="send" size={20} color={BIRTHDAY_PRIMARY} />
                             </TouchableOpacity>
                         )}
                     </View>
                 </ScrollView>
 
-                <TouchableOpacity
-                    onPress={onClose}
-                    style={[styles.closeButton, { borderColor: colors.PRIMARY_BORDER_DARK }]}
-                >
-                    <StyledText style={[styles.closeText, { color: colors.SECTION_TEXT }]}>
-                        {t("close")}
-                    </StyledText>
-                </TouchableOpacity>
+                <View style={[modalStyles.buttonsContainer, { justifyContent: "center", marginTop: 8 }]}>
+                    <StyledButton
+                        label={t("close")}
+                        onPress={onClose}
+                        variant="dark_button"
+                    />
+                </View>
             </View>
         </StyledModal>
     );

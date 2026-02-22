@@ -10,7 +10,13 @@ import { useNavigation, useRouter } from "expo-router"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Animated, LayoutAnimation, Platform, ScrollView, TouchableOpacity, UIManager, View } from "react-native"
 import ArchiveAllModal from "../modals/ArchiveAllModal.tsx"
+import ArchiveTodoModal from "../modals/ArchiveTodoModal.tsx"
 import ClearArchiveModal from "../modals/ClearArchiveModal.tsx"
+import DeleteTodoModal from "../modals/DeleteTodoModal.tsx"
+import EditTodoModal from "../modals/EditTodoModal.tsx"
+import RetryTodoModal from "../modals/RetryTodoModal.tsx"
+import TodoMenuModal from "../modals/TodoMenuModal"
+import ViewTodoModal from "../modals/ViewTodoModal.tsx"
 import TodoItem from "../TodoItem"
 import SortControls, { SortBy, SortOrder } from "./SortControls"
 import { getStyles } from "./styles"
@@ -59,6 +65,17 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
 
     const { refreshing, onRefresh } = useRefresh();
     const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
+    // Menu modal state
+    const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+    const [menuAnchor, setMenuAnchor] = useState<{ x: number, y: number, width: number, height: number } | undefined>(undefined);
+    const [menuTarget, setMenuTarget] = useState<Todo | undefined>(undefined);
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+    const [isRetryModalOpen, setIsRetryModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
     const pendingTodos = todos.filter(todo => !todo.isCompleted && !todo.isArchived)
     const completedTodos = todos.filter(todo => todo.isCompleted && !todo.isArchived)
@@ -136,6 +153,12 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
     const toggleViewMode = () => {
         setViewMode(prev => (prev === 'list' ? 'card' : 'list'));
     }
+
+    const handleOpenMenu = (todo: Todo, anchor: { x: number, y: number, width: number, height: number }) => {
+        setMenuTarget(todo);
+        setMenuAnchor(anchor);
+        setIsMenuModalOpen(true);
+    };
 
     const getRotation = (anim: any) => {
         return anim.interpolate({
@@ -512,6 +535,11 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                             categoryIcon={categoryIcon}
                                             category="todo"
                                             viewMode={viewMode}
+                                            onOpenMenu={(anchor) => handleOpenMenu(item, anchor)}
+                                            onPress={() => {
+                                                setMenuTarget(item);
+                                                setIsViewModalOpen(true);
+                                            }}
                                         />
                                     ))}
                                 </View>
@@ -576,6 +604,11 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                             categoryIcon={categoryIcon}
                                             category="done"
                                             viewMode={viewMode}
+                                            onOpenMenu={(anchor) => handleOpenMenu(item, anchor)}
+                                            onPress={() => {
+                                                setMenuTarget(item);
+                                                setIsViewModalOpen(true);
+                                            }}
                                         />
                                     ))}
                                 </View>
@@ -639,6 +672,11 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                     categoryIcon={categoryIcon}
                                     category="archive"
                                     viewMode={viewMode}
+                                    onOpenMenu={(anchor) => handleOpenMenu(item, anchor)}
+                                    onPress={() => {
+                                        setMenuTarget(item);
+                                        setIsViewModalOpen(true);
+                                    }}
                                 />
                             ))}
                         </View>
@@ -659,6 +697,98 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                 onClose={() => setIsClearArchiveModalOpen(false)}
                 onClear={onClearArchive}
             />
+
+            {/* Centralized Modals */}
+            {menuTarget && (
+                <>
+                    <TodoMenuModal
+                        isOpen={isMenuModalOpen}
+                        onClose={() => setIsMenuModalOpen(false)}
+                        onEdit={() => setIsEditModalOpen(true)}
+                        onRetry={() => setIsRetryModalOpen(true)}
+                        onDelete={() => setIsDeleteModalOpen(true)}
+                        onArchive={() => setIsArchiveModalOpen(true)}
+                        onView={() => setIsViewModalOpen(true)}
+                        isCompleted={menuTarget.isCompleted}
+                        isArchived={!!menuTarget.isArchived}
+                        archiveTodoAvailable={!!onArchiveTodo}
+                        anchorPosition={menuAnchor}
+                    />
+
+                    <EditTodoModal
+                        isOpen={isEditModalOpen}
+                        onClose={() => {
+                            setIsEditModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                        onEdit={(title, reminder, notificationId) => {
+                            onEditTodo(menuTarget.id, title, reminder, notificationId);
+                            setIsEditModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                        id={menuTarget.id}
+                        initialTitle={menuTarget.title}
+                        initialReminder={menuTarget.reminder}
+                        initialNotificationId={menuTarget.notificationId}
+                        categoryTitle={categoryTitle}
+                        categoryIcon={categoryIcon}
+                    />
+
+                    <DeleteTodoModal
+                        isOpen={isDeleteModalOpen}
+                        onClose={() => {
+                            setIsDeleteModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                        onDelete={() => {
+                            onDeleteTodo(menuTarget.id);
+                            setIsDeleteModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                    />
+
+                    <ArchiveTodoModal
+                        isOpen={isArchiveModalOpen}
+                        onClose={() => {
+                            setIsArchiveModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                        onArchive={() => {
+                            if (onArchiveTodo) onArchiveTodo(menuTarget.id);
+                            setIsArchiveModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                    />
+
+                    <RetryTodoModal
+                        isOpen={isRetryModalOpen}
+                        onClose={() => {
+                            setIsRetryModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                        onRetry={(delayType) => {
+                            onRetryTodo(menuTarget.id, delayType, categoryTitle, categoryIcon);
+                            setIsRetryModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                    />
+
+                    <ViewTodoModal
+                        isOpen={isViewModalOpen}
+                        onClose={() => {
+                            setIsViewModalOpen(false);
+                            setMenuTarget(undefined);
+                        }}
+                        title={menuTarget.title}
+                        createdAt={menuTarget.createdAt}
+                        updatedAt={menuTarget.updatedAt}
+                        completedAt={menuTarget.completedAt}
+                        reminder={menuTarget.reminder}
+                        reminderCancelled={menuTarget.reminderCancelled}
+                        notificationId={menuTarget.notificationId}
+                    />
+                </>
+            )}
         </View>
     )
 }

@@ -30,9 +30,7 @@ type AddBirthdayModalProps = {
     onAdd: (
         name: string,
         date: string,
-        nickname?: string,
-        phone?: string,
-        note?: string
+        phone?: string
     ) => void;
 };
 
@@ -41,13 +39,11 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     onClose,
     onAdd,
 }) => {
-    const { t, colors, theme, isDark } = useTheme();
+    const { t, colors, theme, isDark, lang } = useTheme();
     const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
     const router = useRouter();
     const [name, setName] = useState("");
-    const [nickname, setNickname] = useState("");
     const [phone, setPhone] = useState("");
-    const [note, setNote] = useState("");
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [nameError, setNameError] = useState(false);
@@ -60,9 +56,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     useEffect(() => {
         if (isOpen) {
             setName("");
-            setNickname("");
             setPhone("");
-            setNote("");
             setDate(undefined);
             setNameError(false);
             setDateError(false);
@@ -89,9 +83,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
         onAdd(
             name.trim(),
             date!.toISOString(),
-            undefined,
-            phone.trim() || undefined,
-            undefined
+            phone.trim() || undefined
         );
         onClose();
     };
@@ -133,11 +125,13 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
         setContactSelected(false);
     };
 
-    const formatDate = (d: Date) => {
-        const day = d.getDate().toString().padStart(2, "0");
-        const month = (d.getMonth() + 1).toString().padStart(2, "0");
-        const year = d.getFullYear();
-        return `${day}.${month}.${year}`;
+    const formatDateDisplay = (date: Date) => {
+        const locale = lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US';
+        return date.toLocaleDateString(locale, {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
     };
 
     return (
@@ -288,7 +282,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                                         fontSize: 14,
                                         color: date ? colors.PRIMARY_TEXT : colors.PLACEHOLDER
                                     }}>
-                                        {date ? formatDate(date) : t("birthday_date")}
+                                        {date ? formatDateDisplay(date) : t("birthday_date")}
                                     </StyledText>
                                 </View>
                                 <Ionicons name="chevron-expand-outline" size={18} color={colors.PLACEHOLDER} />
@@ -300,9 +294,10 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                             <DateTimePicker
                                 value={date || new Date(2000, 0, 1)}
                                 mode="date"
-                                display="spinner"
+                                display="default"
                                 onChange={onDateChange}
                                 maximumDate={new Date()}
+                                locale={lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US'}
                             />
                         )}
 
@@ -336,6 +331,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                                         onChange={onDateChange}
                                         maximumDate={new Date()}
                                         themeVariant={theme}
+                                        locale={lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US'}
                                         style={{ height: 180, width: '100%' }}
                                     />
                                     <View style={[modalStyles.buttonsContainer, { marginTop: 20 }]}>

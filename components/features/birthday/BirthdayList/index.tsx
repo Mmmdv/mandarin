@@ -1,6 +1,7 @@
 import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
 import StyledText from "@/components/ui/StyledText";
 import { toggleAnimation } from "@/constants/animations";
+import { formatDate } from "@/helpers/date";
 import useRefresh from "@/hooks/useRefresh";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppSelector } from "@/store";
@@ -19,6 +20,7 @@ import {
     View
 } from "react-native";
 import BirthdayMenuModal from "../modals/BirthdayMenuModal";
+import BirthdayViewModal from "../modals/BirthdayViewModal";
 import DeleteBirthdayModal from "../modals/DeleteBirthdayModal";
 import GreetingModal from "../modals/GreetingModal";
 import { RescheduleBirthdayModal } from "../modals/RescheduleBirthdayModal";
@@ -55,7 +57,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
     getDaysUntilBirthday,
     getAge,
 }) => {
-    const { colors, t, isDark } = useTheme();
+    const { colors, t, isDark, lang } = useTheme();
     const router = useRouter();
     const navigation = useNavigation();
     const { refreshing, onRefresh } = useRefresh();
@@ -64,6 +66,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
     const [deleteTarget, setDeleteTarget] = useState<Birthday | null>(null);
     const [greetingTarget, setGreetingTarget] = useState<Birthday | null>(null);
     const [rescheduleTarget, setRescheduleTarget] = useState<Birthday | null>(null);
+    const [viewTarget, setViewTarget] = useState<Birthday | null>(null);
     const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
     const [menuTarget, setMenuTarget] = useState<Birthday | null>(null);
     const [menuAnchor, setMenuAnchor] = useState<{ x: number, y: number, width: number, height: number } | undefined>(undefined);
@@ -168,7 +171,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
     };
 
     const getDaysColor = (days: number) => {
-        if (days === 0) return BIRTHDAY_LIGHT;
+        if (days === 0) return '#F43F5E';
         if (days === 1) return colors.REMINDER;
         if (days <= 7) return colors.CHECKBOX_SUCCESS;
         return colors.SECTION_TEXT;
@@ -286,85 +289,122 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
         };
 
         return (
-            <View
-                key={item.id}
-                style={[
-                    styles.card,
-                    {
-                        backgroundColor: isToday
-                            ? (isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.08)')
-                            : colors.SECONDARY_BACKGROUND,
-                        borderColor: isToday
-                            ? 'rgba(79, 70, 229, 0.3)'
-                            : (isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER),
-                        shadowOpacity: isDark ? 0.2 : 0.05,
-                        shadowColor: isToday ? BIRTHDAY_PRIMARY : "#000",
-                    },
-                ]}
-            >
-                <View
+            <View key={item.id} style={{ position: 'relative' }}>
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => setViewTarget(item)}
                     style={[
-                        styles.avatar,
+                        styles.card,
                         {
                             backgroundColor: isToday
-                                ? (isDark ? 'rgba(79, 70, 229, 0.3)' : 'rgba(79, 70, 229, 0.15)')
-                                : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'),
+                                ? (isDark ? 'rgba(244, 63, 94, 0.15)' : 'rgba(244, 63, 94, 0.08)')
+                                : colors.SECONDARY_BACKGROUND,
+                            borderColor: isToday
+                                ? 'rgba(244, 63, 94, 0.3)'
+                                : (isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER),
+                            shadowOpacity: isDark ? 0.2 : 0.05,
+                            shadowColor: isToday ? '#F43F5E' : "#000",
                         },
                     ]}
                 >
-                    <StyledText style={[styles.avatarText, { color: isToday ? BIRTHDAY_PRIMARY : colors.PRIMARY_TEXT }]}>
-                        {isToday ? "🎂" : item.name.charAt(0).toUpperCase()}
-                    </StyledText>
-                </View>
-
-                <View style={styles.cardContent}>
-                    <View style={styles.nameRow}>
-                        <StyledText
-                            style={[styles.name, { color: colors.PRIMARY_TEXT }]}
-                            numberOfLines={1}
-                        >
-                            {item.nickname ? `${item.nickname} ` : ""}
-                            {item.name}
-                        </StyledText>
-                    </View>
-
-                    <View style={styles.infoRow}>
-                        <StyledText style={[styles.dateText, { color: colors.SECTION_TEXT }]}>
-                            {formatBirthdayDate(item.date)}
-                        </StyledText>
-                        <View style={styles.dot} />
-                        <StyledText style={[styles.dateText, { color: colors.SECTION_TEXT }]}>
-                            {nextAge} {t("birthday_age")}
-                        </StyledText>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
-                        <View style={[styles.daysBadge, { backgroundColor: getDaysColor(daysUntil) + "20", marginTop: 0 }]}>
-                            <StyledText style={[styles.daysText, { color: getDaysColor(daysUntil) }]}>
-                                {getDaysLabel(daysUntil)}
+                    <View
+                        style={[
+                            styles.avatar,
+                            {
+                                backgroundColor: isToday
+                                    ? (isDark ? 'rgba(244, 63, 94, 0.3)' : 'rgba(244, 63, 94, 0.15)')
+                                    : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'),
+                            },
+                        ]}
+                    >
+                        {isToday ? (
+                            <Ionicons name="gift" size={24} color="#F43F5E" />
+                        ) : (
+                            <StyledText style={[styles.avatarText, { color: colors.PRIMARY_TEXT }]}>
+                                {item.name.charAt(0).toUpperCase()}
                             </StyledText>
-                        </View>
-                        {item.notificationId && (
-                            <View style={styles.notificationStatus}>
-                                <Ionicons
-                                    name={isReminderCancelled ? "notifications-off" : "notifications"}
-                                    size={10}
-                                    color={isReminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER}
-                                />
-                                <StyledText style={{ fontSize: 9, fontWeight: '600', color: isReminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER }}>
-                                    {isReminderCancelled ? t("status_cancelled") : t("status_scheduled")}
-                                </StyledText>
-                            </View>
                         )}
                     </View>
-                </View>
 
-                <View style={styles.actions}>
+                    <View style={styles.cardContent}>
+                        <View style={styles.nameRow}>
+                            <StyledText
+                                style={[styles.name, { color: colors.PRIMARY_TEXT }]}
+                                numberOfLines={1}
+                            >
+                                {item.name}
+                            </StyledText>
+                        </View>
+
+                        <View style={styles.infoRow}>
+                            <StyledText style={[styles.dateText, { color: colors.SECTION_TEXT }]}>
+                                {formatBirthdayDate(item.date)}
+                            </StyledText>
+                            <View style={styles.dot} />
+                            <StyledText style={[styles.dateText, { color: colors.SECTION_TEXT }]}>
+                                {nextAge} {t("birthday_age")}
+                            </StyledText>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                            <View style={[styles.daysBadge, { backgroundColor: getDaysColor(daysUntil) + "20", marginTop: 0 }]}>
+                                <StyledText style={[styles.daysText, { color: getDaysColor(daysUntil) }]}>
+                                    {getDaysLabel(daysUntil)}
+                                </StyledText>
+                            </View>
+                        </View>
+
+                        {isToday ? (
+                            <View style={[styles.notificationStatus, { marginTop: 4, gap: 10 }]}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                    <Ionicons
+                                        name={item.greetingSent ? "checkmark-done-circle-outline" : "close-circle-outline"}
+                                        size={14}
+                                        color={item.greetingSent ? "#4ECDC4" : colors.SECTION_TEXT}
+                                    />
+                                    <StyledText style={{ fontSize: 10, fontWeight: '600', color: item.greetingSent ? "#4ECDC4" : colors.SECTION_TEXT }}>
+                                        {item.greetingSent ? t("birthday_greeting_sent") : t("birthday_greeting_not_sent")}
+                                    </StyledText>
+                                </View>
+                            </View>
+                        ) : (
+                            item.notificationId && (
+                                <View style={[styles.notificationStatus, { marginTop: 4, gap: 10 }]}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                        <Ionicons
+                                            name="alarm-outline"
+                                            size={14}
+                                            color={isReminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER}
+                                        />
+                                        <StyledText style={{
+                                            fontSize: 10,
+                                            fontWeight: '600',
+                                            color: isReminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER,
+                                            textDecorationLine: isReminderCancelled ? 'line-through' : 'none'
+                                        }}>
+                                            {notification?.date ? formatDate(notification.date, lang) : t("status_scheduled")}
+                                        </StyledText>
+                                    </View>
+
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                        {isReminderCancelled ? (
+                                            <Ionicons name="notifications-off" size={12} color={colors.ERROR_INPUT_TEXT} />
+                                        ) : (
+                                            <Ionicons name="hourglass-outline" size={12} color={colors.REMINDER} />
+                                        )}
+                                    </View>
+                                </View>
+                            )
+                        )}
+                    </View>
+                </TouchableOpacity>
+
+                <View style={[styles.actions, { position: 'absolute', right: 14, top: 14, height: 48, justifyContent: 'center' }]}>
                     <TouchableOpacity
                         ref={menuButtonRef}
                         onPress={onOpenMenu}
                         activeOpacity={0.7}
-                        hitSlop={10}
+                        hitSlop={15}
                     >
                         <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={colors.PRIMARY_TEXT} />
                     </TouchableOpacity>
@@ -407,12 +447,12 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                 {todayBirthdays.length > 0 && (
                     <View style={styles.sectionContainer}>
                         <TouchableOpacity
-                            style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(79, 70, 229, 0.3)' : 'rgba(79, 70, 229, 0.15)' }]}
+                            style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(244, 63, 94, 0.15)' : 'rgba(244, 63, 94, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(244, 63, 94, 0.3)' : 'rgba(244, 63, 94, 0.15)' }]}
                             onPress={() => toggleSection(setTodayExpanded, todayAnimation, 'today')}
                         >
                             <View style={styles.sectionTitleContainer}>
-                                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.2)' : 'rgba(79, 70, 229, 0.1)' }]}>
-                                    <Ionicons name="gift-outline" size={18} color={BIRTHDAY_LIGHT} />
+                                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(244, 63, 94, 0.2)' : 'rgba(244, 63, 94, 0.1)' }]}>
+                                    <Ionicons name="sparkles-outline" size={18} color="#F43F5E" />
                                 </View>
                                 <StyledText style={styles.sectionTitleCard}>
                                     {t("birthday_today")}
@@ -429,7 +469,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                                     </Animated.View>
                                 </View>
                             </View>
-                            <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(79, 70, 229, 0.12)' }, getCircleTransform(todayAnimation)]} />
+                            <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(244, 63, 94, 0.12)' }, getCircleTransform(todayAnimation)]} />
                         </TouchableOpacity>
 
                         {todayExpanded && (
@@ -483,7 +523,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                     >
                         <View style={styles.sectionTitleContainer}>
                             <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.2)' : 'rgba(79, 70, 229, 0.1)' }]}>
-                                <Ionicons name="people-outline" size={16} color={BIRTHDAY_LIGHT} />
+                                <Ionicons name="gift-outline" size={18} color={BIRTHDAY_LIGHT} />
                             </View>
                             <StyledText style={styles.sectionTitleCard}>
                                 {t("birthday_all")}
@@ -532,7 +572,6 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                     }
                 }}
                 personName={greetingTarget?.name || ""}
-                nickname={greetingTarget?.nickname}
             />
 
             <BirthdayMenuModal
@@ -541,6 +580,11 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                 anchorPosition={menuAnchor}
                 isToday={getDaysUntilBirthday(menuTarget?.date || "") === 0}
                 alreadyGreeted={!!(menuTarget?.greetingSent && menuTarget?.greetingYear === new Date().getFullYear())}
+                onViewDetails={() => {
+                    if (menuTarget) {
+                        setViewTarget(menuTarget);
+                    }
+                }}
                 onGreet={() => {
                     if (menuTarget) {
                         setGreetingTarget(menuTarget);
@@ -564,6 +608,12 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                         })()
                         : false
                 }
+            />
+
+            <BirthdayViewModal
+                isOpen={!!viewTarget}
+                onClose={() => setViewTarget(null)}
+                birthday={viewTarget}
             />
 
             <RescheduleBirthdayModal

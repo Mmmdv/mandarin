@@ -1,23 +1,17 @@
 import StyledCheckBox from "@/components/ui/StyledCheckBox";
 import StyledText from "@/components/ui/StyledText";
 import { formatDate } from "@/helpers/date";
-import { hyphenateText } from "@/helpers/text"; // Added
+import { hyphenateText } from "@/helpers/text";
+import { useTheme } from "@/hooks/useTheme";
+import { useAppSelector } from "@/store";
+import { selectNotificationById } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, TouchableOpacity, View } from "react-native";
-import ArchiveTodoModal from "../modals/ArchiveTodoModal.tsx";
-import DeleteTodoModal from "../modals/DeleteTodoModal.tsx";
-import EditTodoModal from "../modals/EditTodoModal.tsx";
-import RetryTodoModal from "../modals/RetryTodoModal.tsx";
-import TodoMenuModal from "../modals/TodoMenuModal";
-import ViewTodoModal from "../modals/ViewTodoModal.tsx";
 import CelebrationEffect, { CelebrationType, createCelebrationAnimations, playCelebration } from "./CelebrationEffect";
 import { getStyles } from "./styles";
-
-import { useAppSelector } from "@/store";
-import { selectNotificationById } from "@/store/slices/notificationSlice";
 
 type TodoItemProps = Todo & {
     reminder?: string;
@@ -31,60 +25,25 @@ type TodoItemProps = Todo & {
     categoryIcon?: string
     category?: 'todo' | 'done' | 'archive'
     viewMode?: 'list' | 'card'
+    onOpenMenu?: (anchor: { x: number, y: number, width: number, height: number }) => void
+    onPress?: () => void
 }
 
-import { useTheme } from "@/hooks/useTheme";
-
-const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived, createdAt, completedAt, updatedAt, archivedAt, reminder, reminderCancelled, notificationId, checkTodo, deleteTodo, editTodo, retryTodo, archiveTodo, categoryTitle, categoryIcon, category, viewMode = 'list' }) => {
-    const { t, colors, isDark, notificationsEnabled, lang } = useTheme();
+const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived, createdAt, completedAt, updatedAt, archivedAt, reminder, reminderCancelled, notificationId, checkTodo, deleteTodo, editTodo, retryTodo, archiveTodo, categoryTitle, categoryIcon, category, viewMode = 'list', onOpenMenu, onPress }) => {
+    const { t, colors, isDark, lang } = useTheme();
 
     // Look up status from notification history centralized data
     const notification = useAppSelector(state => notificationId ? selectNotificationById(state, notificationId) : undefined);
     const reminderStatus = notification?.status;
 
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-    const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false)
-    const [isRetryModalOpen, setIsRetryModalOpen] = useState(false)
-    const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-    const [isMenuModalOpen, setIsMenuModalOpen] = useState(false)
-    const [menuAnchor, setMenuAnchor] = useState<{ x: number, y: number, width: number, height: number } | undefined>(undefined)
     const menuButtonRef = useRef<any>(null)
     const [showCelebrate, setShowCelebrate] = useState(false)
     const [celebrationType, setCelebrationType] = useState<CelebrationType>('idea')
 
     const ideaAnimations = useRef(createCelebrationAnimations()).current
 
-    const onPressDelete = () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        setIsDeleteModalOpen(true);
-    }
-
-    const onPressArchive = () => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        setIsArchiveModalOpen(true);
-    }
-
-    const onPressEdit = () => {
-        setIsEditModalOpen(true)
-    }
-
-    const onPressRetry = () => {
-        setIsRetryModalOpen(true);
-    }
-
-    const onConfirmRetry = (delayType: 'hour' | 'day' | 'week' | 'month') => {
-        if (retryTodo) {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            retryTodo(id, delayType, categoryTitle, categoryIcon);
-            setIsRetryModalOpen(false);
-        }
-    }
-
     const handleCheckToken = () => {
-        // Light haptic feedback for both checking and unchecking
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
         if (!isCompleted) {
             setCelebrationType('star')
             playCelebration(ideaAnimations, setShowCelebrate)
@@ -95,10 +54,19 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
     }
 
     const openMenu = () => {
-        menuButtonRef.current?.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
-            setMenuAnchor({ x: pageX, y: pageY, width, height });
-            setIsMenuModalOpen(true);
-        });
+        if (!onOpenMenu) return;
+
+        // Small delay to ensure any ongoing layout animations finish or settle
+        // This is crucial for the menu to appear in the correct position when folders toggle
+        setTimeout(() => {
+            menuButtonRef.current?.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
+                if (pageX === 0 && pageY === 0 && pageY === 0) {
+                    setTimeout(openMenu, 50);
+                    return;
+                }
+                onOpenMenu({ x: pageX, y: pageY, width, height });
+            });
+        }, 64);
     }
 
     // Check if it's a new task (created within last 2 seconds)
@@ -126,11 +94,6 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
 
     const styles = useMemo(() => getStyles(colors), [colors]);
 
-    const backgroundColor = fadeAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [colors.PRIMARY_BORDER_DARK, colors.SECONDARY_BACKGROUND],
-    });
-
     if (viewMode === 'card') {
         return (
             <Animated.View style={[
@@ -157,7 +120,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 }]} />
                 <TouchableOpacity
                     style={styles.cardBody}
-                    onPress={() => setIsViewModalOpen(true)}
+                    onPress={onPress}
                     activeOpacity={0.7}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10 }}>
@@ -223,62 +186,6 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                         </TouchableOpacity>
                     </View>
                 </View>
-
-                {/* Modals */}
-                <EditTodoModal
-                    title={title}
-                    isOpen={isEditModalOpen}
-                    onClose={() => setIsEditModalOpen(false)}
-                    onUpdate={(title, reminder, notificationId) => editTodo(id, title, reminder, notificationId)}
-                    reminder={reminder}
-                    reminderCancelled={reminderCancelled}
-                    notificationId={notificationId}
-                    categoryTitle={categoryTitle}
-                    categoryIcon={categoryIcon}
-                />
-                <RetryTodoModal
-                    isOpen={isRetryModalOpen}
-                    onClose={() => setIsRetryModalOpen(false)}
-                    onRetry={onConfirmRetry}
-                />
-                <DeleteTodoModal
-                    isOpen={isDeleteModalOpen}
-                    onClose={() => setIsDeleteModalOpen(false)}
-                    onDelete={() => deleteTodo(id)}
-                />
-                {
-                    archiveTodo && (
-                        <ArchiveTodoModal
-                            isOpen={isArchiveModalOpen}
-                            onClose={() => setIsArchiveModalOpen(false)}
-                            onArchive={() => archiveTodo(id)}
-                        />
-                    )
-                }
-                <ViewTodoModal
-                    isOpen={isViewModalOpen}
-                    onClose={() => setIsViewModalOpen(false)}
-                    title={title}
-                    createdAt={createdAt}
-                    updatedAt={updatedAt}
-                    completedAt={completedAt}
-                    reminder={reminder}
-                    reminderCancelled={reminderCancelled}
-                    notificationId={notificationId}
-                />
-                <TodoMenuModal
-                    isOpen={isMenuModalOpen}
-                    onClose={() => setIsMenuModalOpen(false)}
-                    onEdit={onPressEdit}
-                    onRetry={onPressRetry}
-                    onDelete={onPressDelete}
-                    onArchive={archiveTodo ? onPressArchive : undefined}
-                    onView={() => setIsViewModalOpen(true)}
-                    isCompleted={isCompleted}
-                    isArchived={!!isArchived}
-                    archiveTodoAvailable={!!archiveTodo}
-                    anchorPosition={menuAnchor}
-                />
             </Animated.View>
         );
     }
@@ -321,7 +228,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 )}
                 <TouchableOpacity
                     style={styles.textContainer}
-                    onPress={() => setIsViewModalOpen(true)}
+                    onPress={onPress} // Open view modal via onOpenMenu if we want, or handle separately
                     onLongPress={handleCheckToken}
                     activeOpacity={0.7}
                 >
@@ -381,62 +288,9 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 >
                     <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>
-                <RetryTodoModal
-                    isOpen={isRetryModalOpen}
-                    onClose={() => setIsRetryModalOpen(false)}
-                    onRetry={onConfirmRetry}
-                />
-                <ViewTodoModal
-                    isOpen={isViewModalOpen}
-                    onClose={() => setIsViewModalOpen(false)}
-                    title={title}
-                    createdAt={createdAt}
-                    updatedAt={updatedAt}
-                    completedAt={completedAt}
-                    reminder={reminder}
-                    reminderCancelled={reminderCancelled}
-                    notificationId={notificationId}
-                />
-
-                <EditTodoModal
-                    title={title}
-                    isOpen={isEditModalOpen}
-                    onClose={() => setIsEditModalOpen(false)}
-                    onUpdate={(title, reminder, notificationId) => editTodo(id, title, reminder, notificationId)}
-                    reminder={reminder}
-                    reminderCancelled={reminderCancelled}
-                    notificationId={notificationId}
-                    categoryTitle={categoryTitle}
-                    categoryIcon={categoryIcon}
-                />
-                <DeleteTodoModal
-                    isOpen={isDeleteModalOpen}
-                    onClose={() => setIsDeleteModalOpen(false)}
-                    onDelete={() => deleteTodo(id)}
-                />
-                {archiveTodo && (
-                    <ArchiveTodoModal
-                        isOpen={isArchiveModalOpen}
-                        onClose={() => setIsArchiveModalOpen(false)}
-                        onArchive={() => archiveTodo(id)}
-                    />
-                )}
-                <TodoMenuModal
-                    isOpen={isMenuModalOpen}
-                    onClose={() => setIsMenuModalOpen(false)}
-                    onEdit={onPressEdit}
-                    onRetry={onPressRetry}
-                    onDelete={onPressDelete}
-                    onArchive={archiveTodo ? onPressArchive : undefined}
-                    onView={() => setIsViewModalOpen(true)}
-                    isCompleted={isCompleted}
-                    isArchived={!!isArchived}
-                    archiveTodoAvailable={!!archiveTodo}
-                    anchorPosition={menuAnchor}
-                />
             </View>
         </Animated.View>
     )
 }
 
-export default TodoItem
+export default TodoItem;

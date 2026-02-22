@@ -52,7 +52,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
                     shadowRadius: 2,
                     elevation: 2
                 }]}>
-                    <Ionicons name="checkbox" size={28} color="#4ECDC4" />
+                    <Ionicons name="eye-outline" size={28} color="#4ECDC4" />
                 </View>
 
                 <StyledText style={styles.headerText}>{t("task_details")}</StyledText>
