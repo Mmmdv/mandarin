@@ -84,16 +84,17 @@ const StyledButton: React.FC<StyledButtonProps> = ({ label, icon, size, variant,
             disabled={disabled}
             activeOpacity={activeOpacity ?? 0.7}
         >
+            {icon && <Ionicons
+                name={icon}
+                size={iconSize}
+                color={contrastColor}
+                style={{ marginRight: label ? 8 : 0 }}>
+            </Ionicons>}
             {label && <StyledText
                 variant={textVariant}
                 style={{ color: contrastColor }}>
                 {label}
             </StyledText>}
-            {icon && <Ionicons
-                name={icon}
-                size={iconSize}
-                color={contrastColor}>
-            </Ionicons>}
         </TouchableOpacity>
     )
 }

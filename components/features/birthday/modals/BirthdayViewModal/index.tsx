@@ -125,7 +125,20 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
                                     <Ionicons name="hourglass-outline" size={14} color={colors.REMINDER} />
                                 )}
                                 <StyledText style={[styles.tableValueText, { color: isReminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER }]}>
-                                    {notification?.date ? formatDate(notification.date, lang) : (isReminderCancelled ? t("status_cancelled") : t("pending"))}
+                                    {notification?.date ? formatDate(notification.date, lang) : (
+                                        isReminderCancelled ? t("status_cancelled") : (
+                                            (() => {
+                                                const d = new Date(birthday.date);
+                                                const today = new Date();
+                                                const isActualToday = d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
+                                                if (isActualToday) {
+                                                    const todayNotif = new Date(today.getFullYear(), d.getMonth(), d.getDate(), 9, 0);
+                                                    return formatDate(todayNotif.toISOString(), lang);
+                                                }
+                                                return t("pending");
+                                            })()
+                                        )
+                                    )}
                                 </StyledText>
                             </View>
                         </View>

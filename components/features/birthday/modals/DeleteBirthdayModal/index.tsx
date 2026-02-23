@@ -58,11 +58,28 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
                 </StyledText>
 
                 {name && (
-                    <StyledText
-                        style={[styles.messageText, { fontWeight: "600", color: BIRTHDAY_LIGHT }]}
-                    >
-                        {name}
-                    </StyledText>
+                    <View style={[
+                        styles.recipientCard,
+                        {
+                            backgroundColor: isDark ? 'rgba(212, 136, 15, 0.08)' : 'rgba(212, 136, 15, 0.05)',
+                            borderColor: isDark ? 'rgba(212, 136, 15, 0.3)' : 'rgba(212, 136, 15, 0.2)',
+                            marginTop: 8
+                        }
+                    ]}>
+                        <View style={[
+                            styles.recipientAvatar,
+                            { backgroundColor: isDark ? 'rgba(212, 136, 15, 0.2)' : 'rgba(212, 136, 15, 0.1)' }
+                        ]}>
+                            <StyledText style={{ color: BIRTHDAY_LIGHT, fontSize: 18, fontWeight: 'bold' }}>
+                                {name?.charAt(0).toUpperCase()}
+                            </StyledText>
+                        </View>
+                        <View style={styles.recipientInfo}>
+                            <StyledText style={[styles.recipientName, { color: colors.PRIMARY_TEXT }]}>
+                                {name}
+                            </StyledText>
+                        </View>
+                    </View>
                 )}
 
                 <View style={modalStyles.buttonsContainer}>

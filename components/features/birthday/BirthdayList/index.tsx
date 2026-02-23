@@ -354,8 +354,8 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                             </View>
                         </View>
 
-                        {isToday ? (
-                            <View style={[styles.notificationStatus, { marginTop: 4, gap: 10 }]}>
+                        <View style={[styles.notificationStatus, { marginTop: 4, gap: 10 }]}>
+                            {isToday ? (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                     <Ionicons
                                         name={item.greetingSent ? "checkmark-done-circle-outline" : "close-circle-outline"}
@@ -366,10 +366,8 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                                         {item.greetingSent ? t("birthday_greeting_sent") : t("birthday_greeting_not_sent")}
                                     </StyledText>
                                 </View>
-                            </View>
-                        ) : (
-                            item.notificationId && (
-                                <View style={[styles.notificationStatus, { marginTop: 4, gap: 10 }]}>
+                            ) : (
+                                item.notificationId && (
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                         <Ionicons
                                             name="alarm-outline"
@@ -384,22 +382,20 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                                         }}>
                                             {notification?.date ? formatDate(notification.date, lang) : t("status_scheduled")}
                                         </StyledText>
-                                    </View>
-
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                        {isReminderCancelled ? (
-                                            <Ionicons name="notifications-off" size={12} color={colors.ERROR_INPUT_TEXT} />
-                                        ) : (
+                                        {!isReminderCancelled && (
                                             <Ionicons name="hourglass-outline" size={12} color={colors.REMINDER} />
                                         )}
+                                        {isReminderCancelled && (
+                                            <Ionicons name="notifications-off" size={12} color={colors.ERROR_INPUT_TEXT} />
+                                        )}
                                     </View>
-                                </View>
-                            )
-                        )}
+                                )
+                            )}
+                        </View>
                     </View>
                 </TouchableOpacity>
 
-                <View style={[styles.actions, { position: 'absolute', right: 14, top: 14, height: 48, justifyContent: 'center' }]}>
+                <View style={{ position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' }}>
                     <TouchableOpacity
                         ref={menuButtonRef}
                         onPress={onOpenMenu}
