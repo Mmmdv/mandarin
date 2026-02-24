@@ -9,8 +9,6 @@ import { View } from "react-native";
 import { getStyles } from "./styles";
 
 // ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
-const BIRTHDAY_PRIMARY = "#9D6506";
-const BIRTHDAY_LIGHT = "#D4880F";
 
 type DeleteBirthdayModalProps = {
     isOpen: boolean;
@@ -36,7 +34,7 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
                         modalStyles.iconContainer,
                         {
                             backgroundColor: colors.SECONDARY_BACKGROUND,
-                            shadowColor: "#FF6B6B",
+                            shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                             shadowOffset: { width: 0, height: 2 },
                             shadowOpacity: 0.3,
                             shadowRadius: 2,
@@ -44,7 +42,7 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
                         },
                     ]}
                 >
-                    <Ionicons name="trash" size={28} color="#FF6B6B" />
+                    <Ionicons name="trash" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                 </View>
 
                 <StyledText style={styles.headerText}>
@@ -61,16 +59,17 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
                     <View style={[
                         styles.recipientCard,
                         {
-                            backgroundColor: isDark ? 'rgba(212, 136, 15, 0.08)' : 'rgba(212, 136, 15, 0.05)',
-                            borderColor: isDark ? 'rgba(212, 136, 15, 0.3)' : 'rgba(212, 136, 15, 0.2)',
+                            backgroundColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER + "80",
+                            borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+                            borderWidth: 0.2,
                             marginTop: 8
                         }
                     ]}>
                         <View style={[
                             styles.recipientAvatar,
-                            { backgroundColor: isDark ? 'rgba(212, 136, 15, 0.2)' : 'rgba(212, 136, 15, 0.1)' }
+                            { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }
                         ]}>
-                            <StyledText style={{ color: BIRTHDAY_LIGHT, fontSize: 18, fontWeight: 'bold' }}>
+                            <StyledText style={{ color: colors.PRIMARY_TEXT, fontSize: 18, fontWeight: 'bold' }}>
                                 {name?.charAt(0).toUpperCase()}
                             </StyledText>
                         </View>

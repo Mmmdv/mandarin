@@ -50,7 +50,7 @@ export default function Index() {
           onClearArchive={onClearArchive}
           archivedTodos={archivedTodos}
           onAddRequest={() => setIsAddModalOpen(true)}
-          categoryTitle={t("tab_todo")}
+          categoryTitle={t("notifications_todo")}
           categoryIcon="list"
         />
 
@@ -58,7 +58,7 @@ export default function Index() {
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           onAdd={handleAddTodo}
-          categoryTitle={t("tab_todo")}
+          categoryTitle={t("notifications_todo")}
           categoryIcon="list"
         />
       </View>

@@ -197,7 +197,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
         let notificationId: string | undefined;
 
         if (finalDate && notificationsEnabled && todoNotifications) {
-            const displayTitle = categoryTitle || t("tab_todo");
+            const displayTitle = categoryTitle || t("notifications_todo");
             notificationId = await schedulePushNotification(displayTitle, title, finalDate, categoryIcon);
             if (notificationId) {
                 dispatch(addNotification({
@@ -249,13 +249,13 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                 <View style={themedLocalStyles.container}>
                     <View style={[modalStyles.iconContainer, {
                         backgroundColor: colors.TAB_BAR,
-                        shadowColor: colors.CHECKBOX_SUCCESS,
+                        shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.3,
                         shadowRadius: 2,
                         elevation: 2
                     }]}>
-                        <Ionicons name="add" size={28} color={colors.CHECKBOX_SUCCESS} />
+                        <Ionicons name="add" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                     </View>
 
                     <StyledText style={themedLocalStyles.headerText}>{t("add")}</StyledText>
@@ -377,7 +377,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                     <Ionicons
                                         name={isRecording ? "mic" : "cloud-upload"}
                                         size={32}
-                                        color={isRecording ? "#ea4335" : colors.CHECKBOX_SUCCESS}
+                                        color={isRecording ? "#ea4335" : colors.PRIMARY_ACTIVE_BUTTON}
                                     />
                                 </View>
                                 <StyledText style={themedLocalStyles.voiceModalStatusText}>
@@ -450,7 +450,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                             <View style={themedModalStyles.modalContainer}>
                                 <View style={[themedModalStyles.iconContainer, {
                                     backgroundColor: colors.TAB_BAR,
-                                    shadowColor: picker.showDatePicker ? "#5BC0EB" : colors.REMINDER,
+                                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                                     shadowOffset: { width: 0, height: 2 },
                                     shadowOpacity: 0.3,
                                     shadowRadius: 2,
@@ -459,7 +459,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                                     <Ionicons
                                         name={picker.showDatePicker ? "calendar" : "time"}
                                         size={28}
-                                        color={picker.showDatePicker ? "#5BC0EB" : colors.REMINDER}
+                                        color={colors.PRIMARY_ACTIVE_BUTTON}
                                     />
                                 </View>
 
@@ -520,13 +520,13 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                         <View style={themedModalStyles.modalContainer}>
                             <View style={[themedModalStyles.iconContainer, {
                                 backgroundColor: colors.TAB_BAR,
-                                shadowColor: colors.REMINDER,
+                                shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                                 shadowOffset: { width: 0, height: 2 },
                                 shadowOpacity: 0.3,
                                 shadowRadius: 2,
                                 elevation: 2
                             }]}>
-                                <Ionicons name="notifications" size={28} color={colors.REMINDER} />
+                                <Ionicons name="notifications" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                             </View>
 
                             <StyledText style={themedModalStyles.headerText}>{t("enable_notifications")}</StyledText>
@@ -569,13 +569,13 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                         <View style={themedModalStyles.modalContainer}>
                             <View style={[themedModalStyles.iconContainer, {
                                 backgroundColor: colors.TAB_BAR,
-                                shadowColor: "#FFB74D",
+                                shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                                 shadowOffset: { width: 0, height: 2 },
                                 shadowOpacity: 0.3,
                                 shadowRadius: 2,
                                 elevation: 2
                             }]}>
-                                <Ionicons name="alert-circle" size={28} color="#FFB74D" />
+                                <Ionicons name="alert-circle" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                             </View>
 
                             <StyledText style={themedModalStyles.headerText}>{t("attention")}</StyledText>

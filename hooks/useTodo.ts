@@ -5,6 +5,7 @@ import { addNotification, updateNotificationStatus } from "@/store/slices/notifi
 import { addTodo, archiveAllTodos, archiveTodo, checkTodo, clearArchive, deleteTodo, editTodo, selectTodos } from "@/store/slices/todoSlice";
 import { Todo } from "@/types/todo";
 import * as Notifications from 'expo-notifications';
+import { useTheme } from "./useTheme";
 
 // Random ID generator 
 const generateId = (): string => {
@@ -16,6 +17,7 @@ const useTodo = () => {
     const dispatch = useAppDispatch();
     const settings = useAppSelector(selectAppSettings); // Added
 
+    const { t } = useTheme();
     const notifications = useAppSelector(state => state.notification.notifications);
 
     const onAddTodo = (title: Todo["title"], reminder?: string, notificationId?: string) => {
@@ -57,7 +59,7 @@ const useTodo = () => {
         newReminder = newDate.toISOString();
 
         if (newDate > new Date() && settings.notificationsEnabled && settings.todoNotifications) {
-            const displayTitle = categoryTitle || "Tapşırıqlar";
+            const displayTitle = categoryTitle || t("notifications_todo");
             newNotificationId = await schedulePushNotification(displayTitle, todo.title, newDate, categoryIcon);
             if (newNotificationId) {
                 dispatch(addNotification({

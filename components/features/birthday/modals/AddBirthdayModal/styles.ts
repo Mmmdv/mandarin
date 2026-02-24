@@ -1,74 +1,61 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet } from "react-native";
 
 export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
-    container: {
-        borderRadius: 24,
-        borderWidth: 0.2,
-        padding: 24,
-        width: 340,
-        maxWidth: "90%",
-        gap: 12,
-        alignItems: 'center',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: isDark ? 0.3 : 0.2, // Increased opacity for light mode definition
-        shadowRadius: isDark ? 20 : 15,    // Tighter shadow for light mode
-        elevation: 10,
+
+    iconContainer: {
         backgroundColor: colors.SECONDARY_BACKGROUND,
-        borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER, // More distinct border in light mode
+        shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+        elevation: 2
     },
-    headerText: {
-        fontSize: 18,
-        fontWeight: "bold",
-        textAlign: 'center',
-        opacity: 0.8,
-        color: colors.PRIMARY_TEXT,
+    scrollView: {
+        width: '100%',
+        maxHeight: 400
     },
-    messageText: {
-        fontSize: 14,
-        color: colors.PLACEHOLDER,
-        textAlign: "center",
-        lineHeight: 20,
+    scrollContent: {
+        gap: 12,
+        paddingBottom: 10
     },
-    inputGroup: {
-        width: "100%",
-        gap: 4,
+    inputInline: {
+        textAlign: 'right',
+        padding: 0,
+        minWidth: 100,
     },
-    label: {
-        fontSize: 12,
-        fontWeight: "500",
-        marginLeft: 4,
+    nameRow: {
+        borderRadius: 12
     },
-    input: {
-        width: "100%",
-        height: 48,
-        borderRadius: 16,
-        borderWidth: 0.2,
-        paddingHorizontal: 16,
-        fontSize: 14,
+    dateRow: {
+        borderBottomLeftRadius: 12,
+        borderBottomRightRadius: 12
     },
-    inputFocused: {
-        borderColor: "#4F46E5",
-        borderWidth: 0.2,
+    phoneInput: {
+        color: colors.PLACEHOLDER
+    },
+    contactButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        paddingVertical: 10,
+        marginTop: 4,
+        borderRadius: 12,
+        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+        borderWidth: 0.5,
+        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+    },
+    contactButtonText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: colors.SECTION_TEXT
     },
     inputError: {
         borderColor: "#FF6B6B",
         borderWidth: 0.2,
         backgroundColor: isDark ? "rgba(255, 107, 107, 0.05)" : "rgba(255, 107, 107, 0.02)",
     },
-    dateButton: {
-        width: "100%",
-        height: 48,
-        borderRadius: 16,
-        borderWidth: 0.2,
-        paddingHorizontal: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-    },
-    dateText: {
-        fontSize: 14,
-        flex: 1,
-    },
-
-})
+    buttonsContainerMargin: {
+        marginTop: 16
+    }
+});

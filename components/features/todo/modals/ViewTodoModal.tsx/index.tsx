@@ -46,13 +46,13 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
                     backgroundColor: colors.TAB_BAR,
-                    shadowColor: colors.CHECKBOX_SUCCESS,
+                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
                     shadowRadius: 2,
                     elevation: 2
                 }]}>
-                    <Ionicons name="eye-outline" size={28} color="#4ECDC4" />
+                    <Ionicons name="eye-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                 </View>
 
                 <StyledText style={styles.headerText}>{t("task_details")}</StyledText>

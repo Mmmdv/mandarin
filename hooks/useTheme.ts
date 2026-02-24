@@ -22,7 +22,7 @@ export const useTheme = () => {
     const isDark = theme === Theme.DARK;
 
     const t = (key: TranslationKey) => {
-        return TRANSLATIONS[lang][key] || key;
+        return (TRANSLATIONS[lang] as any)[key] || key;
     };
 
     return {

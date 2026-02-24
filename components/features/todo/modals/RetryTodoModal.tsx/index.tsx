@@ -27,13 +27,13 @@ const RetryTodoModal: React.FC<RetryTodoModalProps> = ({
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
                     backgroundColor: colors.TAB_BAR,
-                    shadowColor: "#4F46E5",
+                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
                     shadowRadius: 2,
                     elevation: 2
                 }]}>
-                    <Ionicons name="sync-outline" size={28} color="#4F46E5" />
+                    <Ionicons name="sync-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                 </View>
 
                 <StyledText style={styles.headerText}>{t("retry_confirm_title")}</StyledText>

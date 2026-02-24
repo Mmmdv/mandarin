@@ -10,6 +10,7 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     header: {
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: 'space-between',
         paddingTop: 15,
         paddingBottom: 10,
         paddingHorizontal: 20,
@@ -18,13 +19,6 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         fontSize: 24,
         marginBottom: 4,
         fontWeight: "bold",
-    },
-    addButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        justifyContent: "center",
-        alignItems: "center",
     },
     scrollContent: {
         paddingHorizontal: 16,
@@ -54,7 +48,7 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     sectionTitleContainer: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
+        gap: 6,
         width: 175,
         zIndex: 2,
     },
@@ -102,6 +96,7 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         alignItems: 'flex-end',
         justifyContent: 'center',
     },
+    // List Item Styles
     card: {
         flexDirection: "row",
         alignItems: "center",
@@ -114,6 +109,83 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 4,
         elevation: 2,
+    },
+    // Grid Item Styles
+    gridCard: {
+        width: '48.5%',
+        borderRadius: 20,
+        padding: 15,
+        marginBottom: 10,
+        borderWidth: 0.2,
+        height: 165,
+        justifyContent: 'space-between',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+        position: 'relative',
+        overflow: 'hidden',
+    },
+    gridCardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+    },
+    gridAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    gridAvatarText: {
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    gridCardBody: {
+        flex: 1,
+        justifyContent: 'center',
+        marginTop: 8,
+    },
+    gridName: {
+        fontSize: 15,
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    gridDate: {
+        fontSize: 12,
+        opacity: 0.8,
+    },
+    gridCardFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 'auto',
+        paddingTop: 8,
+        borderTopWidth: 0.2,
+        borderTopColor: colors.PRIMARY_BORDER_DARK,
+    },
+    gridMetadata: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        flex: 1,
+    },
+    gridDaysBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 6,
+    },
+    gridDaysText: {
+        fontSize: 10,
+        fontWeight: '600',
+    },
+    gridContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        paddingVertical: 5,
     },
     avatar: {
         width: 48,
@@ -180,6 +252,14 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
+    viewToggleButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 0.2,
+    },
     emptyContainer: {
         flex: 1,
         justifyContent: "center",
@@ -210,5 +290,10 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 5,
+    },
+    stickySectionHeader: {
+        marginHorizontal: 16,
+        marginTop: 6,
+        marginBottom: 2,
     },
 });

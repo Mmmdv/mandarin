@@ -136,10 +136,9 @@ const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
                         )}
                         {isToday && onGreet && (
                             <MenuItem
-                                icon={alreadyGreeted ? "checkmark-circle" : "paper-plane-outline"}
+                                icon="paper-plane-outline"
                                 label={alreadyGreeted ? t("birthday_greeting_sent") : t("birthday_send_greeting")}
                                 onPress={alreadyGreeted ? undefined : onGreet}
-                                color={alreadyGreeted ? "#4ECDC4" : undefined}
                                 disabled={alreadyGreeted}
                             />
                         )}

@@ -1,20 +1,16 @@
 import StyledText from "@/components/ui/StyledText";
+import { useTheme } from "@/hooks/useTheme";
 import { Lobster_400Regular, useFonts } from '@expo-google-fonts/lobster';
 import React, { forwardRef } from "react";
-import { Dimensions, ImageBackground, StyleSheet, View } from "react-native";
+import { ImageBackground, StyleSheet, View, useWindowDimensions } from "react-native";
 import ViewShot from "react-native-view-shot";
 
-const { width: W } = Dimensions.get('window');
-const CARD_WIDTH = W * 0.65;
-const CARD_HEIGHT = CARD_WIDTH * 1.25;
-
-export type BirthdayBackgroundHandle = 'v1' | 'v2' | 'v3' | 'v4';
+export type BirthdayBackgroundHandle = 'v1' | 'v2' | 'v3'
 
 const BACKGROUNDS = {
-    v1: require("@/assets/images/Birthday/birthday_background_v1.webp"),
-    v2: require("@/assets/images/Birthday/birthday_background_v2.webp"),
-    v3: require("@/assets/images/Birthday/birthday_background_v3.webp"),
-    v4: require("@/assets/images/Birthday/birthday_background_v4.webp"),
+    v1: require("@/assets/images/Birthday/birthday_background_v1.jpg"),
+    v2: require("@/assets/images/Birthday/birthday_background_v2.jpg"),
+    v3: require("@/assets/images/Birthday/birthday_background_v3.jpg"),
 };
 
 type BirthdayCardPreviewProps = {
@@ -23,34 +19,65 @@ type BirthdayCardPreviewProps = {
 };
 
 const BirthdayCardPreview = forwardRef<ViewShot, BirthdayCardPreviewProps>(({ message, backgroundHandle }, ref) => {
+    const { t } = useTheme();
+    const { width: W } = useWindowDimensions();
+    const CARD_WIDTH = W * 0.53;
+    const CARD_HEIGHT = 255;
+
+    const [isImageLoaded, setIsImageLoaded] = React.useState(false);
     const [fontsLoaded] = useFonts({
         Lobster_400Regular,
     });
 
-    if (!fontsLoaded) return null;
+    if (!fontsLoaded) return (
+        <View style={{ width: CARD_WIDTH, height: CARD_HEIGHT, backgroundColor: 'transparent' }} />
+    );
+
+    const isDarkBg = backgroundHandle === 'v1' || backgroundHandle === 'v2' || backgroundHandle === 'v3';
+    const textColor = isDarkBg ? '#fadb75ff' : '#fadb75ff'; // Premium Gold color for dark backgrounds
 
     return (
-        <ViewShot ref={ref} options={{ format: 'png', quality: 1.0 }} style={styles.viewShot}>
-            <ImageBackground
-                source={BACKGROUNDS[backgroundHandle]}
-                style={styles.background}
-                resizeMode="stretch"
-            >
-                <View style={styles.textContainer}>
-                    <StyledText style={styles.messageText}>
-                        {message}
-                    </StyledText>
-                </View>
-            </ImageBackground>
-        </ViewShot>
+        <View pointerEvents="none" style={{ borderRadius: 15, overflow: 'hidden', opacity: isImageLoaded ? 1 : 0 }}>
+            <ViewShot ref={ref} options={{ format: 'jpg', quality: 0.9 }} style={[styles.viewShot, { width: CARD_WIDTH, height: CARD_HEIGHT }]}>
+                <ImageBackground
+                    source={BACKGROUNDS[backgroundHandle]}
+                    style={styles.background}
+                    resizeMode="stretch"
+                    onLoad={() => setIsImageLoaded(true)}
+                >
+                    {/* Main Greeting Message */}
+                    <View style={[styles.textContainer, {
+                        left: CARD_WIDTH * 0.400,
+                        top: CARD_HEIGHT * -0.01,
+                        width: CARD_WIDTH * 0.370,
+                        height: CARD_HEIGHT * 0.500,
+                        transform: [{ rotate: '10deg' }],
+                    }]}>
+                        <StyledText style={[styles.messageText, { fontSize: CARD_WIDTH * 0.045, color: textColor, opacity: 0.95 }]}>
+                            {message}
+                        </StyledText>
+                    </View>
+
+                    {/* Happy Birthday Static Text */}
+                    <View style={[styles.nameContainer, {
+                        left: CARD_WIDTH * 0.15,
+                        top: CARD_HEIGHT * 0.52,
+                        width: CARD_WIDTH * 0.250,
+                        height: CARD_HEIGHT * 0.500,
+                        transform: [{ rotate: '14deg' }],
+                    }]}>
+                        <StyledText style={[styles.nameText, { fontSize: CARD_WIDTH * 0.045, color: textColor, opacity: 0.9 }]}>
+                            {t("birthday_happy_birthday")}
+                        </StyledText>
+                    </View>
+                </ImageBackground>
+            </ViewShot>
+        </View>
     );
 });
 
 const styles = StyleSheet.create({
     viewShot: {
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT,
-        borderRadius: 16,
         overflow: 'hidden',
         alignSelf: 'center',
     },
@@ -60,18 +87,24 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         position: 'absolute',
-        left: CARD_WIDTH * 0.167,
-        top: CARD_HEIGHT * 0.25, // Moved up from 0.313
-        width: CARD_WIDTH * 0.676,
-        height: CARD_HEIGHT * 0.410,
         justifyContent: 'center',
         alignItems: 'center',
     },
     messageText: {
         fontFamily: 'Lobster_400Regular',
-        fontSize: CARD_WIDTH * 0.08, // Reduced from 0.08
         color: '#4A2B0F',
         textAlign: 'center',
+        letterSpacing: 1,
+    },
+    nameContainer: {
+        position: 'absolute',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+    },
+    nameText: {
+        fontFamily: 'Lobster_400Regular',
+        textAlign: 'right',
+        letterSpacing: 1,
     },
 });
 

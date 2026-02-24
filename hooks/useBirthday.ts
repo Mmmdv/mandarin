@@ -47,16 +47,15 @@ const useBirthday = () => {
             }
 
             notificationId = await schedulePushNotification(
-                "🎂 Ad günü!",
+                "Ad günü xatırlatması",
                 `Bugün ${name} ad günüdür!`,
-                notifDate,
-                "gift"
+                notifDate
             );
 
             if (notificationId) {
                 dispatch(addNotification({
                     id: notificationId,
-                    title: "🎂 Ad günü!",
+                    title: "Ad günü xatırlatması",
                     body: `Bugün ${name} ad günüdür!`,
                     date: notifDate.toISOString(),
                     categoryIcon: "gift",
@@ -182,16 +181,15 @@ const useBirthday = () => {
         // Schedule new notification
         const displayName = birthday.name;
         const notificationId = await schedulePushNotification(
-            "🎂 Ad günü!",
+            "Ad günü xatırlatması",
             `Bugün ${displayName} ad günüdür!`,
-            newDate,
-            "gift"
+            newDate
         );
 
         if (notificationId) {
             dispatch(addNotification({
                 id: notificationId,
-                title: "🎂 Ad günü!",
+                title: "Ad günü xatırlatması",
                 body: `Bugün ${displayName} ad günüdür!`,
                 date: newDate.toISOString(),
                 categoryIcon: "gift",

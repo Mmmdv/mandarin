@@ -32,13 +32,13 @@ const ArchiveTodoModal: React.FC<ArchiveTodoModalProps> = ({
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
                     backgroundColor: colors.TAB_BAR,
-                    shadowColor: colors.PLACEHOLDER,
+                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
                     shadowRadius: 2,
                     elevation: 2
                 }]}>
-                    <Ionicons name="archive-outline" size={28} color={colors.PLACEHOLDER} />
+                    <Ionicons name="archive-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                 </View>
 
                 <StyledText style={styles.headerText}>{t("archive_confirm_title")}</StyledText>

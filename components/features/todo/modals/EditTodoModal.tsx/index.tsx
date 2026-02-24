@@ -125,13 +125,13 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
             <View style={themedLocalStyles.container}>
                 <View style={[modalStyles.iconContainer, {
                     backgroundColor: colors.TAB_BAR,
-                    shadowColor: "#5BC0EB",
+                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
                     shadowRadius: 2,
                     elevation: 2
                 }]}>
-                    <Ionicons name="create-outline" size={28} color="#5BC0EB" />
+                    <Ionicons name="create-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                 </View>
 
                 <StyledText style={themedLocalStyles.headerText}>{t("edit")}</StyledText>
@@ -238,7 +238,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                         <View style={themedModalStyles.modalContainer}>
                             <View style={[themedModalStyles.iconContainer, {
                                 backgroundColor: colors.TAB_BAR,
-                                shadowColor: picker.showDatePicker ? "#5BC0EB" : colors.REMINDER,
+                                shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                                 shadowOffset: { width: 0, height: 4 },
                                 shadowOpacity: 0.3,
                                 shadowRadius: 8,
@@ -247,7 +247,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                                 <Ionicons
                                     name={picker.showDatePicker ? "calendar" : "time"}
                                     size={28}
-                                    color={picker.showDatePicker ? "#5BC0EB" : colors.REMINDER}
+                                    color={colors.PRIMARY_ACTIVE_BUTTON}
                                 />
                             </View>
 
@@ -307,13 +307,13 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     <View style={themedModalStyles.modalContainer}>
                         <View style={[themedModalStyles.iconContainer, {
                             backgroundColor: colors.TAB_BAR,
-                            shadowColor: colors.REMINDER,
+                            shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                             shadowOffset: { width: 0, height: 4 },
                             shadowOpacity: 0.3,
                             shadowRadius: 8,
                             elevation: 5
                         }]}>
-                            <Ionicons name="notifications" size={28} color={colors.REMINDER} />
+                            <Ionicons name="notifications" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                         </View>
 
                         <StyledText style={themedModalStyles.headerText}>{t("enable_notifications")}</StyledText>
@@ -353,13 +353,13 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     <View style={themedModalStyles.modalContainer}>
                         <View style={[themedModalStyles.iconContainer, {
                             backgroundColor: colors.TAB_BAR,
-                            shadowColor: "#FFB74D",
+                            shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                             shadowOffset: { width: 0, height: 4 },
                             shadowOpacity: 0.3,
                             shadowRadius: 8,
                             elevation: 5
                         }]}>
-                            <Ionicons name="alert-circle" size={28} color="#FFB74D" />
+                            <Ionicons name="alert-circle" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                         </View>
 
                         <StyledText style={themedModalStyles.headerText}>{t("attention")}</StyledText>

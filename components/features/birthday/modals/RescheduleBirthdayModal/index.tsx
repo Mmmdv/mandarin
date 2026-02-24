@@ -7,9 +7,8 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useEffect, useMemo, useState } from "react";
 import { Platform, TouchableOpacity, View } from "react-native";
-import { getStyles } from "../AddBirthdayModal/styles";
-
-const BIRTHDAY_PRIMARY = "#4F46E5";
+import { getStyles as getViewStyles } from "../BirthdayViewModal/styles";
+import { getStyles as getLocalStyles } from "./styles";
 
 type RescheduleBirthdayModalProps = {
     isOpen: boolean;
@@ -25,7 +24,8 @@ export function RescheduleBirthdayModal({
     onReschedule,
 }: RescheduleBirthdayModalProps) {
     const { t, colors, theme, isDark } = useTheme();
-    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+    const styles = useMemo(() => getViewStyles(colors, isDark), [colors, isDark]);
+    const localStyles = useMemo(() => getLocalStyles(colors, isDark), [colors, isDark]);
     const [date, setDate] = useState<Date>(new Date());
     const [showPicker, setShowPicker] = useState(false);
     const [pickerMode, setPickerMode] = useState<'date' | 'time'>('date');
@@ -77,22 +77,15 @@ export function RescheduleBirthdayModal({
     };
 
     return (
-        <StyledModal isOpen={isOpen} onClose={onClose}>
+        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
                 <View
                     style={[
                         modalStyles.iconContainer,
-                        {
-                            backgroundColor: colors.SECONDARY_BACKGROUND,
-                            shadowColor: BIRTHDAY_PRIMARY,
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.3,
-                            shadowRadius: 2,
-                            elevation: 2
-                        },
+                        localStyles.iconContainer,
                     ]}
                 >
-                    <Ionicons name="calendar-outline" size={28} color={BIRTHDAY_PRIMARY} />
+                    <Ionicons name="calendar-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                 </View>
 
                 <StyledText style={styles.headerText}>
@@ -102,7 +95,7 @@ export function RescheduleBirthdayModal({
                 <View style={modalStyles.divider} />
 
                 {/* Quick Presets */}
-                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16, width: '100%' }}>
+                <View style={localStyles.presetsRow}>
                     {[
                         { h: 9, label: t("preset_morning") },
                         { h: 14, label: t("preset_afternoon") },
@@ -111,64 +104,116 @@ export function RescheduleBirthdayModal({
                         <TouchableOpacity
                             key={preset.h}
                             onPress={() => setQuickTime(preset.h)}
-                            style={{
-                                flex: 1,
-                                padding: 8,
-                                borderRadius: 12,
-                                backgroundColor: date.getHours() === preset.h ? BIRTHDAY_PRIMARY : colors.PRIMARY_BORDER,
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
+                            style={[
+                                localStyles.presetButton,
+                                {
+                                    backgroundColor: date.getHours() === preset.h ? colors.PRIMARY_ACTIVE_BUTTON : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'),
+                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                                }
+                            ]}
                         >
-                            <StyledText style={{ fontSize: 10, fontWeight: '700', color: date.getHours() === preset.h ? '#FFF' : colors.PRIMARY_TEXT, textAlign: 'center' }}>
+                            <StyledText style={[
+                                localStyles.presetText,
+                                { color: date.getHours() === preset.h ? '#FFF' : colors.SECTION_TEXT }
+                            ]}>
                                 {preset.label}
                             </StyledText>
                         </TouchableOpacity>
                     ))}
                 </View>
 
-                <View style={{ flexDirection: 'row', gap: 12, width: '100%', marginBottom: 16 }}>
-                    <View style={{ flex: 1.5, gap: 4 }}>
-                        <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>{t("date")}</StyledText>
-                        <StyledButton
-                            label={formatDateOnly(date)}
-                            onPress={() => {
-                                setPickerMode('date');
-                                setShowPicker(true);
-                            }}
-                            variant="gray_button"
-                            style={{ height: 48, borderRadius: 16 }}
-                        />
-                    </View>
-                    <View style={{ flex: 1, gap: 4 }}>
-                        <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>{t("time")}</StyledText>
-                        <StyledButton
-                            label={formatTimeOnly(date)}
-                            onPress={() => {
-                                setPickerMode('time');
-                                setShowPicker(true);
-                            }}
-                            variant="gray_button"
-                            style={{ height: 48, borderRadius: 16 }}
-                        />
-                    </View>
+                <View style={styles.tableContainer}>
+                    <TouchableOpacity
+                        style={styles.tableRow}
+                        onPress={() => {
+                            setPickerMode('date');
+                            setShowPicker(true);
+                        }}
+                    >
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="calendar-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("date")}</StyledText>
+                        </View>
+                        <View style={styles.tableValueColumn}>
+                            <StyledText style={styles.tableValueText}>
+                                {formatDateOnly(date)}
+                            </StyledText>
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.tableRow, styles.tableRowBorder]}
+                        onPress={() => {
+                            setPickerMode('time');
+                            setShowPicker(true);
+                        }}
+                    >
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="time-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("time")}</StyledText>
+                        </View>
+                        <View style={styles.tableValueColumn}>
+                            <StyledText style={styles.tableValueText}>
+                                {formatTimeOnly(date)}
+                            </StyledText>
+                        </View>
+                    </TouchableOpacity>
                 </View>
 
-                {(showPicker || Platform.OS === "ios") && (
-                    <View style={{ width: '100%', marginBottom: 16 }}>
-                        <DateTimePicker
-                            value={date}
-                            mode={pickerMode}
-                            display={Platform.OS === "ios" ? "spinner" : "default"}
-                            onChange={onDateChange}
-                            minimumDate={new Date()}
-                            themeVariant={theme}
-                            style={Platform.OS === "ios" ? { height: 120, width: '100%' } : undefined}
-                        />
-                    </View>
+                {/* Android Picker */}
+                {Platform.OS === "android" && showPicker && (
+                    <DateTimePicker
+                        value={date}
+                        mode={pickerMode}
+                        display="default"
+                        onChange={onDateChange}
+                        minimumDate={new Date()}
+                    />
                 )}
 
-                <View style={[modalStyles.buttonsContainer, { marginTop: 10 }]}>
+                {/* iOS Picker Modal */}
+                {Platform.OS === "ios" && (
+                    <StyledModal isOpen={showPicker} onClose={() => setShowPicker(false)}>
+                        <View style={styles.container}>
+                            <View style={[modalStyles.iconContainer, {
+                                backgroundColor: colors.SECONDARY_BACKGROUND,
+                                shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
+                                shadowOffset: { width: 0, height: 2 },
+                                shadowOpacity: 0.3,
+                                shadowRadius: 2,
+                                elevation: 2
+                            }]}>
+                                <Ionicons
+                                    name={pickerMode === 'date' ? "calendar-outline" : "time-outline"}
+                                    size={28}
+                                    color={colors.PRIMARY_ACTIVE_BUTTON}
+                                />
+                            </View>
+                            <StyledText style={styles.headerText}>
+                                {pickerMode === 'date' ? t("date") : t("time")}
+                            </StyledText>
+                            <View style={modalStyles.divider} />
+                            <DateTimePicker
+                                value={date}
+                                mode={pickerMode}
+                                display="spinner"
+                                onChange={onDateChange}
+                                minimumDate={new Date()}
+                                themeVariant={theme}
+                                style={{ height: 180, width: '100%' }}
+                            />
+                            <View style={[modalStyles.buttonsContainer, { marginTop: 20 }]}>
+                                <StyledButton
+                                    label={t("save")}
+                                    onPress={() => setShowPicker(false)}
+                                    variant="dark_button"
+                                />
+                            </View>
+                        </View>
+                    </StyledModal>
+                )}
+
+                <View style={[modalStyles.buttonsContainer, localStyles.buttonsContainerMargin]}>
                     <StyledButton
                         label={t("cancel")}
                         onPress={onClose}
@@ -185,4 +230,4 @@ export function RescheduleBirthdayModal({
     );
 }
 
-// export default RescheduleBirthdayModal;
+export default RescheduleBirthdayModal;

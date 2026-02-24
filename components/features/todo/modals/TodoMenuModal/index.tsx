@@ -74,7 +74,6 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
         } else if (isCompleted && !isArchived) {
             if (onRetry) visibleItems.push('retry');
             if (archiveTodoAvailable && onArchive) visibleItems.push('archive');
-            if (onDelete) visibleItems.push('delete'); // Allow delete for completed too
         } else if (isArchived) {
             if (onDelete) visibleItems.push('delete');
         }
@@ -131,7 +130,6 @@ const TodoMenuModal: React.FC<TodoMenuModalProps> = ({
         } else if (isCompleted && !isArchived) {
             if (onRetry) items.push({ id: 'retry', icon: 'sync-outline', label: t("retry"), onPress: onRetry, color: colors.PRIMARY_TEXT });
             if (archiveTodoAvailable && onArchive) items.push({ id: 'archive', icon: 'archive-outline', label: t("archive_action"), onPress: onArchive, color: colors.PRIMARY_TEXT });
-            if (onDelete) items.push({ id: 'delete', icon: 'trash-outline', label: t("delete"), onPress: onDelete, color: colors.ERROR_INPUT_TEXT });
         } else if (isArchived) {
             if (onDelete) items.push({ id: 'delete', icon: 'trash-outline', label: t("delete"), onPress: onDelete, color: colors.ERROR_INPUT_TEXT });
         }

@@ -6,10 +6,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Contacts from 'expo-contacts';
-import { useRouter } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-    Animated,
     Keyboard,
     Platform,
     ScrollView,
@@ -18,11 +16,8 @@ import {
     TouchableWithoutFeedback,
     View
 } from "react-native";
-import { getStyles } from "./styles";
-
-// ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
-const BIRTHDAY_PRIMARY = "#D4880F";
-const BIRTHDAY_LIGHT = "#D4880F";
+import { getStyles as getViewStyles } from "../BirthdayViewModal/styles";
+import { getStyles as getAddStyles } from "./styles";
 
 type AddBirthdayModalProps = {
     isOpen: boolean;
@@ -40,8 +35,9 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     onAdd,
 }) => {
     const { t, colors, theme, isDark, lang } = useTheme();
-    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
-    const router = useRouter();
+    const viewStyles = useMemo(() => getViewStyles(colors, isDark), [colors, isDark]);
+    const addStyles = useMemo(() => getAddStyles(colors, isDark), [colors, isDark]);
+
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [date, setDate] = useState<Date | undefined>(undefined);
@@ -49,9 +45,6 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     const [nameError, setNameError] = useState(false);
     const [dateError, setDateError] = useState(false);
     const [contactSelected, setContactSelected] = useState(false);
-    const [isFocused, setIsFocused] = useState(false);
-
-    const scaleAnim = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
         if (isOpen) {
@@ -63,10 +56,6 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
             setContactSelected(false);
         }
     }, [isOpen]);
-
-    useEffect(() => {
-        if (nameError && name) setNameError(false);
-    }, [name]);
 
     const onPressAdd = () => {
         let hasError = false;
@@ -126,168 +115,125 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     };
 
     const formatDateDisplay = (date: Date) => {
-        const locale = lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US';
-        return date.toLocaleDateString(locale, {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-        });
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
     };
 
     return (
-        <StyledModal isOpen={isOpen} onClose={onClose}>
+        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={styles.container}>
+                <View style={viewStyles.container}>
                     <View
                         style={[
                             modalStyles.iconContainer,
-                            {
-                                backgroundColor: colors.SECONDARY_BACKGROUND,
-                                shadowColor: "#9D6506",
-                                shadowOffset: { width: 0, height: 2 },
-                                shadowOpacity: 0.3,
-                                shadowRadius: 2,
-                                elevation: 2
-                            },
+                            addStyles.iconContainer,
                         ]}
                     >
-                        <Ionicons name="gift" size={28} color={BIRTHDAY_PRIMARY} />
+                        <Ionicons name="gift-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                     </View>
 
-                    <StyledText style={styles.headerText}>
+                    <StyledText style={viewStyles.headerText}>
                         {t("birthday_add")}
                     </StyledText>
 
                     <View style={modalStyles.divider} />
 
                     <ScrollView
-                        style={{ width: '100%', maxHeight: 400 }}
+                        style={addStyles.scrollView}
                         showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ gap: 16, paddingBottom: 10 }}
+                        contentContainerStyle={addStyles.scrollContent}
                     >
-                        {/* 1. Name Input */}
-                        <View style={styles.inputGroup}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 4 }}>
-                                <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                    {t("birthday_name")} *
-                                </StyledText>
-                                <TouchableOpacity
-                                    onPress={contactSelected ? handleClearContact : handlePickContact}
-                                    activeOpacity={0.7}
-                                    style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        gap: 4,
-                                        backgroundColor: contactSelected ? (isDark ? 'rgba(255, 107, 107, 0.1)' : 'rgba(255, 107, 107, 0.05)') : 'transparent',
-                                        paddingHorizontal: 8,
-                                        paddingVertical: 4,
-                                        borderRadius: 8
-                                    }}
-                                >
-                                    <Ionicons
-                                        name={contactSelected ? "close-circle" : "person-add-outline"}
-                                        size={16}
-                                        color={contactSelected ? "#FF6B6B" : BIRTHDAY_PRIMARY}
-                                    />
-                                    <StyledText style={{
-                                        fontSize: 11,
-                                        fontWeight: '700',
-                                        color: contactSelected ? "#FF6B6B" : BIRTHDAY_PRIMARY
-                                    }}>
-                                        {contactSelected ? t("clear") || "Təmizlə" : t("birthday_pick_contact")}
-                                    </StyledText>
-                                </TouchableOpacity>
-                            </View>
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    {
-                                        color: colors.PRIMARY_TEXT,
-                                        backgroundColor: colors.PRIMARY_BACKGROUND,
-                                        borderColor: colors.PRIMARY_BORDER_DARK,
-                                    },
-                                    isFocused && styles.inputFocused,
-                                    nameError && styles.inputError,
-                                ]}
-                                placeholder={t("birthday_name_placeholder")}
-                                placeholderTextColor={colors.PLACEHOLDER}
-                                value={name}
-                                onChangeText={setName}
-                                onFocus={() => {
-                                    setIsFocused(true);
-                                    setNameError(false);
-                                }}
-                                onBlur={() => setIsFocused(false)}
-                            />
-                        </View>
-
-                        {/* 2. Phone Input - ONLY visible if contact picked */}
-                        {contactSelected && (
-                            <View style={styles.inputGroup}>
-                                <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                    {t("birthday_phone")}
-                                </StyledText>
-                                <View style={{ position: 'relative', justifyContent: 'center' }}>
+                        <View style={viewStyles.tableContainer}>
+                            {/* 1. Name Input */}
+                            <View style={[
+                                viewStyles.tableRow,
+                                nameError && addStyles.inputError,
+                                addStyles.nameRow
+                            ]}>
+                                <View style={viewStyles.tableLabelColumn}>
+                                    <Ionicons name="person-outline" size={18} color={colors.SECTION_TEXT} />
+                                    <StyledText style={viewStyles.tableLabelText}>{t("birthday_name")} *</StyledText>
+                                </View>
+                                <View style={viewStyles.tableValueColumn}>
                                     <TextInput
                                         style={[
-                                            styles.input,
-                                            {
-                                                color: colors.PLACEHOLDER,
-                                                backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-                                                borderColor: colors.PRIMARY_BORDER_DARK,
-                                                paddingRight: 40, // Space for the lock icon
-                                            },
+                                            viewStyles.tableValueText,
+                                            addStyles.inputInline,
                                         ]}
-                                        placeholder="+994 -- --- -- --"
                                         placeholderTextColor={colors.PLACEHOLDER}
-                                        value={phone}
-                                        editable={false}
+                                        value={name}
+                                        onChangeText={(text) => {
+                                            setName(text);
+                                            if (nameError) setNameError(false);
+                                        }}
+                                        placeholder={t("birthday_name")}
                                     />
-                                    <View style={{ position: 'absolute', right: 14 }}>
-                                        <Ionicons name="lock-closed" size={16} color={colors.PLACEHOLDER} style={{ opacity: 0.5 }} />
-                                    </View>
                                 </View>
                             </View>
-                        )}
 
-                        {/* 3. Date Picker (Mandatory) */}
-                        <View style={styles.inputGroup}>
-                            <StyledText style={[styles.label, { color: colors.SECTION_TEXT }]}>
-                                {t("birthday_date")} *
-                            </StyledText>
+                            {/* 2. Date Picker */}
                             <TouchableOpacity
-                                activeOpacity={0.7}
-                                onPress={handleOpenDatePicker}
                                 style={[
-                                    styles.dateButton,
-                                    {
-                                        backgroundColor: colors.PRIMARY_BACKGROUND,
-                                        borderColor: colors.PRIMARY_BORDER_DARK,
-                                    },
-                                    dateError && styles.inputError,
+                                    viewStyles.tableRow,
+                                    viewStyles.tableRowBorder,
+                                    dateError && addStyles.inputError,
+                                    addStyles.dateRow
                                 ]}
+                                onPress={handleOpenDatePicker}
                             >
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                                    <View style={{
-                                        width: 34,
-                                        height: 34,
-                                        borderRadius: 12,
-                                        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                                        justifyContent: 'center',
-                                        alignItems: 'center'
-                                    }}>
-                                        <Ionicons name="calendar-clear" size={18} color={BIRTHDAY_PRIMARY} />
-                                    </View>
-                                    <StyledText style={{
-                                        fontSize: 14,
-                                        color: date ? colors.PRIMARY_TEXT : colors.PLACEHOLDER
-                                    }}>
+                                <View style={viewStyles.tableLabelColumn}>
+                                    <Ionicons name="calendar-outline" size={18} color={colors.SECTION_TEXT} />
+                                    <StyledText style={viewStyles.tableLabelText}>{t("birthday_date")} *</StyledText>
+                                </View>
+                                <View style={viewStyles.tableValueColumn}>
+                                    <StyledText style={viewStyles.tableValueText}>
                                         {date ? formatDateDisplay(date) : t("birthday_date")}
                                     </StyledText>
                                 </View>
-                                <Ionicons name="chevron-expand-outline" size={18} color={colors.PLACEHOLDER} />
                             </TouchableOpacity>
+
+                            {/* 3. Phone (Optional) - Only visible if contact picked */}
+                            {contactSelected && (
+                                <View style={[viewStyles.tableRow, viewStyles.tableRowBorder]}>
+                                    <View style={viewStyles.tableLabelColumn}>
+                                        <Ionicons name="call-outline" size={18} color={colors.SECTION_TEXT} />
+                                        <StyledText style={viewStyles.tableLabelText}>{t("birthday_phone")}</StyledText>
+                                    </View>
+                                    <View style={viewStyles.tableValueColumn}>
+                                        <TextInput
+                                            style={[
+                                                viewStyles.tableValueText,
+                                                addStyles.inputInline,
+                                                addStyles.phoneInput
+                                            ]}
+                                            keyboardType="phone-pad"
+                                            placeholderTextColor={colors.PLACEHOLDER}
+                                            value={phone}
+                                            editable={false} // Only from contacts, so probably shouldn't be edited here
+                                            placeholder="+994"
+                                        />
+                                    </View>
+                                </View>
+                            )}
                         </View>
+
+                        {/* Contacts Picker Button */}
+                        <TouchableOpacity
+                            onPress={contactSelected ? handleClearContact : handlePickContact}
+                            activeOpacity={0.7}
+                            style={addStyles.contactButton}
+                        >
+                            <Ionicons
+                                name={contactSelected ? "close-circle" : "person-add-outline"}
+                                size={18}
+                                color={contactSelected ? colors.SECTION_TEXT : colors.SECTION_TEXT}
+                            />
+                            <StyledText style={addStyles.contactButtonText}>
+                                {contactSelected ? t("clear") : t("birthday_pick_contact")}
+                            </StyledText>
+                        </TouchableOpacity>
 
                         {/* Android Date Picker */}
                         {Platform.OS === "android" && showDatePicker && (
@@ -304,25 +250,18 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                         {/* iOS Date Picker Modal */}
                         {Platform.OS === "ios" && (
                             <StyledModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)}>
-                                <View style={[modalStyles.modalContainer, {
-                                    backgroundColor: colors.SECONDARY_BACKGROUND,
-                                    borderRadius: 30,
-                                    padding: 24,
-                                    width: 340,
-                                    maxWidth: '90%',
-                                    alignItems: 'center'
-                                }]}>
+                                <View style={viewStyles.container}>
                                     <View style={[modalStyles.iconContainer, {
                                         backgroundColor: colors.SECONDARY_BACKGROUND,
-                                        shadowColor: "#D4880F",
+                                        shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                                         shadowOffset: { width: 0, height: 2 },
                                         shadowOpacity: 0.3,
                                         shadowRadius: 2,
                                         elevation: 2
                                     }]}>
-                                        <Ionicons name="time" size={28} color={BIRTHDAY_PRIMARY} />
+                                        <Ionicons name="calendar-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                                     </View>
-                                    <StyledText style={styles.headerText}>{t("birthday_date")}</StyledText>
+                                    <StyledText style={viewStyles.headerText}>{t("birthday_date")}</StyledText>
                                     <View style={modalStyles.divider} />
                                     <DateTimePicker
                                         value={date || new Date(2000, 0, 1)}
@@ -338,10 +277,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                                         <StyledButton
                                             label={t("save")}
                                             onPress={() => {
-                                                if (!date) {
-                                                    setDate(new Date(2000, 0, 1));
-                                                    setDateError(false);
-                                                }
+                                                if (!date) setDate(new Date(2000, 0, 1));
                                                 setShowDatePicker(false);
                                             }}
                                             variant="dark_button"
@@ -352,7 +288,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                         )}
                     </ScrollView>
 
-                    <View style={modalStyles.buttonsContainer}>
+                    <View style={[modalStyles.buttonsContainer, addStyles.buttonsContainerMargin]}>
                         <StyledButton
                             label={t("cancel")}
                             onPress={onClose}

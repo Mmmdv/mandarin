@@ -1,14 +1,14 @@
 import StyledButton from "@/components/ui/StyledButton";
+import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
+import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Sharing from 'expo-sharing';
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    ImageBackground,
-    Modal,
-    Pressable,
+    Platform,
     ScrollView,
     Share,
     TouchableOpacity,
@@ -36,11 +36,10 @@ const GREETING_KEYS = [
     "birthday_greeting_5",
 ] as const;
 
-const BACKGROUND_OPTIONS: { id: BirthdayBackgroundHandle; source: any }[] = [
-    { id: 'v1', source: require("@/assets/images/Birthday/birthday_background_v1.webp") },
-    { id: 'v2', source: require("@/assets/images/Birthday/birthday_background_v2.webp") },
-    { id: 'v3', source: require("@/assets/images/Birthday/birthday_background_v3.webp") },
-    { id: 'v4', source: require("@/assets/images/Birthday/birthday_background_v4.webp") },
+const BACKGROUND_OPTIONS: { id: BirthdayBackgroundHandle; color: string }[] = [
+    { id: 'v1', color: '#1A1A1A' }, // Dark/Black
+    { id: 'v2', color: '#1B4D3E' }, // Dark Green
+    { id: 'v3', color: '#4d1b1eff' }, // Dark Red
 ];
 
 type TabType = 'text' | 'card' | 'draw';
@@ -61,9 +60,11 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
     const cardRef = useRef<ViewShot>(null);
 
     // Initial message from list if empty
-    useMemo(() => {
-        if (!selectedMessage) setSelectedMessage(t(GREETING_KEYS[0] as any));
-    }, []);
+    useEffect(() => {
+        if (!selectedMessage && isOpen) {
+            setSelectedMessage(t(GREETING_KEYS[0] as any));
+        }
+    }, [isOpen]);
 
     const handleTabChange = (tab: TabType) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -71,25 +72,55 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
     };
 
     const handleShare = async () => {
-        const messageToSend = selectedMessage;
-
         try {
+            let sharedMessage = selectedMessage;
+            let shareSuccess = false;
+
+            const isMessagingOrSocial = (type: string) => {
+                const lower = type.toLowerCase();
+                const allowedKeywords = [
+                    'whatsapp', 'telegram', 'instagram', 'messenger',
+                    'viber', 'signal', 'snapchat', 'discord',
+                    'message', 'mail', 'facebook', 'twitter', 'slack'
+                ];
+                return allowedKeywords.some(keyword => lower.includes(keyword));
+            };
+
             if (activeTab === 'card') {
                 const uri = await cardRef.current?.capture?.();
                 if (uri) {
-                    const isAvailable = await Sharing.isAvailableAsync();
-                    if (isAvailable) {
+                    if (Platform.OS === 'ios') {
+                        const result = await Share.share({
+                            url: uri,
+                            message: t("birthday_happy_birthday")
+                        });
+                        if (result.action === Share.sharedAction && result.activityType) {
+                            if (isMessagingOrSocial(result.activityType)) {
+                                sharedMessage = "[Card]";
+                                shareSuccess = true;
+                            }
+                        }
+                    } else {
                         await Sharing.shareAsync(uri);
-                        finalizeSend("[Card]");
-                        return;
+                        sharedMessage = "[Card]";
+                        shareSuccess = true;
+                    }
+                }
+            } else {
+                const result = await Share.share({ message: selectedMessage });
+                if (result.action === Share.sharedAction) {
+                    if (Platform.OS === 'ios' && result.activityType) {
+                        if (isMessagingOrSocial(result.activityType)) {
+                            shareSuccess = true;
+                        }
+                    } else {
+                        shareSuccess = true;
                     }
                 }
             }
 
-            // Default text share
-            const result = await Share.share({ message: messageToSend });
-            if (result.action === Share.sharedAction) {
-                finalizeSend(messageToSend);
+            if (shareSuccess) {
+                finalizeSend(sharedMessage);
             }
         } catch (e) {
             console.error("Share error:", e);
@@ -105,171 +136,178 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <Modal transparent visible={isOpen} animationType="fade">
-            <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }} onPress={onClose}>
-                <Pressable style={styles.container} onPress={(e) => e.stopPropagation()}>
-                    <View style={styles.headerWrapper}>
-                        <StyledText style={styles.headerText}>{t("birthday_select_greeting")}</StyledText>
+        <StyledModal isOpen={isOpen} onClose={onClose}>
+            <View style={styles.container}>
+                <View style={[
+                    modalStyles.iconContainer,
+                    {
+                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                        shadowColor: BIRTHDAY_PRIMARY,
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 2,
+                        elevation: 2
+                    }]}>
+                    <Ionicons name="paper-plane" size={28} color={BIRTHDAY_PRIMARY} />
+                </View>
+
+                <StyledText style={styles.headerText}>{t("birthday_send_greeting")}</StyledText>
+                <View style={modalStyles.divider} />
+
+                <View style={styles.recipientCard}>
+                    <View style={[styles.recipientAvatar, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }]}>
+                        <Ionicons name="gift" size={20} color={colors.SECTION_TEXT} />
                     </View>
-
-                    <View style={styles.recipientCard}>
-                        <View style={[styles.recipientAvatar, { backgroundColor: isDark ? 'rgba(212, 136, 15, 0.2)' : 'rgba(212, 136, 15, 0.1)' }]}>
-                            <Ionicons name="gift" size={20} color="#D4880F" />
-                        </View>
-                        <View style={styles.recipientInfo}>
-                            <StyledText style={[styles.recipientLabel, { color: "#D4880F" }]}>{t("birthday_recipient_label")}</StyledText>
-                            <StyledText style={styles.recipientName}>{personName}</StyledText>
-                        </View>
+                    <View style={styles.recipientInfo}>
+                        <StyledText style={[styles.recipientLabel, { color: colors.PLACEHOLDER }]}>{t("birthday_recipient_label")}</StyledText>
+                        <StyledText style={styles.recipientName}>{personName}</StyledText>
                     </View>
+                </View>
 
-                    {/* Tabs */}
-                    <View style={styles.tabsRow}>
-                        <TouchableOpacity
-                            style={[styles.tabButton, activeTab === 'text' && styles.activeTab]}
-                            onPress={() => handleTabChange('text')}
-                        >
-                            <Ionicons name="chatbubble-outline" size={16} color={activeTab === 'text' ? '#FFF' : colors.SECTION_TEXT} />
-                            <StyledText style={[styles.tabText, activeTab === 'text' && styles.activeTabText]}>{t("tab_text")}</StyledText>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.tabButton, activeTab === 'card' && styles.activeTab]}
-                            onPress={() => handleTabChange('card')}
-                        >
-                            <Ionicons name="image-outline" size={16} color={activeTab === 'card' ? '#FFF' : colors.SECTION_TEXT} />
-                            <StyledText style={[styles.tabText, activeTab === 'card' && styles.activeTabText]}>{t("tab_design_card")}</StyledText>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.tabButton, activeTab === 'draw' && styles.activeTab]}
-                            onPress={() => handleTabChange('draw')}
-                        >
-                            <Ionicons name="brush-outline" size={16} color={activeTab === 'draw' ? '#FFF' : colors.SECTION_TEXT} />
-                            <StyledText style={[styles.tabText, activeTab === 'draw' && styles.activeTabText]}>{t("tab_handwritten")}</StyledText>
-                        </TouchableOpacity>
-                    </View>
+                {/* Tabs */}
+                <View style={styles.tabsRow}>
+                    <TouchableOpacity
+                        style={[styles.tabButton, activeTab === 'text' && styles.activeTab]}
+                        onPress={() => handleTabChange('text')}
+                    >
+                        <Ionicons name="chatbubble-outline" size={16} color={activeTab === 'text' ? '#FFF' : colors.SECTION_TEXT} />
+                        <StyledText style={[styles.tabText, activeTab === 'text' && styles.activeTabText]}>{t("tab_text")}</StyledText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.tabButton, activeTab === 'card' && styles.activeTab]}
+                        onPress={() => handleTabChange('card')}
+                    >
+                        <Ionicons name="image-outline" size={16} color={activeTab === 'card' ? '#FFF' : colors.SECTION_TEXT} />
+                        <StyledText style={[styles.tabText, activeTab === 'card' && styles.activeTabText]}>{t("tab_design_card")}</StyledText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.tabButton, activeTab === 'draw' && styles.activeTab]}
+                        onPress={() => handleTabChange('draw')}
+                    >
+                        <Ionicons name="brush-outline" size={16} color={activeTab === 'draw' ? '#FFF' : colors.SECTION_TEXT} />
+                        <StyledText style={[styles.tabText, activeTab === 'draw' && styles.activeTabText]}>{t("tab_handwritten")}</StyledText>
+                    </TouchableOpacity>
+                </View>
 
-                    {/* Content */}
-                    <View style={styles.contentArea}>
-                        {activeTab === 'text' && (
-                            <ScrollView style={styles.greetingsScroll} showsVerticalScrollIndicator={false}>
-                                {GREETING_KEYS.map((key) => {
-                                    const msg = t(key as any);
-                                    return (
-                                        <TouchableOpacity
-                                            key={key}
-                                            style={[styles.greetingCard, selectedMessage === msg && styles.selectedGreeting]}
-                                            onPress={() => {
-                                                setSelectedMessage(msg);
-                                            }}
-                                        >
-                                            <StyledText style={styles.greetingText}>{msg}</StyledText>
-                                            <Ionicons
-                                                name={selectedMessage === msg ? "radio-button-on" : "radio-button-off"}
-                                                size={18}
-                                                color={selectedMessage === msg ? BIRTHDAY_PRIMARY : colors.SECTION_TEXT}
-                                            />
-                                        </TouchableOpacity>
-                                    );
-                                })}
-                            </ScrollView>
-                        )}
+                {/* Content */}
+                <View style={styles.contentArea}>
+                    {activeTab === 'text' && (
+                        <ScrollView
+                            style={styles.greetingsScroll}
+                            contentContainerStyle={styles.greetingsContent}
+                            showsVerticalScrollIndicator={false}
+                            nestedScrollEnabled={true}
+                        >
+                            {GREETING_KEYS.map((key) => {
+                                const msg = t(key as any);
+                                return (
+                                    <TouchableOpacity
+                                        key={key}
+                                        style={[styles.greetingCard, selectedMessage === msg && styles.selectedGreeting]}
+                                        onPress={() => {
+                                            setSelectedMessage(msg);
+                                        }}
+                                    >
+                                        <StyledText style={styles.greetingText}>{msg}</StyledText>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </ScrollView>
+                    )}
 
-                        {activeTab === 'card' && (
+                    {activeTab === 'card' && (
+                        <View style={[styles.greetingsScroll, { borderRightWidth: 0, height: 240, justifyContent: 'center' }]}>
                             <View style={styles.cardPreviewContainer}>
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.backgroundSelector}>
-                                    <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
-                                        {BACKGROUND_OPTIONS.map((bg) => (
-                                            <TouchableOpacity
-                                                key={bg.id}
-                                                style={[styles.bgThumbnail, selectedBackground === bg.id && styles.activeBgThumbnail]}
-                                                onPress={() => setSelectedBackground(bg.id)}
-                                            >
-                                                <ImageBackground source={bg.source} style={styles.bgThumbnailImage} resizeMode="cover" />
-                                            </TouchableOpacity>
-                                        ))}
+                                <View style={styles.cardRow}>
+                                    {/* Left: Side Background Selector */}
+                                    <View style={styles.sideSelector}>
+                                        {BACKGROUND_OPTIONS.map((bg) => {
+                                            const isSelected = selectedBackground === bg.id;
+                                            return (
+                                                <TouchableOpacity
+                                                    key={bg.id}
+                                                    style={[styles.bgOptionBtn, isSelected && styles.bgOptionActive]}
+                                                    onPress={() => {
+                                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                                        setSelectedBackground(bg.id);
+                                                    }}
+                                                >
+                                                    <View style={[styles.bgOptionInner, { backgroundColor: bg.color }]} />
+                                                </TouchableOpacity>
+                                            );
+                                        })}
                                     </View>
-                                </ScrollView>
-                                <BirthdayCardPreview
-                                    ref={cardRef}
-                                    message={selectedMessage}
-                                    backgroundHandle={selectedBackground}
-                                />
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ maxHeight: 60, width: '100%' }}>
-                                    <View style={{ flexDirection: 'row', gap: 10 }}>
-                                        {GREETING_KEYS.map((key) => {
+
+                                    {/* Middle: Preview */}
+                                    <View pointerEvents="none" style={{ flex: 1, alignItems: 'center' }}>
+                                        <BirthdayCardPreview
+                                            ref={cardRef}
+                                            message={selectedMessage}
+                                            backgroundHandle={selectedBackground}
+                                        />
+                                    </View>
+
+                                    {/* Right: Side Number Selector */}
+                                    <View style={styles.sideNumberSelector}>
+                                        {GREETING_KEYS.map((key, index) => {
                                             const msg = t(key as any);
+                                            const isSelected = selectedMessage === msg;
                                             return (
                                                 <TouchableOpacity
                                                     key={key}
-                                                    style={[
-                                                        {
-                                                            padding: 8,
-                                                            borderRadius: 10,
-                                                            borderWidth: 1,
-                                                            borderColor: selectedMessage === msg ? BIRTHDAY_PRIMARY : isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                                                            backgroundColor: selectedMessage === msg
-                                                                ? (isDark ? 'rgba(35, 78, 148, 0.2)' : 'rgba(35, 78, 148, 0.1)')
-                                                                : 'transparent'
-                                                        }
-                                                    ]}
+                                                    style={[styles.numberBtn, isSelected && styles.numberBtnActive]}
                                                     onPress={() => {
+                                                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                                                         setSelectedMessage(msg);
                                                     }}
                                                 >
-                                                    <StyledText
-                                                        style={{
-                                                            fontSize: 10,
-                                                            maxWidth: 100,
-                                                            color: selectedMessage === msg ? BIRTHDAY_PRIMARY : colors.PRIMARY_TEXT
-                                                        }}
-                                                        numberOfLines={1}
-                                                    >
-                                                        {msg}
+                                                    <StyledText style={[styles.numberBtnText, isSelected && styles.numberBtnTextActive]}>
+                                                        {index + 1}
                                                     </StyledText>
                                                 </TouchableOpacity>
                                             );
                                         })}
                                     </View>
-                                </ScrollView>
+                                </View>
                             </View>
-                        )}
+                        </View>
+                    )}
 
-                        {activeTab === 'draw' && (
-                            <View style={styles.handwrittenContainer}>
-                                <TouchableOpacity style={styles.drawHeroButton} onPress={() => setIsDrawingModalOpen(true)}>
-                                    <Ionicons name="brush-outline" size={40} color={BIRTHDAY_PRIMARY} />
-                                    <StyledText style={styles.drawHeroText}>{t("birthday_draw_button")}</StyledText>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    </View>
 
-                    {/* Footer */}
-                    <View style={styles.footer}>
-                        {activeTab !== 'draw' && (
-                            <StyledButton
-                                label={t("birthday_send_greeting")}
-                                icon="paper-plane"
-                                onPress={handleShare}
-                                variant="dark_button"
-                                style={{ width: '100%' }}
-                            />
-                        )}
+
+                    {activeTab === 'draw' && (
+                        <View style={styles.handwrittenContainer}>
+                            <TouchableOpacity style={styles.drawHeroButton} onPress={() => setIsDrawingModalOpen(true)}>
+                                <Ionicons name="brush-outline" size={40} color={BIRTHDAY_PRIMARY} />
+                                <StyledText style={styles.drawHeroText}>{t("birthday_draw_button")}</StyledText>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
+
+                {/* Footer */}
+                <View style={modalStyles.buttonsContainer}>
+                    <StyledButton
+                        label={t("close")}
+                        onPress={onClose}
+                        variant="dark_button"
+                    />
+                    {activeTab !== 'draw' && (
                         <StyledButton
-                            label={t("close")}
-                            onPress={onClose}
+                            label="Göndər"
+                            onPress={handleShare}
                             variant="dark_button"
-                            style={{ width: '100%' }}
                         />
-                    </View>
-                </Pressable>
-            </Pressable>
+                    )}
+                </View>
+            </View>
 
             <DrawingModal
                 isOpen={isDrawingModalOpen}
                 onClose={() => setIsDrawingModalOpen(false)}
                 onSend={() => onSend("[Handwritten Greeting]")}
             />
-        </Modal>
+        </StyledModal>
     );
 };
 

@@ -53,13 +53,13 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
                     backgroundColor: colors.SECONDARY_BACKGROUND,
-                    shadowColor: "#D4880F",
+                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
                     shadowRadius: 2,
                     elevation: 2
                 }]}>
-                    <Ionicons name="eye-outline" size={28} color="#D4880F" />
+                    <Ionicons name="eye-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                 </View>
 
                 <StyledText style={styles.headerText}>{t("birthday_info")}</StyledText>
@@ -69,7 +69,7 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
                 <View style={styles.tableContainer}>
                     <View style={styles.tableRow}>
                         <View style={styles.tableLabelColumn}>
-                            <Ionicons name="person-outline" size={18} color="#D4880F" />
+                            <Ionicons name="person-outline" size={18} color={colors.SECTION_TEXT} />
                             <StyledText style={styles.tableLabelText}>{t("birthday_name")}</StyledText>
                         </View>
                         <View style={styles.tableValueColumn}>
@@ -83,7 +83,7 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
 
                     <View style={[styles.tableRow, styles.tableRowBorder]}>
                         <View style={styles.tableLabelColumn}>
-                            <Ionicons name="calendar-outline" size={18} color="#D4880F" />
+                            <Ionicons name="calendar-outline" size={18} color={colors.SECTION_TEXT} />
                             <StyledText style={styles.tableLabelText}>{t("birthday_date")}</StyledText>
                         </View>
                         <View style={styles.tableValueColumn}>
@@ -99,11 +99,11 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
                             onPress={handleCall}
                         >
                             <View style={styles.tableLabelColumn}>
-                                <Ionicons name="call-outline" size={18} color="#4ECDC4" />
+                                <Ionicons name="call-outline" size={18} color={colors.SECTION_TEXT} />
                                 <StyledText style={styles.tableLabelText}>{t("birthday_phone")}</StyledText>
                             </View>
                             <View style={styles.tableValueColumn}>
-                                <StyledText style={[styles.tableValueText, { color: '#4ECDC4', textDecorationLine: 'underline' }]}>
+                                <StyledText style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}>
                                     {birthday.phone}
                                 </StyledText>
                             </View>
@@ -112,19 +112,19 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
 
                     <View style={[styles.tableRow, styles.tableRowBorder]}>
                         <View style={styles.tableLabelColumn}>
-                            <Ionicons name="alarm-outline" size={18} color={colors.REMINDER} />
+                            <Ionicons name="alarm-outline" size={18} color={colors.SECTION_TEXT} />
                             <StyledText style={styles.tableLabelText}>{t("reminder")}</StyledText>
                         </View>
                         <View style={styles.tableValueColumn}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                                 {reminderStatus === 'Göndərilib' ? (
-                                    <Ionicons name="checkmark-done-circle-outline" size={14} color={colors.CHECKBOX_SUCCESS} />
+                                    <Ionicons name="checkmark-done" size={14} color={colors.CHECKBOX_SUCCESS} />
                                 ) : isReminderCancelled ? (
                                     <Ionicons name="notifications-off" size={14} color={colors.ERROR_INPUT_TEXT} />
                                 ) : (
                                     <Ionicons name="hourglass-outline" size={14} color={colors.REMINDER} />
                                 )}
-                                <StyledText style={[styles.tableValueText, { color: isReminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER }]}>
+                                <StyledText style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}>
                                     {notification?.date ? formatDate(notification.date, lang) : (
                                         isReminderCancelled ? t("status_cancelled") : (
                                             (() => {
@@ -156,7 +156,7 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
                                     size={14}
                                     color={birthday.greetingSent ? "#4ECDC4" : colors.SECTION_TEXT}
                                 />
-                                <StyledText style={[styles.tableValueText, { color: birthday.greetingSent ? "#4ECDC4" : colors.SECTION_TEXT }]}>
+                                <StyledText style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}>
                                     {birthday.greetingSent ? t("status_sent") : t("status_not_sent")}
                                 </StyledText>
                             </View>

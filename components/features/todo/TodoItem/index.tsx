@@ -101,22 +101,13 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 {
                     opacity: fadeAnim,
                     transform: [{ scale: scaleAnim }, { translateY: translateAnim }],
-                    backgroundColor: category === 'todo' ? (isDark ? colors.SECONDARY_BACKGROUND : 'rgba(79, 70, 229, 0.07)') :
-                        category === 'done' ? 'rgba(16, 185, 129, 0.05)' :
-                            category === 'archive' ? 'rgba(139, 92, 246, 0.07)' :
-                                colors.SECONDARY_BACKGROUND,
-                    borderColor: category === 'todo' ? (isDark ? colors.PRIMARY_BORDER_DARK : 'rgba(79, 70, 229, 0.15)') :
-                        category === 'done' ? 'rgba(16, 185, 129, 0.08)' :
-                            category === 'archive' ? 'rgba(139, 92, 246, 0.15)' :
-                                colors.PRIMARY_BORDER_DARK,
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
+                    borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
                     borderWidth: isDark ? 0.2 : 1,
                 }
             ]}>
                 <View style={[styles.cardOverlay, {
-                    backgroundColor: category === 'todo' ? 'rgba(79, 70, 229, 0.02)' :
-                        category === 'done' ? 'rgba(16, 185, 129, 0.02)' :
-                            category === 'archive' ? 'rgba(139, 92, 246, 0.02)' :
-                                'transparent'
+                    backgroundColor: 'transparent'
                 }]} />
                 <TouchableOpacity
                     style={styles.cardBody}
@@ -141,9 +132,9 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                                 style={[
                                     styles.cardTitle,
                                     {
-                                        opacity: isArchived ? 0.9 : (isCompleted ? 0.6 : 1),
+                                        opacity: isArchived ? 0.9 : 1,
                                         textDecorationLine: (isCompleted && !isArchived) ? 'line-through' : 'none',
-                                        color: (isCompleted && !isArchived) ? colors.PLACEHOLDER : colors.PRIMARY_TEXT,
+                                        color: colors.PRIMARY_TEXT,
                                     }
                                 ]}
                                 numberOfLines={3}
@@ -196,22 +187,13 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
             {
                 opacity: fadeAnim,
                 transform: [{ scale: scaleAnim }, { translateY: translateAnim }],
-                backgroundColor: category === 'todo' ? (isDark ? colors.SECONDARY_BACKGROUND : 'rgba(79, 70, 229, 0.07)') :
-                    category === 'done' ? 'rgba(16, 185, 129, 0.05)' :
-                        category === 'archive' ? 'rgba(139, 92, 246, 0.07)' :
-                            colors.SECONDARY_BACKGROUND,
-                borderColor: category === 'todo' ? (isDark ? colors.PRIMARY_BORDER_DARK : 'rgba(79, 70, 229, 0.15)') :
-                    category === 'done' ? 'rgba(16, 185, 129, 0.08)' :
-                        category === 'archive' ? 'rgba(139, 92, 246, 0.15)' :
-                            colors.PRIMARY_BORDER_DARK,
+                backgroundColor: colors.SECONDARY_BACKGROUND,
+                borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
                 borderWidth: isDark ? 0.2 : 1,
             }
         ]}>
             <View style={[styles.cardOverlay, {
-                backgroundColor: category === 'todo' ? 'rgba(79, 70, 229, 0.02)' :
-                    category === 'done' ? 'rgba(16, 185, 129, 0.02)' :
-                        category === 'archive' ? 'rgba(139, 92, 246, 0.02)' :
-                            'transparent'
+                backgroundColor: 'transparent'
             }]} />
             <View style={styles.checkTitleContainer}>
                 {!isArchived ? (
@@ -239,9 +221,9 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                                 fontWeight: '600',
                                 lineHeight: 20,
                                 letterSpacing: 0.1,
-                                opacity: isArchived ? 0.9 : (isCompleted ? 0.6 : 1),
+                                opacity: isArchived ? 0.9 : 1,
                                 textDecorationLine: (isCompleted && !isArchived) ? 'line-through' : 'none',
-                                color: (isCompleted && !isArchived) ? colors.PLACEHOLDER : colors.PRIMARY_TEXT,
+                                color: colors.PRIMARY_TEXT,
                             }]}
                         >
                             {hyphenateText(title)}

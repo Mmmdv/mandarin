@@ -9,11 +9,12 @@ import { selectNotificationById } from "@/store/slices/notificationSlice";
 import { Birthday } from "@/types/birthday";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
     Animated,
     LayoutAnimation,
     Platform,
+    Pressable,
     ScrollView,
     TouchableOpacity,
     UIManager,
@@ -33,6 +34,8 @@ import {
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
 }
+
+type ViewMode = "card" | "list";
 
 type BirthdayListProps = {
     birthdays: Birthday[];
@@ -63,6 +66,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
     const { refreshing, onRefresh } = useRefresh();
     const notifications = useAppSelector(state => state.notification.notifications);
 
+    const [viewMode, setViewMode] = useState<ViewMode>("list");
     const [deleteTarget, setDeleteTarget] = useState<Birthday | null>(null);
     const [greetingTarget, setGreetingTarget] = useState<Birthday | null>(null);
     const [rescheduleTarget, setRescheduleTarget] = useState<Birthday | null>(null);
@@ -86,6 +90,11 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
     const todayAnimation = useRef(new Animated.Value(1)).current;
     const upcomingAnimation = useRef(new Animated.Value(0)).current;
     const allAnimation = useRef(new Animated.Value(0)).current;
+
+    const toggleViewMode = useCallback(() => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setViewMode(prev => prev === "card" ? "list" : "card");
+    }, []);
 
     const toggleSection = (
         setter: React.Dispatch<React.SetStateAction<boolean>>,
@@ -183,90 +192,112 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
         setIsMenuModalOpen(true);
     };
 
-    // Empty state
-    if (birthdays.length === 0) {
-        return (
-            <View style={{ flex: 1 }}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <TouchableOpacity
-                        onPress={() => {
-                            if (navigation.canGoBack()) {
-                                navigation.goBack();
-                            } else {
-                                router.replace("/");
-                            }
-                        }}
-                        style={{ marginRight: 10, zIndex: 20 }}
-                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 60 }}
-                    >
-                        <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
-                    </TouchableOpacity>
-                    <View style={{ flex: 1, justifyContent: "center" }} pointerEvents="none">
-                        <StyledText style={[styles.headerTitle, { color: colors.PRIMARY_TEXT }]}>
-                            {t("tab_birthday")}
-                        </StyledText>
-                    </View>
-                    <View style={{ width: 40, height: 40 }} />
-                </View>
-                <ScrollView
-                    style={{ flex: 1 }}
-                    contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", paddingBottom: 80 }}
-                    refreshControl={
-                        <StyledRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                    }
-                >
-                    <View style={styles.emptyContainer}>
-                        <View
-                            style={[
-                                styles.emptyIcon,
-                                {
-                                    backgroundColor: colors.SECONDARY_BACKGROUND,
-                                    shadowColor: BIRTHDAY_PRIMARY,
-                                },
-                            ]}
-                        >
-                            <Ionicons name="gift-outline" size={64} color={BIRTHDAY_LIGHT} />
-                        </View>
-                        <StyledText
-                            style={{ fontSize: 22, fontWeight: "bold", color: colors.PRIMARY_TEXT, marginBottom: 8 }}
-                        >
-                            {t("birthday_empty_title")}
-                        </StyledText>
-                        <StyledText
-                            style={{
-                                fontSize: 16,
-                                color: colors.PLACEHOLDER,
-                                textAlign: "center",
-                                marginBottom: 32,
-                                paddingHorizontal: 40,
-                            }}
-                        >
-                            {t("birthday_empty_desc")}
-                        </StyledText>
-                        <TouchableOpacity
-                            onPress={onAddRequest}
-                            activeOpacity={0.8}
-                            style={[
-                                styles.emptyButton,
-                                {
-                                    backgroundColor: isDark ? colors.SECONDARY_BACKGROUND : colors.PRIMARY_BACKGROUND,
-                                    borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
-                                    shadowColor: BIRTHDAY_PRIMARY,
-                                    shadowOpacity: isDark ? 0.3 : 0.1,
-                                },
-                            ]}
-                        >
-                            <Ionicons name="add" size={24} color={BIRTHDAY_PRIMARY} />
-                            <StyledText style={{ color: BIRTHDAY_PRIMARY, fontSize: 16, fontWeight: "bold" }}>
-                                {t("birthday_add")}
-                            </StyledText>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
-            </View>
+    // Card Item (Grid View)
+    const BirthdayGridItem = ({ item }: { item: Birthday }) => {
+        const daysUntil = getDaysUntilBirthday(item.date);
+        const age = getAge(item.date);
+        const nextAge = age + (daysUntil === 0 ? 0 : 1);
+        const isToday = daysUntil === 0;
+
+        const notification = useAppSelector(state =>
+            item.notificationId ? selectNotificationById(state, item.notificationId) : undefined
         );
-    }
+        const reminderStatus = notification?.status;
+        const isReminderCancelled = reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub';
+
+        const menuButtonRef = useRef<any>(null);
+
+        const onOpenMenu = () => {
+            menuButtonRef.current?.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
+                handleOpenMenu(item, { x: pageX, y: pageY, width, height });
+            });
+        };
+
+        return (
+            <Pressable
+                onPress={() => setViewTarget(item)}
+                style={[
+                    styles.gridCard,
+                    {
+                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                        borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+                    }
+                ]}
+            >
+                <View style={styles.gridCardHeader}>
+                    <View style={[styles.gridAvatar, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }]}>
+                        {isToday ? (
+                            <Ionicons name="gift" size={20} color="#F43F5E" />
+                        ) : (
+                            <StyledText style={[styles.gridAvatarText, { color: colors.PRIMARY_TEXT }]}>
+                                {item.name.charAt(0).toUpperCase()}
+                            </StyledText>
+                        )}
+                    </View>
+                    <View style={[styles.gridDaysBadge, { backgroundColor: getDaysColor(daysUntil) + "20" }]}>
+                        <StyledText style={[styles.gridDaysText, { color: getDaysColor(daysUntil) }]}>
+                            {getDaysLabel(daysUntil)}
+                        </StyledText>
+                    </View>
+                </View>
+
+                <View style={styles.gridCardBody}>
+                    <StyledText style={[styles.gridName, { color: colors.PRIMARY_TEXT }]} numberOfLines={1}>
+                        {item.name}
+                    </StyledText>
+                    <StyledText style={[styles.gridDate, { color: colors.SECTION_TEXT }]}>
+                        {formatBirthdayDate(item.date)}
+                    </StyledText>
+                    <StyledText style={[styles.gridDate, { color: colors.SECTION_TEXT, fontSize: 10, marginTop: 2 }]}>
+                        {nextAge} {t("birthday_age")}
+                    </StyledText>
+                </View>
+
+                <View style={styles.gridCardFooter}>
+                    <View style={styles.gridMetadata}>
+                        {isToday ? (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                <Ionicons
+                                    name={item.greetingSent ? "checkmark-done-circle-outline" : "close-circle-outline"}
+                                    size={12}
+                                    color={item.greetingSent ? "#4ECDC4" : colors.SECTION_TEXT}
+                                />
+                                <StyledText style={{ fontSize: 9, fontWeight: '600', color: item.greetingSent ? "#4ECDC4" : colors.SECTION_TEXT }}>
+                                    {item.greetingSent ? t("birthday_greeting_sent") : t("birthday_greeting_not_sent")}
+                                </StyledText>
+                            </View>
+                        ) : (
+                            item.notificationId && (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                    <Ionicons
+                                        name="alarm-outline"
+                                        size={12}
+                                        color={isReminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER}
+                                    />
+                                    <StyledText style={{
+                                        fontSize: 9,
+                                        fontWeight: '600',
+                                        color: isReminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER,
+                                        textDecorationLine: isReminderCancelled ? 'line-through' : 'none'
+                                    }}>
+                                        {notification?.date ? formatDate(notification.date, lang) : t("status_scheduled")}
+                                    </StyledText>
+                                </View>
+                            )
+                        )}
+                    </View>
+                    <TouchableOpacity
+                        ref={menuButtonRef}
+                        onPress={onOpenMenu}
+                        hitSlop={15}
+                        style={{ marginLeft: 'auto' }}
+                    >
+                        <Ionicons name="ellipsis-horizontal" size={18} color={colors.PRIMARY_TEXT} />
+                    </TouchableOpacity>
+                </View>
+            </Pressable>
+        );
+    };
 
     const BirthdayCard = ({ item }: { item: Birthday }) => {
         const daysUntil = getDaysUntilBirthday(item.date);
@@ -296,14 +327,10 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                     style={[
                         styles.card,
                         {
-                            backgroundColor: isToday
-                                ? (isDark ? 'rgba(244, 63, 94, 0.15)' : 'rgba(244, 63, 94, 0.08)')
-                                : colors.SECONDARY_BACKGROUND,
-                            borderColor: isToday
-                                ? 'rgba(244, 63, 94, 0.3)'
-                                : (isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER),
+                            backgroundColor: colors.SECONDARY_BACKGROUND,
+                            borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
                             shadowOpacity: isDark ? 0.2 : 0.05,
-                            shadowColor: isToday ? '#F43F5E' : "#000",
+                            shadowColor: "#000",
                         },
                     ]}
                 >
@@ -311,9 +338,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                         style={[
                             styles.avatar,
                             {
-                                backgroundColor: isToday
-                                    ? (isDark ? 'rgba(244, 63, 94, 0.3)' : 'rgba(244, 63, 94, 0.15)')
-                                    : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'),
+                                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
                             },
                         ]}
                     >
@@ -409,6 +434,90 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
         );
     };
 
+    // Empty state
+    if (birthdays.length === 0) {
+        return (
+            <View style={{ flex: 1 }}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            if (navigation.canGoBack()) {
+                                navigation.goBack();
+                            } else {
+                                router.replace("/");
+                            }
+                        }}
+                        style={{ marginRight: 10, zIndex: 20 }}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 60 }}
+                    >
+                        <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
+                    </TouchableOpacity>
+                    <View style={{ flex: 1, justifyContent: "center" }} pointerEvents="none">
+                        <StyledText style={[styles.headerTitle, { color: colors.PRIMARY_TEXT }]}>
+                            {t("tab_birthday")}
+                        </StyledText>
+                    </View>
+                </View>
+                <ScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", paddingBottom: 80 }}
+                    refreshControl={
+                        <StyledRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
+                >
+                    <View style={styles.emptyContainer}>
+                        <View
+                            style={[
+                                styles.emptyIcon,
+                                {
+                                    backgroundColor: colors.SECONDARY_BACKGROUND,
+                                    shadowColor: BIRTHDAY_PRIMARY,
+                                },
+                            ]}
+                        >
+                            <Ionicons name="gift-outline" size={64} color={BIRTHDAY_LIGHT} />
+                        </View>
+                        <StyledText
+                            style={{ fontSize: 22, fontWeight: "bold", color: colors.PRIMARY_TEXT, marginBottom: 8 }}
+                        >
+                            {t("birthday_empty_title")}
+                        </StyledText>
+                        <StyledText
+                            style={{
+                                fontSize: 16,
+                                color: colors.PLACEHOLDER,
+                                textAlign: "center",
+                                marginBottom: 32,
+                                paddingHorizontal: 40,
+                            }}
+                        >
+                            {t("birthday_empty_desc")}
+                        </StyledText>
+                        <TouchableOpacity
+                            onPress={onAddRequest}
+                            activeOpacity={0.8}
+                            style={[
+                                styles.emptyButton,
+                                {
+                                    backgroundColor: isDark ? colors.SECONDARY_BACKGROUND : colors.PRIMARY_BACKGROUND,
+                                    borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+                                    shadowColor: BIRTHDAY_PRIMARY,
+                                    shadowOpacity: isDark ? 0.3 : 0.1,
+                                },
+                            ]}
+                        >
+                            <Ionicons name="add" size={24} color={BIRTHDAY_PRIMARY} />
+                            <StyledText style={{ color: BIRTHDAY_PRIMARY, fontSize: 16, fontWeight: "bold" }}>
+                                {t("birthday_add")}
+                            </StyledText>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </View>
+        );
+    }
+
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.header}>
@@ -425,13 +534,124 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                 >
                     <Ionicons name="chevron-back" size={24} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>
-                <View style={{ flex: 1, justifyContent: "center" }} pointerEvents="none">
+
+                <View style={{ flex: 1, justifyContent: "center" }}>
                     <StyledText style={[styles.headerTitle, { color: colors.PRIMARY_TEXT }]}>
                         {t("tab_birthday")}
                     </StyledText>
                 </View>
-                <View style={{ width: 40, height: 40 }} />
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <TouchableOpacity
+                        onPress={toggleViewMode}
+                        style={[styles.viewToggleButton, {
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                        }]}
+                    >
+                        <Ionicons
+                            name={viewMode === "card" ? "list" : "grid"}
+                            size={20}
+                            color={colors.PRIMARY_TEXT}
+                        />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => router.push("/birthday-history")}
+                        style={{
+                            width: 38,
+                            height: 38,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                            borderRadius: 12,
+                            borderWidth: 0.2,
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                        }}
+                    >
+                        <Ionicons name="time-outline" size={22} color={colors.PRIMARY_TEXT} />
+                    </TouchableOpacity>
+                </View>
             </View>
+
+            {/* Sticky headers handled conditionally */}
+            {todayBirthdays.length > 0 && (todayExpanded || upcomingExpanded || allExpanded) && (
+                <TouchableOpacity
+                    style={[styles.sectionHeaderCard, styles.stickySectionHeader, { backgroundColor: isDark ? 'rgba(244, 63, 94, 0.15)' : 'rgba(244, 63, 94, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(244, 63, 94, 0.3)' : 'rgba(244, 63, 94, 0.15)' }]}
+                    onPress={() => toggleSection(setTodayExpanded, todayAnimation, 'today')}
+                >
+                    <View style={styles.sectionTitleContainer}>
+                        <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(244, 63, 94, 0.2)' : 'rgba(244, 63, 94, 0.1)' }]}>
+                            <Ionicons name="sparkles-outline" size={18} color="#F43F5E" />
+                        </View>
+                        <StyledText style={styles.sectionTitleCard}>{t("birthday_today")}</StyledText>
+                        <View style={styles.cardBadge}>
+                            <StyledText style={styles.cardBadgeText}>{todayBirthdays.length}</StyledText>
+                        </View>
+                    </View>
+                    <View style={styles.sectionControls}>
+                        <View style={{ flex: 1 }} />
+                        <View style={styles.chevronZone}>
+                            <Animated.View style={{ transform: [{ rotate: getRotation(todayAnimation) }] }}>
+                                <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
+                            </Animated.View>
+                        </View>
+                    </View>
+                    <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(244, 63, 94, 0.12)' }, getCircleTransform(todayAnimation)]} />
+                </TouchableOpacity>
+            )}
+
+            {upcomingBirthdays.length > 0 && (upcomingExpanded || allExpanded) && (
+                <TouchableOpacity
+                    style={[styles.sectionHeaderCard, styles.stickySectionHeader, { backgroundColor: isDark ? 'rgba(78, 205, 196, 0.15)' : 'rgba(78, 205, 196, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(78, 205, 196, 0.3)' : 'rgba(78, 205, 196, 0.15)' }]}
+                    onPress={() => toggleSection(setUpcomingExpanded, upcomingAnimation, 'upcoming')}
+                >
+                    <View style={styles.sectionTitleContainer}>
+                        <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(78, 205, 196, 0.2)' : 'rgba(78, 205, 196, 0.1)' }]}>
+                            <Ionicons name="calendar-outline" size={18} color="#4ECDC4" />
+                        </View>
+                        <StyledText style={styles.sectionTitleCard}>{t("birthday_upcoming")}</StyledText>
+                        <View style={styles.cardBadge}>
+                            <StyledText style={styles.cardBadgeText}>{upcomingBirthdays.length}</StyledText>
+                        </View>
+                    </View>
+                    <View style={styles.sectionControls}>
+                        <View style={{ flex: 1 }} />
+                        <View style={styles.chevronZone}>
+                            <Animated.View style={{ transform: [{ rotate: getRotation(upcomingAnimation) }] }}>
+                                <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
+                            </Animated.View>
+                        </View>
+                    </View>
+                    <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(78, 205, 196, 0.12)' }, getCircleTransform(upcomingAnimation)]} />
+                </TouchableOpacity>
+            )}
+
+            {allExpanded && (
+                <TouchableOpacity
+                    style={[styles.sectionHeaderCard, styles.stickySectionHeader, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(79, 70, 229, 0.3)' : 'rgba(79, 70, 229, 0.15)' }]}
+                    onPress={() => toggleSection(setAllExpanded, allAnimation, 'all')}
+                >
+                    <View style={styles.sectionTitleContainer}>
+                        <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.2)' : 'rgba(79, 70, 229, 0.1)' }]}>
+                            <Ionicons name="gift-outline" size={18} color={BIRTHDAY_LIGHT} />
+                        </View>
+                        <StyledText style={styles.sectionTitleCard}>{t("birthday_all")}</StyledText>
+                        <View style={styles.cardBadge}>
+                            <StyledText style={styles.cardBadgeText}>{otherBirthdays.length}</StyledText>
+                        </View>
+                    </View>
+                    <View style={styles.sectionControls}>
+                        <View style={{ flex: 1 }} />
+                        <View style={styles.chevronZone}>
+                            <Animated.View style={{ transform: [{ rotate: getRotation(allAnimation) }] }}>
+                                <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
+                            </Animated.View>
+                        </View>
+                    </View>
+                    <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(79, 70, 229, 0.12)' }, getCircleTransform(allAnimation)]} />
+                </TouchableOpacity>
+            )}
 
             <ScrollView
                 style={{ flex: 1 }}
@@ -442,35 +662,41 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
             >
                 {todayBirthdays.length > 0 && (
                     <View style={styles.sectionContainer}>
-                        <TouchableOpacity
-                            style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(244, 63, 94, 0.15)' : 'rgba(244, 63, 94, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(244, 63, 94, 0.3)' : 'rgba(244, 63, 94, 0.15)' }]}
-                            onPress={() => toggleSection(setTodayExpanded, todayAnimation, 'today')}
-                        >
-                            <View style={styles.sectionTitleContainer}>
-                                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(244, 63, 94, 0.2)' : 'rgba(244, 63, 94, 0.1)' }]}>
-                                    <Ionicons name="sparkles-outline" size={18} color="#F43F5E" />
+                        {!upcomingExpanded && !allExpanded && !todayExpanded && (
+                            <TouchableOpacity
+                                style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(244, 63, 94, 0.15)' : 'rgba(244, 63, 94, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(244, 63, 94, 0.3)' : 'rgba(244, 63, 94, 0.15)' }]}
+                                onPress={() => toggleSection(setTodayExpanded, todayAnimation, 'today')}
+                            >
+                                <View style={styles.sectionTitleContainer}>
+                                    <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(244, 63, 94, 0.2)' : 'rgba(244, 63, 94, 0.1)' }]}>
+                                        <Ionicons name="sparkles-outline" size={18} color="#F43F5E" />
+                                    </View>
+                                    <StyledText style={styles.sectionTitleCard}>
+                                        {t("birthday_today")}
+                                    </StyledText>
+                                    <View style={styles.cardBadge}>
+                                        <StyledText style={styles.cardBadgeText}>{todayBirthdays.length}</StyledText>
+                                    </View>
                                 </View>
-                                <StyledText style={styles.sectionTitleCard}>
-                                    {t("birthday_today")}
-                                </StyledText>
-                                <View style={styles.cardBadge}>
-                                    <StyledText style={styles.cardBadgeText}>{todayBirthdays.length}</StyledText>
+                                <View style={styles.sectionControls}>
+                                    <View style={{ flex: 1 }} />
+                                    <View style={styles.chevronZone}>
+                                        <Animated.View style={{ transform: [{ rotate: getRotation(todayAnimation) }] }}>
+                                            <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
+                                        </Animated.View>
+                                    </View>
                                 </View>
-                            </View>
-                            <View style={styles.sectionControls}>
-                                <View style={{ flex: 1 }} />
-                                <View style={styles.chevronZone}>
-                                    <Animated.View style={{ transform: [{ rotate: getRotation(todayAnimation) }] }}>
-                                        <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
-                                    </Animated.View>
-                                </View>
-                            </View>
-                            <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(244, 63, 94, 0.12)' }, getCircleTransform(todayAnimation)]} />
-                        </TouchableOpacity>
+                                <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(244, 63, 94, 0.12)' }, getCircleTransform(todayAnimation)]} />
+                            </TouchableOpacity>
+                        )}
 
                         {todayExpanded && (
-                            <View style={{ marginTop: 5 }}>
-                                {todayBirthdays.map(item => <BirthdayCard key={item.id} item={item} />)}
+                            <View style={[viewMode === 'card' ? styles.gridContainer : { marginTop: 5 }]}>
+                                {todayBirthdays.map(item =>
+                                    viewMode === 'card'
+                                        ? <BirthdayGridItem key={item.id} item={item} />
+                                        : <BirthdayCard key={item.id} item={item} />
+                                )}
                             </View>
                         )}
                     </View>
@@ -478,70 +704,82 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
 
                 {upcomingBirthdays.length > 0 && (
                     <View style={styles.sectionContainer}>
-                        <TouchableOpacity
-                            style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(78, 205, 196, 0.15)' : 'rgba(78, 205, 196, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(78, 205, 196, 0.3)' : 'rgba(78, 205, 196, 0.15)' }]}
-                            onPress={() => toggleSection(setUpcomingExpanded, upcomingAnimation, 'upcoming')}
-                        >
-                            <View style={styles.sectionTitleContainer}>
-                                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(78, 205, 196, 0.2)' : 'rgba(78, 205, 196, 0.1)' }]}>
-                                    <Ionicons name="time-outline" size={18} color="#4ECDC4" />
+                        {!allExpanded && !upcomingExpanded && (
+                            <TouchableOpacity
+                                style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(78, 205, 196, 0.15)' : 'rgba(78, 205, 196, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(78, 205, 196, 0.3)' : 'rgba(78, 205, 196, 0.15)' }]}
+                                onPress={() => toggleSection(setUpcomingExpanded, upcomingAnimation, 'upcoming')}
+                            >
+                                <View style={styles.sectionTitleContainer}>
+                                    <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(78, 205, 196, 0.2)' : 'rgba(78, 205, 196, 0.1)' }]}>
+                                        <Ionicons name="calendar-outline" size={18} color="#4ECDC4" />
+                                    </View>
+                                    <StyledText style={styles.sectionTitleCard}>
+                                        {t("birthday_upcoming")}
+                                    </StyledText>
+                                    <View style={styles.cardBadge}>
+                                        <StyledText style={styles.cardBadgeText}>{upcomingBirthdays.length}</StyledText>
+                                    </View>
                                 </View>
-                                <StyledText style={styles.sectionTitleCard}>
-                                    {t("birthday_upcoming")}
-                                </StyledText>
-                                <View style={styles.cardBadge}>
-                                    <StyledText style={styles.cardBadgeText}>{upcomingBirthdays.length}</StyledText>
+                                <View style={styles.sectionControls}>
+                                    <View style={{ flex: 1 }} />
+                                    <View style={styles.chevronZone}>
+                                        <Animated.View style={{ transform: [{ rotate: getRotation(upcomingAnimation) }] }}>
+                                            <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
+                                        </Animated.View>
+                                    </View>
                                 </View>
-                            </View>
-                            <View style={styles.sectionControls}>
-                                <View style={{ flex: 1 }} />
-                                <View style={styles.chevronZone}>
-                                    <Animated.View style={{ transform: [{ rotate: getRotation(upcomingAnimation) }] }}>
-                                        <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
-                                    </Animated.View>
-                                </View>
-                            </View>
-                            <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(78, 205, 196, 0.12)' }, getCircleTransform(upcomingAnimation)]} />
-                        </TouchableOpacity>
+                                <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(78, 205, 196, 0.12)' }, getCircleTransform(upcomingAnimation)]} />
+                            </TouchableOpacity>
+                        )}
 
                         {upcomingExpanded && (
-                            <View style={{ marginTop: 5 }}>
-                                {upcomingBirthdays.map(item => <BirthdayCard key={item.id} item={item} />)}
+                            <View style={[viewMode === 'card' ? styles.gridContainer : { marginTop: 5 }]}>
+                                {upcomingBirthdays.map(item =>
+                                    viewMode === 'card'
+                                        ? <BirthdayGridItem key={item.id} item={item} />
+                                        : <BirthdayCard key={item.id} item={item} />
+                                )}
                             </View>
                         )}
                     </View>
                 )}
 
                 <View style={styles.sectionContainer}>
-                    <TouchableOpacity
-                        style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(79, 70, 229, 0.3)' : 'rgba(79, 70, 229, 0.15)' }]}
-                        onPress={() => toggleSection(setAllExpanded, allAnimation, 'all')}
-                    >
-                        <View style={styles.sectionTitleContainer}>
-                            <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.2)' : 'rgba(79, 70, 229, 0.1)' }]}>
-                                <Ionicons name="gift-outline" size={18} color={BIRTHDAY_LIGHT} />
+                    {!allExpanded && (
+                        <TouchableOpacity
+                            style={[styles.sectionHeaderCard, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.08)', borderWidth: 0.2, borderColor: isDark ? 'rgba(79, 70, 229, 0.3)' : 'rgba(79, 70, 229, 0.15)' }]}
+                            onPress={() => toggleSection(setAllExpanded, allAnimation, 'all')}
+                        >
+                            <View style={styles.sectionTitleContainer}>
+                                <View style={[styles.iconContainer, { backgroundColor: isDark ? 'rgba(79, 70, 229, 0.2)' : 'rgba(79, 70, 229, 0.1)' }]}>
+                                    <Ionicons name="gift-outline" size={18} color={BIRTHDAY_LIGHT} />
+                                </View>
+                                <StyledText style={styles.sectionTitleCard}>
+                                    {t("birthday_all")}
+                                </StyledText>
+                                <View style={styles.cardBadge}>
+                                    <StyledText style={styles.cardBadgeText}>{otherBirthdays.length}</StyledText>
+                                </View>
                             </View>
-                            <StyledText style={styles.sectionTitleCard}>
-                                {t("birthday_all")}
-                            </StyledText>
-                            <View style={styles.cardBadge}>
-                                <StyledText style={styles.cardBadgeText}>{otherBirthdays.length}</StyledText>
+                            <View style={styles.sectionControls}>
+                                <View style={{ flex: 1 }} />
+                                <View style={styles.chevronZone}>
+                                    <Animated.View style={{ transform: [{ rotate: getRotation(allAnimation) }] }}>
+                                        <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
+                                    </Animated.View>
+                                </View>
                             </View>
-                        </View>
-                        <View style={styles.sectionControls}>
-                            <View style={{ flex: 1 }} />
-                            <View style={styles.chevronZone}>
-                                <Animated.View style={{ transform: [{ rotate: getRotation(allAnimation) }] }}>
-                                    <Ionicons name="chevron-forward" size={14} color={isDark ? colors.SECTION_TEXT : colors.PRIMARY_TEXT} />
-                                </Animated.View>
-                            </View>
-                        </View>
-                        <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(79, 70, 229, 0.12)' }, getCircleTransform(allAnimation)]} />
-                    </TouchableOpacity>
+                            <Animated.View style={[styles.decorativeCircle, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(79, 70, 229, 0.12)' }, getCircleTransform(allAnimation)]} />
+                        </TouchableOpacity>
+                    )}
 
                     {allExpanded && (
-                        <View style={{ marginTop: 5 }}>
-                            {otherBirthdays.map(item => <BirthdayCard key={item.id} item={item} />)}
+                        <View style={[viewMode === 'card' ? styles.gridContainer : { marginTop: 5 }]}>
+                            {otherBirthdays.map(item =>
+                                viewMode === 'card'
+                                    ? <BirthdayGridItem key={item.id} item={item} />
+                                    : <BirthdayCard key={item.id} item={item} />
+                            )}
                         </View>
                     )}
                 </View>

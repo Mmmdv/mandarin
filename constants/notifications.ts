@@ -25,7 +25,7 @@ export async function registerForLocalNotificationsAsync() {
 }
 
 const ICON_MAP: Record<string, string> = {
-    'list': '📝',
+    'list': '',
     'gift': '🎁',
     'videocam': '🎬',
     'film': '🎬',
