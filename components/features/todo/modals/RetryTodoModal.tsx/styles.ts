@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native"
 export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     container: {
         borderRadius: 24,
-        borderWidth: 0.2,
+        borderWidth: 1,
         padding: 24,
         width: 340,
         maxWidth: "90%",
@@ -29,18 +29,34 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         color: colors.PLACEHOLDER,
         textAlign: "center",
         lineHeight: 20,
+        marginBottom: 8,
     },
-    optionsContainer: {
-        width: '100%',
-        gap: 10,
-        marginVertical: 15,
+    tableContainer: {
+        width: "100%",
+        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+        borderRadius: 16,
+        padding: 4,
+        overflow: 'hidden',
     },
-    buttonRow: {
+    tableRow: {
         flexDirection: 'row',
-        gap: 10,
-        justifyContent: 'space-between',
+        paddingVertical: 14,
+        paddingHorizontal: 12,
+        alignItems: 'center',
     },
-    optionButton: {
+    tableRowBorder: {
+        borderTopWidth: 1,
+        borderTopColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+    },
+    tableLabelColumn: {
         flex: 1,
-    }
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    tableLabelText: {
+        fontSize: 12,
+        color: colors.SECTION_TEXT,
+        fontWeight: "500",
+    },
 })

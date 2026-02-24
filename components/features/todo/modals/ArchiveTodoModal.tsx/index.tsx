@@ -12,12 +12,14 @@ type ArchiveTodoModalProps = {
     isOpen: boolean
     onClose: () => void
     onArchive: () => void
+    title: string
 };
 
 const ArchiveTodoModal: React.FC<ArchiveTodoModalProps> = ({
     isOpen,
     onClose,
     onArchive,
+    title
 }) => {
     const { colors, t, isDark } = useTheme();
     const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
@@ -31,7 +33,7 @@ const ArchiveTodoModal: React.FC<ArchiveTodoModalProps> = ({
         <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
-                    backgroundColor: colors.TAB_BAR,
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
                     shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
@@ -45,7 +47,21 @@ const ArchiveTodoModal: React.FC<ArchiveTodoModalProps> = ({
 
                 <View style={modalStyles.divider} />
 
-                <StyledText style={styles.messageText}>
+                <View style={styles.tableContainer}>
+                    <View style={styles.tableRow}>
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="document-text-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("title")}</StyledText>
+                        </View>
+                        <View style={styles.tableValueColumn}>
+                            <StyledText style={[styles.tableValueText, { textAlign: 'right' }]}>
+                                {title}
+                            </StyledText>
+                        </View>
+                    </View>
+                </View>
+
+                <StyledText style={[styles.messageText, { marginTop: 8 }]}>
                     {t("archive_confirm_message")}
                 </StyledText>
 

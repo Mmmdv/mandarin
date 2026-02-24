@@ -116,9 +116,14 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
 
     const formatDateDisplay = (date: Date) => {
         const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const months = ["Yan", "Fev", "Mar", "Apr", "May", "İyn", "İyl", "Avq", "Sen", "Okt", "Noy", "Dek"];
+        const enMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const ruMonths = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+
+        const monthNames = lang === 'az' ? months : lang === 'ru' ? ruMonths : enMonths;
+        const month = monthNames[date.getMonth()];
         const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
+        return `${day} ${month} ${year}`;
     };
 
     return (

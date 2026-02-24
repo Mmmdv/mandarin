@@ -145,7 +145,7 @@ const BirthdayMenuModal: React.FC<BirthdayMenuModalProps> = ({
                         {onReschedule && (
                             <MenuItem
                                 icon="notifications-outline"
-                                label={t("reschedule")}
+                                label={t("edit")}
                                 onPress={onReschedule}
                                 color={colors.PRIMARY_TEXT}
                             />

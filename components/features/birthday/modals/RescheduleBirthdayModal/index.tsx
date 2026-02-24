@@ -23,7 +23,7 @@ export function RescheduleBirthdayModal({
     initialDate,
     onReschedule,
 }: RescheduleBirthdayModalProps) {
-    const { t, colors, theme, isDark } = useTheme();
+    const { t, colors, theme, isDark, lang } = useTheme();
     const styles = useMemo(() => getViewStyles(colors, isDark), [colors, isDark]);
     const localStyles = useMemo(() => getLocalStyles(colors, isDark), [colors, isDark]);
     const [date, setDate] = useState<Date>(new Date());
@@ -59,9 +59,14 @@ export function RescheduleBirthdayModal({
 
     const formatDateOnly = (d: Date) => {
         const day = d.getDate().toString().padStart(2, "0");
-        const month = (d.getMonth() + 1).toString().padStart(2, "0");
+        const months = ["Yan", "Fev", "Mar", "Apr", "May", "İyn", "İyl", "Avq", "Sen", "Okt", "Noy", "Dek"];
+        const enMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const ruMonths = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+
+        const monthNames = lang === 'az' ? months : lang === 'ru' ? ruMonths : enMonths;
+        const month = monthNames[d.getMonth()];
         const year = d.getFullYear();
-        return `${day}.${month}.${year}`;
+        return `${day} ${month} ${year}`;
     };
 
     const formatTimeOnly = (d: Date) => {
@@ -85,11 +90,11 @@ export function RescheduleBirthdayModal({
                         localStyles.iconContainer,
                     ]}
                 >
-                    <Ionicons name="calendar-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
+                    <Ionicons name="notifications-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                 </View>
 
                 <StyledText style={styles.headerText}>
-                    {t("reschedule")}
+                    {t("edit")}
                 </StyledText>
 
                 <View style={modalStyles.divider} />

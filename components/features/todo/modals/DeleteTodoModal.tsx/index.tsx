@@ -12,12 +12,14 @@ type DeleteTodoModalProps = {
     isOpen: boolean
     onClose: () => void
     onDelete: () => void
+    title: string
 };
 
 const DeleteTodoModal: React.FC<DeleteTodoModalProps> = ({
     isOpen,
     onClose,
-    onDelete
+    onDelete,
+    title
 }) => {
     const { t, colors, isDark } = useTheme();
     const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
@@ -26,7 +28,7 @@ const DeleteTodoModal: React.FC<DeleteTodoModalProps> = ({
         <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
-                    backgroundColor: colors.TAB_BAR,
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
                     shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
@@ -40,7 +42,21 @@ const DeleteTodoModal: React.FC<DeleteTodoModalProps> = ({
 
                 <View style={modalStyles.divider} />
 
-                <StyledText style={styles.messageText}>
+                <View style={styles.tableContainer}>
+                    <View style={styles.tableRow}>
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="document-text-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("title")}</StyledText>
+                        </View>
+                        <View style={styles.tableValueColumn}>
+                            <StyledText style={[styles.tableValueText, { textAlign: 'right' }]}>
+                                {title}
+                            </StyledText>
+                        </View>
+                    </View>
+                </View>
+
+                <StyledText style={[styles.messageText, { marginTop: 8 }]}>
                     {t("delete_confirm_message")}
                 </StyledText>
 

@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native"
 export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     container: {
         borderRadius: 24,
-        borderWidth: 0.2,
+        borderWidth: 1,
         padding: 24,
         width: 340,
         maxWidth: "90%",

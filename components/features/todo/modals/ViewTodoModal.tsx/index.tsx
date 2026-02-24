@@ -45,7 +45,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
         <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
-                    backgroundColor: colors.TAB_BAR,
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
                     shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
@@ -59,62 +59,29 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
 
                 <View style={modalStyles.divider} />
 
-                {/* Prominent Task Title */}
-                <View style={styles.titleSection}>
-                    <StyledText style={styles.titleValue}>{title}</StyledText>
-                </View>
-
                 {/* Table-like Date Section */}
                 <View style={styles.tableContainer}>
                     <View style={styles.tableRow}>
                         <View style={styles.tableLabelColumn}>
-                            <Ionicons name="add" size={18} color={isDark ? "#D1D1D1" : "#8E8E93"} />
-                            <StyledText style={styles.tableLabelText}>{t("created")}</StyledText>
+                            <Ionicons name="document-text-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("title")}</StyledText>
                         </View>
                         <View style={styles.tableValueColumn}>
-                            <StyledText style={[styles.tableValueText, { color: isDark ? '#D1D1D1' : '#8E8E93' }]}>
-                                {formatDate(createdAt, lang)}
+                            <StyledText style={[styles.tableValueText, { textAlign: 'right' }]}>
+                                {title}
                             </StyledText>
                         </View>
                     </View>
 
-                    {updatedAt && (
-                        <View style={[styles.tableRow, styles.tableRowBorder]}>
-                            <View style={styles.tableLabelColumn}>
-                                <Ionicons name="create-outline" size={18} color="#5BC0EB" />
-                                <StyledText style={styles.tableLabelText}>{t("edited")}</StyledText>
-                            </View>
-                            <View style={styles.tableValueColumn}>
-                                <StyledText style={[styles.tableValueText, { color: '#5BC0EB' }]}>
-                                    {formatDate(updatedAt, lang)}
-                                </StyledText>
-                            </View>
-                        </View>
-                    )}
-
-                    {completedAt && (
-                        <View style={[styles.tableRow, styles.tableRowBorder]}>
-                            <View style={styles.tableLabelColumn}>
-                                <Ionicons name="checkmark-done-outline" size={18} color="#4ECDC4" />
-                                <StyledText style={styles.tableLabelText}>{t("completed")}</StyledText>
-                            </View>
-                            <View style={styles.tableValueColumn}>
-                                <StyledText style={[styles.tableValueText, { color: '#4ECDC4' }]}>
-                                    {formatDate(completedAt, lang)}
-                                </StyledText>
-                            </View>
-                        </View>
-                    )}
-
                     <View style={[styles.tableRow, styles.tableRowBorder]}>
                         <View style={styles.tableLabelColumn}>
-                            <Ionicons name="speedometer-outline" size={18} color="#FF7043" />
+                            <Ionicons name="speedometer-outline" size={18} color={colors.SECTION_TEXT} />
                             <StyledText style={styles.tableLabelText}>
                                 {completedAt ? t("execution_time") : t("time_elapsed")}
                             </StyledText>
                         </View>
                         <View style={styles.tableValueColumn}>
-                            <StyledText style={[styles.tableValueText, { color: '#FF7043' }]}>
+                            <StyledText style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}>
                                 {completedAt
                                     ? formatDuration(updatedAt || createdAt, completedAt, t)
                                     : formatDuration(updatedAt || createdAt, new Date().toISOString(), t)
@@ -126,22 +93,62 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
                     {reminder && (
                         <View style={[styles.tableRow, styles.tableRowBorder]}>
                             <View style={styles.tableLabelColumn}>
-                                <Ionicons name="alarm-outline" size={18} color={colors.REMINDER} />
+                                <Ionicons name="alarm-outline" size={18} color={colors.SECTION_TEXT} />
                                 <StyledText style={styles.tableLabelText}>{t("reminder")}</StyledText>
                             </View>
                             <View style={styles.tableValueColumn}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                                     {reminderStatus === 'Göndərilib' ? (
-                                        <Ionicons name="checkmark-done-circle-outline" size={14} color={colors.CHECKBOX_SUCCESS} />
+                                        <Ionicons name="checkmark-done" size={14} color={colors.CHECKBOX_SUCCESS} />
                                     ) : (reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled || completedAt) ? (
                                         <Ionicons name="notifications-off" size={14} color={colors.ERROR_INPUT_TEXT} />
                                     ) : (
                                         <Ionicons name="hourglass-outline" size={14} color={colors.REMINDER} />
                                     )}
-                                    <StyledText style={[styles.tableValueText, { color: colors.REMINDER }]}>
+                                    <StyledText style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}>
                                         {formatDate(reminder, lang)}
                                     </StyledText>
                                 </View>
+                            </View>
+                        </View>
+                    )}
+
+                    <View style={[styles.tableRow, styles.tableRowBorder]}>
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="add" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("created")}</StyledText>
+                        </View>
+                        <View style={styles.tableValueColumn}>
+                            <StyledText style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}>
+                                {formatDate(createdAt, lang)}
+                            </StyledText>
+                        </View>
+                    </View>
+
+                    {updatedAt && (
+                        <View style={[styles.tableRow, styles.tableRowBorder]}>
+                            <View style={styles.tableLabelColumn}>
+                                <Ionicons name="create-outline" size={18} color={colors.SECTION_TEXT} />
+                                <StyledText style={styles.tableLabelText}>{t("edited")}</StyledText>
+                            </View>
+                            <View style={styles.tableValueColumn}>
+                                <StyledText style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}>
+                                    {formatDate(updatedAt, lang)}
+                                </StyledText>
+                            </View>
+                        </View>
+                    )}
+
+                    {completedAt && (
+                        <View style={[styles.tableRow, styles.tableRowBorder]}>
+                            <View style={styles.tableLabelColumn}>
+                                <Ionicons name="checkmark-done-outline" size={18} color={colors.SECTION_TEXT} />
+                                <StyledText style={styles.tableLabelText}>{t("completed")}</StyledText>
+                            </View>
+                            <View style={styles.tableValueColumn}>
+                                <StyledText style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}>
+                                    {formatDate(completedAt, lang)}
+                                </StyledText>
                             </View>
                         </View>
                     )}

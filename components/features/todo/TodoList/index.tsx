@@ -393,7 +393,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     </View>
                     <View style={[styles.sectionControls, { zIndex: 2 }]}>
                         <View style={styles.actionZone}>
-                            {sortedCompletedTodos.length > 0 && onArchiveAll && (
+                            {doneExpanded && sortedCompletedTodos.length > 0 && onArchiveAll && (
                                 <TouchableOpacity onPress={() => setIsArchiveAllModalOpen(true)} style={{ padding: 4 }}>
                                     <Ionicons name="archive-outline" size={20} color={colors.PRIMARY_TEXT} />
                                 </TouchableOpacity>
@@ -440,7 +440,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                     </View>
                     <View style={[styles.sectionControls, { zIndex: 2 }]}>
                         <View style={styles.actionZone}>
-                            {archivedTodos.length > 0 && (
+                            {archiveExpanded && archivedTodos.length > 0 && (
                                 <TouchableOpacity onPress={() => setIsClearArchiveModalOpen(true)} style={{ padding: 4 }}>
                                     <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
                                 </TouchableOpacity>
@@ -571,7 +571,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                                 </View>
                                 <View style={[styles.sectionControls, { zIndex: 2 }]}>
                                     <View style={styles.actionZone}>
-                                        {sortedCompletedTodos.length > 0 && onArchiveAll && (
+                                        {doneExpanded && sortedCompletedTodos.length > 0 && onArchiveAll && (
                                             <TouchableOpacity onPress={() => setIsArchiveAllModalOpen(true)} style={{ padding: 4 }}>
                                                 <Ionicons name="archive-outline" size={20} color={colors.PRIMARY_TEXT} />
                                             </TouchableOpacity>
@@ -639,7 +639,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             </View>
                             <View style={[styles.sectionControls, { zIndex: 2 }]}>
                                 <View style={styles.actionZone}>
-                                    {archivedTodos.length > 0 && (
+                                    {archiveExpanded && archivedTodos.length > 0 && (
                                         <TouchableOpacity onPress={() => setIsClearArchiveModalOpen(true)} style={{ padding: 4 }}>
                                             <Ionicons name="trash-outline" size={20} color="#FF6B6B" />
                                         </TouchableOpacity>
@@ -745,6 +745,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             setIsDeleteModalOpen(false);
                             setMenuTarget(undefined);
                         }}
+                        title={menuTarget.title}
                     />
 
                     <ArchiveTodoModal
@@ -758,6 +759,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             setIsArchiveModalOpen(false);
                             setMenuTarget(undefined);
                         }}
+                        title={menuTarget.title}
                     />
 
                     <RetryTodoModal

@@ -31,7 +31,7 @@ const ArchiveAllModal: React.FC<ArchiveAllModalProps> = ({
         <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
-                    backgroundColor: colors.TAB_BAR,
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
                     shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,

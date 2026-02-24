@@ -543,20 +543,6 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     <TouchableOpacity
-                        onPress={toggleViewMode}
-                        style={[styles.viewToggleButton, {
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
-                        }]}
-                    >
-                        <Ionicons
-                            name={viewMode === "card" ? "list" : "grid"}
-                            size={20}
-                            color={colors.PRIMARY_TEXT}
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
                         onPress={() => router.push("/birthday-history")}
                         style={{
                             width: 38,
@@ -570,6 +556,20 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                         }}
                     >
                         <Ionicons name="time-outline" size={22} color={colors.PRIMARY_TEXT} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={toggleViewMode}
+                        style={[styles.viewToggleButton, {
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                        }]}
+                    >
+                        <Ionicons
+                            name={viewMode === "card" ? "list" : "grid"}
+                            size={20}
+                            color={colors.PRIMARY_TEXT}
+                        />
                     </TouchableOpacity>
                 </View>
             </View>

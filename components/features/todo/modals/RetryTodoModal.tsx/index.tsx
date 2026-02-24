@@ -5,7 +5,7 @@ import { modalStyles } from "@/constants/modalStyles";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { getStyles } from "./styles";
 
 type RetryTodoModalProps = {
@@ -26,7 +26,7 @@ const RetryTodoModal: React.FC<RetryTodoModalProps> = ({
         <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
                 <View style={[modalStyles.iconContainer, {
-                    backgroundColor: colors.TAB_BAR,
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
                     shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.3,
@@ -44,35 +44,50 @@ const RetryTodoModal: React.FC<RetryTodoModalProps> = ({
                     {t("retry_confirm_message")}
                 </StyledText>
 
-                <View style={styles.optionsContainer}>
-                    <View style={styles.buttonRow}>
-                        <StyledButton
-                            label={t("retry_1_hour")}
-                            onPress={() => onRetry('hour')}
-                            variant="dark_button"
-                            style={styles.optionButton}
-                        />
-                        <StyledButton
-                            label={t("retry_1_day")}
-                            onPress={() => onRetry('day')}
-                            variant="dark_button"
-                            style={styles.optionButton}
-                        />
-                    </View>
-                    <View style={styles.buttonRow}>
-                        <StyledButton
-                            label={t("retry_1_week")}
-                            onPress={() => onRetry('week')}
-                            variant="dark_button"
-                            style={styles.optionButton}
-                        />
-                        <StyledButton
-                            label={t("retry_1_month")}
-                            onPress={() => onRetry('month')}
-                            variant="dark_button"
-                            style={styles.optionButton}
-                        />
-                    </View>
+                <View style={styles.tableContainer}>
+                    <TouchableOpacity
+                        style={styles.tableRow}
+                        onPress={() => onRetry('hour')}
+                    >
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="time-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("retry_1_hour")}</StyledText>
+                        </View>
+                        <Ionicons name="chevron-forward" size={16} color={colors.SECTION_TEXT} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.tableRow, styles.tableRowBorder]}
+                        onPress={() => onRetry('day')}
+                    >
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="calendar-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("retry_1_day")}</StyledText>
+                        </View>
+                        <Ionicons name="chevron-forward" size={16} color={colors.SECTION_TEXT} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.tableRow, styles.tableRowBorder]}
+                        onPress={() => onRetry('week')}
+                    >
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="calendar-number-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("retry_1_week")}</StyledText>
+                        </View>
+                        <Ionicons name="chevron-forward" size={16} color={colors.SECTION_TEXT} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.tableRow, styles.tableRowBorder]}
+                        onPress={() => onRetry('month')}
+                    >
+                        <View style={styles.tableLabelColumn}>
+                            <Ionicons name="rocket-outline" size={18} color={colors.SECTION_TEXT} />
+                            <StyledText style={styles.tableLabelText}>{t("retry_1_month")}</StyledText>
+                        </View>
+                        <Ionicons name="chevron-forward" size={16} color={colors.SECTION_TEXT} />
+                    </TouchableOpacity>
                 </View>
 
                 <View style={[modalStyles.buttonsContainer, { justifyContent: "center", marginTop: 8 }]}>

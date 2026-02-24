@@ -24,27 +24,6 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         opacity: 0.8,
         color: colors.PRIMARY_TEXT,
     },
-    titleSection: {
-        width: '100%',
-        paddingVertical: 12,
-        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-        borderRadius: 16,
-        marginBottom: 8,
-    },
-    titleLabel: {
-        fontSize: 13,
-        color: isDark ? "#aca9a9ff" : "#666",
-        fontWeight: "bold",
-        marginBottom: 8,
-    },
-    titleValue: {
-        width: '100%',
-        fontSize: 16,
-        color: colors.PRIMARY_TEXT,
-        fontWeight: "bold",
-        paddingHorizontal: 16,
-        textAlign: 'left',
-    },
     tableContainer: {
         width: "100%",
         backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
@@ -70,7 +49,7 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     },
     tableLabelText: {
         fontSize: 12,
-        color: isDark ? "#aca9a9ff" : "#666",
+        color: colors.SECTION_TEXT,
         fontWeight: "500",
     },
     tableValueColumn: {
@@ -81,30 +60,5 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         fontSize: 12,
         color: colors.PRIMARY_TEXT,
         fontWeight: "600",
-    },
-    statusBadge: {
-        marginTop: 4,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 8,
-        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-    },
-    statusTextGeneric: {
-        fontSize: 10,
-        fontWeight: 'bold',
-    },
-    statusTextCancelled: {
-        color: colors.ERROR_INPUT_TEXT,
-    },
-    statusTextPending: {
-        color: colors.REMINDER,
-    },
-    statusTextSent: {
-        color: colors.CHECKBOX_SUCCESS,
-    },
-    statusRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
     },
 })
