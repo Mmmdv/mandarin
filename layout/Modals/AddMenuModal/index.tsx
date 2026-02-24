@@ -31,7 +31,7 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                 icon: "checkbox-outline" as const,
                 label: t("menu_add_task"),
                 onPress: onAddTask,
-                color: isDark ? "#4ECDC4" : "#168B83",
+                color: colors.PRIMARY_TEXT,
                 disabled: false
             },
             {
@@ -39,7 +39,7 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                 icon: "gift-outline" as const,
                 label: t("menu_add_birthday"),
                 onPress: onAddBirthday,
-                color: isDark ? "#9D6506" : "#A67C00",
+                color: colors.PRIMARY_TEXT,
                 disabled: false
             },
             {
@@ -47,7 +47,7 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                 icon: "film-outline" as const,
                 label: t("menu_add_movie"),
                 onPress: onAddMovie,
-                color: isDark ? colors.PRIMARY_TEXT : "#90122E",
+                color: colors.PRIMARY_TEXT,
                 disabled: true
             }
         ];
@@ -84,7 +84,7 @@ const AddMenuModal: React.FC<AddMenuModalProps> = ({
                         : (color ? `${color}15` : "rgba(0,0,0,0.06)")
                 }
             ]}>
-                <Ionicons name={icon} size={14} color={color || colors.PRIMARY_TEXT} />
+                <Ionicons name={icon} size={20} color={color || colors.PRIMARY_TEXT} />
             </View>
             <StyledText style={[styles.menuLabel, { color: colors.PRIMARY_TEXT }]}>{label}</StyledText>
         </TouchableOpacity>
@@ -133,34 +133,34 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         position: 'absolute',
-        width: 150,
+        width: '35%',
         borderRadius: 16,
         borderWidth: 0.2,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 5,
+        shadowRadius: 2,
+        elevation: 2,
         overflow: 'hidden',
         paddingVertical: 1,
     },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 10,
-        paddingHorizontal: 10,
+        paddingVertical: 15,
+        paddingHorizontal: 15,
     },
     iconContainer: {
-        width: 20,
-        height: 20,
-        borderRadius: 6,
+        width: 36,
+        height: 36,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 8,
     },
     menuLabel: {
-        fontSize: 11,
-        fontWeight: '600',
+        fontSize: 13,
+        fontWeight: '500',
         flex: 1,
     }
 });

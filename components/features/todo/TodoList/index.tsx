@@ -721,15 +721,14 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onDeleteTodo, onCheckTodo, o
                             setIsEditModalOpen(false);
                             setMenuTarget(undefined);
                         }}
-                        onEdit={(title, reminder, notificationId) => {
+                        onUpdate={(title, reminder, notificationId) => {
                             onEditTodo(menuTarget.id, title, reminder, notificationId);
                             setIsEditModalOpen(false);
                             setMenuTarget(undefined);
                         }}
-                        id={menuTarget.id}
-                        initialTitle={menuTarget.title}
-                        initialReminder={menuTarget.reminder}
-                        initialNotificationId={menuTarget.notificationId}
+                        title={menuTarget.title}
+                        reminder={menuTarget.reminder}
+                        notificationId={menuTarget.notificationId}
                         categoryTitle={categoryTitle}
                         categoryIcon={categoryIcon}
                     />

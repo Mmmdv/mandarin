@@ -36,14 +36,15 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     contactButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
+        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
         paddingVertical: 10,
-        marginTop: 4,
+        paddingHorizontal: 16,
         borderRadius: 12,
-        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-        borderWidth: 0.5,
-        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+        gap: 8,
+        flex: 1,
+        justifyContent: 'center',
+        borderWidth: 0.2,
+        borderColor: colors.SECTION_TEXT
     },
     contactButtonText: {
         fontSize: 13,

@@ -116,8 +116,12 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10 }}>
                         {!isArchived ? (
-                            <View style={styles.checkboxWrapper}>
-                                <StyledCheckBox checked={isCompleted} onCheck={handleCheckToken} />
+                            <View style={[styles.checkboxWrapper, { zIndex: 10 }]}>
+                                <StyledCheckBox
+                                    checked={isCompleted}
+                                    onCheck={handleCheckToken}
+                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 40 }}
+                                />
                                 <CelebrationEffect
                                     animations={ideaAnimations}
                                     celebrationType={celebrationType}
@@ -150,18 +154,29 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                         {reminder && !isCompleted && !isArchived && (
                             <View style={styles.cardMetadata}>
                                 <Ionicons
-                                    name={reminderStatus === 'Ləğv olunub' || reminderCancelled ? "notifications-off" : "hourglass-outline"}
-                                    size={11}
-                                    color={reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER}
+                                    name="alarm-outline"
+                                    size={13}
+                                    color={colors.REMINDER}
                                 />
                                 <View style={styles.cardTimeContainer}>
-                                    <StyledText style={{ fontSize: 9.5, fontWeight: '600', color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER }}>
+                                    <StyledText style={{ fontSize: 9.5, fontWeight: '600', color: colors.REMINDER }}>
                                         {formatDate(reminder, lang).split(' ')[0]}
                                     </StyledText>
-                                    <StyledText style={[styles.cardTimeSmall, { fontSize: 9.5, color: reminderStatus === 'Ləğv olunub' || reminderCancelled ? colors.ERROR_INPUT_TEXT : colors.REMINDER }]}>
+                                    <StyledText style={[styles.cardTimeSmall, { fontSize: 9.5, color: colors.REMINDER }]}>
                                         {formatDate(reminder, lang).split(' ')[1]}
                                     </StyledText>
                                 </View>
+                                {reminderStatus && (
+                                    <View style={{ marginLeft: 2 }}>
+                                        {reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled ? (
+                                            <Ionicons name="notifications-off" size={11} color={colors.ERROR_INPUT_TEXT} />
+                                        ) : reminderStatus === 'Göndərilib' ? (
+                                            <Ionicons name="checkmark-done-outline" size={11} color={colors.CHECKBOX_SUCCESS} />
+                                        ) : (
+                                            <Ionicons name="hourglass-outline" size={11} color={colors.REMINDER} />
+                                        )}
+                                    </View>
+                                )}
                             </View>
                         )}
                     </View>
@@ -171,7 +186,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                             ref={menuButtonRef}
                             onPress={openMenu}
                             activeOpacity={0.7}
-                            hitSlop={10}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 40 }}
                         >
                             <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={colors.PRIMARY_TEXT} />
                         </TouchableOpacity>
@@ -197,8 +212,12 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
             }]} />
             <View style={styles.checkTitleContainer}>
                 {!isArchived ? (
-                    <View style={styles.checkboxWrapper}>
-                        <StyledCheckBox checked={isCompleted} onCheck={handleCheckToken} />
+                    <View style={[styles.checkboxWrapper, { zIndex: 10 }]}>
+                        <StyledCheckBox
+                            checked={isCompleted}
+                            onCheck={handleCheckToken}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 40 }}
+                        />
                         <CelebrationEffect
                             animations={ideaAnimations}
                             celebrationType={celebrationType}
@@ -251,7 +270,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                                     {reminderStatus === 'Ləğv olunub' || reminderStatus === 'Dəyişdirilib və ləğv olunub' || reminderCancelled ? (
                                         <Ionicons name="notifications-off" size={12} color={colors.ERROR_INPUT_TEXT} />
                                     ) : reminderStatus === 'Göndərilib' ? (
-                                        <Ionicons name="checkmark-done-circle-outline" size={12} color={colors.CHECKBOX_SUCCESS} />
+                                        <Ionicons name="checkmark-done-outline" size={12} color={colors.CHECKBOX_SUCCESS} />
                                     ) : (
                                         <Ionicons name="hourglass-outline" size={12} color={colors.REMINDER} />
                                     )}
@@ -266,7 +285,8 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, title, isCompleted, isArchived,
                     ref={menuButtonRef}
                     onPress={openMenu}
                     activeOpacity={0.7}
-                    hitSlop={10}
+
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 40 }}
                 >
                     <Ionicons name="ellipsis-horizontal-outline" size={20.5} color={colors.PRIMARY_TEXT} />
                 </TouchableOpacity>

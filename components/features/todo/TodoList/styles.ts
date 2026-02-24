@@ -144,7 +144,7 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     stickyTodoHeader: {
         marginHorizontal: 20,
         marginTop: 6,
-        marginBottom: 2,
+        marginBottom: 5,
     }
 })
 

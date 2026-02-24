@@ -95,7 +95,7 @@ const NotificationsPage = () => {
             statusIcon = "notifications-off";
         } else if (item.status === 'Göndərilib') {
             statusColor = colors.CHECKBOX_SUCCESS;
-            statusIcon = "checkmark-done-circle-outline";
+            statusIcon = "checkmark-done-outline";
         } else {
             statusColor = "#FFB74D";
             statusIcon = "hourglass-outline";
@@ -147,7 +147,7 @@ const NotificationsPage = () => {
                         {formatDate(item.date, lang)}
                     </StyledText>
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                         <Ionicons name={statusIcon} size={14} color={statusColor} />
                         <StyledText style={{ fontSize: 12, color: statusColor, fontWeight: "600" }}>{statusLabel}</StyledText>
                     </View>

@@ -13,7 +13,7 @@ import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Animated, Keyboard, Platform, Pressable, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Alert, Animated, Keyboard, Platform, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { getAddStyles } from "./styles";
 
 type AddTodoModalProps = {
@@ -26,7 +26,7 @@ type AddTodoModalProps = {
 
 const AddTodoModal: React.FC<AddTodoModalProps> = ({
     isOpen, onClose, onAdd, categoryTitle, categoryIcon }) => {
-    const { t, theme, colors, isDark, notificationsEnabled, todoNotifications } = useTheme();
+    const { t, theme, colors, isDark, notificationsEnabled, todoNotifications, lang } = useTheme();
     const dispatch = useAppDispatch();
 
     const themedModalStyles = useMemo(() => getModalStyles(colors), [colors]);
@@ -243,12 +243,30 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
         }
     }, [isOpen])
 
+    const formatDateOnly = (date: Date) => {
+        const day = date.getDate().toString().padStart(2, "0");
+        const months = ["Yan", "Fev", "Mar", "Apr", "May", "İyn", "İyl", "Avq", "Sen", "Okt", "Noy", "Dek"];
+        const enMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const ruMonths = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+
+        const monthNames = lang === 'az' ? months : lang === 'ru' ? ruMonths : enMonths;
+        const month = monthNames[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
+    };
+
+    const formatTimeOnly = (date: Date) => {
+        const hours = date.getHours().toString().padStart(2, "0");
+        const minutes = date.getMinutes().toString().padStart(2, "0");
+        return `${hours}:${minutes}`;
+    };
+
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={themedLocalStyles.container}>
                     <View style={[modalStyles.iconContainer, {
-                        backgroundColor: colors.TAB_BAR,
+                        backgroundColor: colors.SECONDARY_BACKGROUND,
                         shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.3,
@@ -262,84 +280,105 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
                     <View style={modalStyles.divider} />
 
-                    <Pressable onPress={() => inputRef.current?.focus()} style={{ width: '100%', alignItems: 'center', zIndex: 10 }} disabled={isRecording || isAnalyzing}>
-                        <Animated.View style={[
-                            themedLocalStyles.inputWrapper,
-                            isFocused && themedLocalStyles.inputFocused,
-                            inputError && themedLocalStyles.inputError,
-                            {
-                                minHeight: scaleAnim.interpolate({
-                                    inputRange: [1, 1.1],
-                                    outputRange: [60, 120]
-                                }),
-                                marginTop: scaleAnim.interpolate({
-                                    inputRange: [1, 1.1],
-                                    outputRange: [0, 5]
-                                }),
-                                marginBottom: scaleAnim.interpolate({
-                                    inputRange: [1, 1.1],
-                                    outputRange: [12, 15]
-                                }),
-                                transform: [{ scale: scaleAnim }]
-                            }
+                    {/* 1. Title Section */}
+                    <View style={themedLocalStyles.tableContainer}>
+                        <View style={[
+                            themedLocalStyles.tableRow,
+                            inputError && themedLocalStyles.inputError
                         ]}>
-                            <TextInput
-                                ref={inputRef}
-                                style={[themedLocalStyles.textInput, { fontSize: title ? 16 : 12 }]}
-                                placeholder={t("todo_placeholder")}
-                                placeholderTextColor={colors.PLACEHOLDER}
-                                value={title}
-                                onChangeText={setTitle}
-                                onFocus={() => setIsFocused(true)}
-                                onBlur={() => setIsFocused(false)}
-                                multiline={true}
-                            />
-                        </Animated.View>
-                    </Pressable>
-
-                    {/* Action Row: Reminder & Voice */}
-                    <View style={themedLocalStyles.actionRow}>
-                        {!picker.reminderDate ? (
-                            <TouchableOpacity
-                                style={themedLocalStyles.addReminderButton}
-                                onPress={picker.startReminderFlow}
-                                activeOpacity={0.7}
-                            >
-                                <Ionicons name="notifications-outline" size={20} color={colors.PLACEHOLDER} />
-                                <StyledText style={themedLocalStyles.addReminderText}>{t("reminder")}</StyledText>
-                                <Ionicons name="add-circle" size={20} color={colors.CHECKBOX_SUCCESS} style={{ marginLeft: 'auto' }} />
-                            </TouchableOpacity>
-                        ) : (
-                            <View style={[themedLocalStyles.reminderChip, { flex: 1 }]}>
-                                <TouchableOpacity
-                                    style={themedLocalStyles.chipContent}
-                                    onPress={picker.startReminderFlow}
-                                    activeOpacity={0.7}
-                                >
-                                    <Ionicons name="calendar" size={18} color="#fff" />
-                                    <StyledText style={themedLocalStyles.chipText}>
-                                        {picker.formatFullDate(picker.reminderDate)}
-                                    </StyledText>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    onPress={() => picker.setReminderDate(undefined)}
-                                    style={themedLocalStyles.clearButton}
-                                >
-                                    <Ionicons name="close-circle" size={20} color="#fff" style={{ opacity: 0.8 }} />
-                                </TouchableOpacity>
+                            <View style={themedLocalStyles.tableLabelColumn}>
+                                <Ionicons name="document-text-outline" size={18} color={colors.SECTION_TEXT} />
+                                <StyledText style={themedLocalStyles.tableLabelText}>{t("title")} *</StyledText>
                             </View>
-                        )}
+                            <View style={themedLocalStyles.tableValueColumn}>
+                                <TextInput
+                                    ref={inputRef}
+                                    style={themedLocalStyles.tableValueText}
+                                    placeholder={t("todo_placeholder")}
+                                    placeholderTextColor={colors.PLACEHOLDER}
+                                    value={title}
+                                    onChangeText={setTitle}
+                                    multiline={true} // Allow longer titles to wrap
+                                />
+                            </View>
+                        </View>
+                    </View>
 
+                    {/* 2. Reminder Section */}
+                    <View style={[themedLocalStyles.tableContainer, { marginTop: 16 }]}>
+                        {/* Date Row */}
                         <TouchableOpacity
-                            style={[themedLocalStyles.voiceButton, isRecording && themedLocalStyles.voiceButtonActive]}
+                            style={themedLocalStyles.tableRow}
+                            onPress={() => picker.setShowDatePicker(true)}
+                            activeOpacity={0.7}
+                        >
+                            <View style={themedLocalStyles.tableLabelColumn}>
+                                <Ionicons name="calendar-outline" size={18} color={colors.SECTION_TEXT} />
+                                <StyledText style={themedLocalStyles.tableLabelText}>{t("date")}</StyledText>
+                            </View>
+                            <View style={themedLocalStyles.tableValueColumn}>
+                                <StyledText style={[themedLocalStyles.tableValueText, !picker.reminderDate && { color: colors.PLACEHOLDER }]}>
+                                    {picker.reminderDate ? formatDateOnly(picker.reminderDate) : t("date")}
+                                </StyledText>
+                            </View>
+                        </TouchableOpacity>
+
+                        {/* Time Row */}
+                        <TouchableOpacity
+                            style={[themedLocalStyles.tableRow, themedLocalStyles.tableRowBorder]}
+                            onPress={() => picker.setShowTimePicker(true)}
+                            activeOpacity={0.7}
+                        >
+                            <View style={themedLocalStyles.tableLabelColumn}>
+                                <Ionicons name="time-outline" size={18} color={colors.SECTION_TEXT} />
+                                <StyledText style={themedLocalStyles.tableLabelText}>{t("time")}</StyledText>
+                            </View>
+                            <View style={themedLocalStyles.tableValueColumn}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                    <StyledText style={[themedLocalStyles.tableValueText, !picker.reminderDate && { color: colors.PLACEHOLDER }]}>
+                                        {picker.reminderDate ? formatTimeOnly(picker.reminderDate) : t("time")}
+                                    </StyledText>
+                                    {picker.reminderDate && (
+                                        <TouchableOpacity onPress={(e) => {
+                                            e.stopPropagation();
+                                            picker.setReminderDate(undefined);
+                                        }}>
+                                            <Ionicons name="close-circle" size={16} color={colors.SECTION_TEXT} />
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={{ width: '100%', paddingHorizontal: 4, marginTop: 0, marginBottom: 4 }}>
+                        <StyledText style={{
+                            fontSize: 9.5,
+                            color: colors.SECTION_TEXT,
+                            opacity: 0.7,
+                            textAlign: 'center',
+                            lineHeight: 10
+                        }}>
+                            {t("reminder_hint")}
+                        </StyledText>
+                    </View>
+
+                    {/* Action Row: Voice Input */}
+                    <View style={[themedLocalStyles.actionRow, { marginTop: 12 }]}>
+                        <TouchableOpacity
                             onPress={handleVoiceInput}
+                            activeOpacity={0.7}
                             disabled={isAnalyzing}
+                            style={themedLocalStyles.voiceButton}
                         >
                             <Ionicons
-                                name={isRecording ? "stop" : "mic"}
-                                size={24}
-                                color={isRecording ? "#ea4335" : (isDark ? "#fff" : colors.PRIMARY_TEXT)}
+                                name={isRecording ? "stop" : "mic-outline"}
+                                size={20}
+                                color={isRecording ? "#ea4335" : colors.SECTION_TEXT}
                             />
+                            <StyledText style={{ color: colors.SECTION_TEXT, fontSize: 13, fontWeight: '600' }}>
+                                {isRecording ? t("stop") : t("voice_input")}
+                            </StyledText>
                         </TouchableOpacity>
                     </View>
 

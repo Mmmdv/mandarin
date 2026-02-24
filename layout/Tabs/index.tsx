@@ -199,7 +199,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
                 onAdd={handleAddTodo}
-                categoryTitle={t("tab_todo")}
+                categoryTitle={t("notifications_todo")}
                 categoryIcon="list"
             />
 

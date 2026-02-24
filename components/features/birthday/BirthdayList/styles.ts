@@ -294,6 +294,6 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     stickySectionHeader: {
         marginHorizontal: 16,
         marginTop: 6,
-        marginBottom: 2,
+        marginBottom: 5,
     },
 });

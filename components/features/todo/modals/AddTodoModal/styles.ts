@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export const getAddStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     container: {
         borderRadius: 24,
-        borderWidth: 0.2,
+        borderWidth: 1,
         padding: 24,
         minWidth: 340,
         gap: 12,
@@ -15,6 +15,66 @@ export const getAddStyles = (colors: any, isDark: boolean) => StyleSheet.create(
         elevation: 10,
         backgroundColor: colors.SECONDARY_BACKGROUND,
         borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+    },
+    presetsRow: {
+        flexDirection: 'row',
+        gap: 8,
+        marginVertical: 4,
+        width: '100%'
+    },
+    presetButton: {
+        flex: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 4,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 0.5,
+    },
+    presetText: {
+        fontSize: 10,
+        fontWeight: '700',
+        lineHeight: 14,
+        textAlign: 'center'
+    },
+    tableContainer: {
+        width: "100%",
+        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+        borderRadius: 16,
+        padding: 4,
+        overflow: 'hidden',
+    },
+    tableRow: {
+        flexDirection: 'row',
+        paddingVertical: 14,
+        paddingHorizontal: 12,
+        alignItems: 'center',
+    },
+    tableRowBorder: {
+        borderTopWidth: 1,
+        borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+    },
+    tableLabelColumn: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    tableLabelText: {
+        fontSize: 12,
+        color: colors.SECTION_TEXT,
+        fontWeight: "500",
+    },
+    tableValueColumn: {
+        flex: 2,
+        alignItems: 'flex-end',
+    },
+    tableValueText: {
+        fontSize: 13,
+        color: colors.PRIMARY_TEXT,
+        fontWeight: "600",
+        width: '100%',
+        textAlign: 'right',
     },
     headerText: {
         fontSize: 18,
@@ -75,14 +135,17 @@ export const getAddStyles = (colors: any, isDark: boolean) => StyleSheet.create(
         marginBottom: 10,
     },
     voiceButton: {
-        width: 48,
-        height: 48,
-        borderRadius: 12,
-        backgroundColor: colors.TAB_BAR,
-        borderWidth: 1,
-        borderColor: colors.PRIMARY_BORDER_DARK,
-        justifyContent: 'center',
+        flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        gap: 8,
+        flex: 1,
+        justifyContent: 'center',
+        borderWidth: 0.2,
+        borderColor: colors.SECTION_TEXT
     },
     voiceButtonActive: {
         backgroundColor: "rgba(234, 67, 53, 0.2)",
