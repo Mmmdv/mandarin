@@ -8,7 +8,7 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         padding: 24,
         borderRadius: 24,
         borderWidth: 1,
-        gap: 12,
+        gap: 6,
         backgroundColor: colors.SECONDARY_BACKGROUND,
         borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
         shadowColor: "#000",
@@ -31,7 +31,6 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
         borderRadius: 18,
         width: '100%',
-        marginBottom: 4,
     },
     recipientAvatar: {
         width: 44,
@@ -57,19 +56,18 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         width: '100%',
     },
     greetingsScroll: {
-        height: 320,
+        height: 280,
         width: '100%',
     },
     greetingsContent: {
-        paddingBottom: 20,
-        paddingTop: 8,
+        paddingBottom: 4,
+        paddingTop: 4,
         flexGrow: 1,
     },
     greetingCard: {
         flexDirection: "row",
         alignItems: "center",
         padding: 16,
-        paddingRight: 12,
         borderRadius: 16,
         marginBottom: 10,
         width: '100%',
@@ -97,6 +95,24 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         marginLeft: 10,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    secondaryActionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        gap: 8,
+        width: '100%',
+        justifyContent: 'center',
+        borderWidth: 0.2,
+        borderColor: colors.SECTION_TEXT
+    },
+    secondaryActionButtonText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: colors.SECTION_TEXT
     },
 })
 

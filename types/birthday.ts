@@ -9,6 +9,7 @@ export interface Birthday {
     greetingSent?: boolean; // Təbrik göndərilib?
     greetingYear?: number; // Hansı il təbrik göndərilib
     readHistory?: number[]; // Hansı illər tarixçədə oxunub
+    greetedHistory?: number[]; // Hansı illər təbrik edilib
 }
 
 export interface BirthdayGreeting {

@@ -40,8 +40,8 @@ export const notificationSlice = createSlice({
             state.unreadCount = 0;
         },
         clearNotifications: (state) => {
-            state.notifications = [];
-            state.unreadCount = 0;
+            state.notifications = state.notifications.filter(n => n.status === 'Gözlənilir');
+            state.unreadCount = state.notifications.filter(n => !n.read).length;
         },
         markAsRead: (state, action: PayloadAction<string>) => {
             const notification = state.notifications.find(n => n.id === action.payload);

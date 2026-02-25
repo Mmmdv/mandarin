@@ -8,20 +8,20 @@ import React, { useMemo } from "react";
 import { View } from "react-native";
 import { getStyles } from "./styles";
 
-// ─── Əsas səhifədəki birthday kartına uyğun rəng paleti ───
-
-type DeleteBirthdayModalProps = {
+type IsGreetingModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    onDelete: () => void;
+    onConfirm: () => void;
     name?: string;
+    year?: number;
 };
 
-const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
+const IsGreetingModal: React.FC<IsGreetingModalProps> = ({
     isOpen,
     onClose,
-    onDelete,
+    onConfirm,
     name,
+    year,
 }) => {
     const { t, colors, isDark } = useTheme();
     const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
@@ -48,18 +48,18 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
                             },
                         ]}
                     >
-                        <Ionicons name="trash" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
+                        <Ionicons name="checkmark-done" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
                     </View>
 
                     <StyledText style={styles.headerText}>
-                        {t("birthday_delete_title")}
+                        {t("birthday_confirm_greeted_title")}
                     </StyledText>
                 </View>
 
                 <View style={modalStyles.divider} />
 
                 <StyledText style={styles.messageText}>
-                    {t("birthday_delete_message")}
+                    {t("birthday_confirm_greeted_message")}
                 </StyledText>
 
                 {name && (
@@ -74,7 +74,7 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
                     ]}>
                         <View style={[
                             styles.recipientAvatar,
-                            { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.05)' }
+                            { backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0, 0, 0, 0.05)' }
                         ]}>
                             <StyledText style={{ color: colors.PRIMARY_TEXT, fontSize: 18, fontWeight: 'bold' }}>
                                 {name?.charAt(0).toUpperCase()}
@@ -90,14 +90,14 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
 
                 <View style={modalStyles.buttonsContainer}>
                     <StyledButton
-                        label={t("cancel")}
+                        label={t("close")}
                         onPress={onClose}
                         variant="dark_button"
                     />
                     <StyledButton
-                        label={t("delete")}
+                        label={t("confirm")}
                         onPress={() => {
-                            onDelete();
+                            onConfirm();
                             onClose();
                         }}
                         variant="dark_button"
@@ -108,4 +108,4 @@ const DeleteBirthdayModal: React.FC<DeleteBirthdayModalProps> = ({
     );
 };
 
-export default React.memo(DeleteBirthdayModal);
+export default React.memo(IsGreetingModal);

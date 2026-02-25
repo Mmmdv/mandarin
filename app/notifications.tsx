@@ -137,7 +137,7 @@ const NotificationsPage = () => {
                         styles.itemTitle,
                         {
                             color: colors.PRIMARY_TEXT,
-                            fontWeight: isUnread ? "700" : "600",
+                            fontWeight: isUnread ? "600" : "500",
                         }
                     ]}
                         numberOfLines={2}
@@ -148,13 +148,13 @@ const NotificationsPage = () => {
                     </StyledText>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                        <Ionicons name={statusIcon} size={14} color={statusColor} />
-                        <StyledText style={{ fontSize: 12, color: statusColor, fontWeight: "600" }}>{statusLabel}</StyledText>
+                        <Ionicons name={statusIcon} size={12} color={statusColor} />
+                        <StyledText style={{ fontSize: 10, color: statusColor, fontWeight: "600" }}>{statusLabel}</StyledText>
                     </View>
                 </View>
                 {isUnread && (
                     <View style={{ justifyContent: 'center' }}>
-                        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.CHECKBOX_SUCCESS }} />
+                        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.CHECKBOX_SUCCESS }} />
                     </View>
                 )}
             </TouchableOpacity>
@@ -351,20 +351,20 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 12,
         marginBottom: 12,
-        borderWidth: 1,
+        borderWidth: 0.5,
         gap: 16,
     },
     contentContainer: {
         flex: 1,
     },
     itemTitle: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "400",
         lineHeight: 20,
         marginBottom: 5,
     },
     itemDate: {
-        fontSize: 12,
+        fontSize: 11,
         marginBottom: 5,
     },
     emptyContainer: {

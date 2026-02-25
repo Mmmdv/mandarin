@@ -1,11 +1,14 @@
+import IsGreetingModal from "@/components/features/birthday/modals/IsGreetingModal";
 import StyledHeader from "@/components/ui/StyledHeader";
 import StyledText from "@/components/ui/StyledText";
 import useBirthday from "@/hooks/useBirthday";
 import { useTheme } from "@/hooks/useTheme";
+import { useAppDispatch } from "@/store";
+import { markAllHistoryRead, markHistoryGreeted, markHistoryRead } from "@/store/slices/birthdaySlice";
 import { Birthday } from "@/types/birthday";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import React, { useCallback, useMemo } from "react";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
 
 interface HistoryItem extends Birthday {
     occurrenceDate: Date;
@@ -16,6 +19,8 @@ interface HistoryItem extends Birthday {
 const BirthdayHistoryPage = () => {
     const { colors, t, isDark } = useTheme();
     const { birthdays } = useBirthday();
+    const dispatch = useAppDispatch();
+    const [selectedFilter, setSelectedFilter] = React.useState<'all' | 'greeted' | 'missed'>('all');
 
     const historyItems = useMemo(() => {
         const today = new Date();
@@ -34,8 +39,6 @@ const BirthdayHistoryPage = () => {
                 const occurrence = new Date(year, bDate.getMonth(), bDate.getDate());
                 occurrence.setHours(0, 0, 0, 0);
 
-                // History includes birthdays that happen after (or on) the day the user was added,
-                // and strictly before today.
                 if (occurrence >= createdDate && occurrence < today) {
                     results.push({
                         ...b,
@@ -47,9 +50,17 @@ const BirthdayHistoryPage = () => {
             }
         });
 
-        // Sort by occurrence date descending (most recent first)
         return results.sort((a, b) => b.occurrenceDate.getTime() - a.occurrenceDate.getTime());
     }, [birthdays]);
+
+    const filteredItems = useMemo(() => {
+        if (selectedFilter === 'all') return historyItems;
+        return historyItems.filter(item => {
+            const wasGreeted = (item.greetingYear === item.occurrenceYear && item.greetingSent) ||
+                (item.greetedHistory && item.greetedHistory.includes(item.occurrenceYear));
+            return selectedFilter === 'greeted' ? wasGreeted : !wasGreeted;
+        });
+    }, [historyItems, selectedFilter]);
 
     const formatOccurrenceDate = (date: Date) => {
         const day = date.getDate().toString().padStart(2, "0");
@@ -58,17 +69,39 @@ const BirthdayHistoryPage = () => {
         return `${day}.${month}.${year}`;
     };
 
+    const handleMarkAllAsRead = useCallback(() => {
+        const payload = historyItems
+            .filter(item => !item.readHistory?.includes(item.occurrenceYear))
+            .map(item => ({ id: item.id, year: item.occurrenceYear }));
+
+        if (payload.length > 0) {
+            dispatch(markAllHistoryRead(payload));
+        }
+    }, [historyItems, dispatch]);
+
+    const [confirmTarget, setConfirmTarget] = React.useState<HistoryItem | null>(null);
+
     const renderItem = ({ item }: { item: HistoryItem }) => {
-        // We can only check greeting status for the year it was last recorded in the slice
-        const isGreetingRecordedForThisYear = item.greetingYear === item.occurrenceYear;
-        const wasGreeted = isGreetingRecordedForThisYear && item.greetingSent;
+        const wasGreeted = (item.greetingYear === item.occurrenceYear && item.greetingSent) ||
+            (item.greetedHistory && item.greetedHistory.includes(item.occurrenceYear));
+        const isUnread = !item.readHistory || !item.readHistory.includes(item.occurrenceYear);
 
         return (
-            <View style={[styles.card, {
-                backgroundColor: colors.SECONDARY_BACKGROUND,
-                borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
-            }]}>
-                <View style={[styles.avatar, { backgroundColor: isDark ? 'rgba(78, 205, 196, 0.15)' : 'rgba(78, 205, 196, 0.1)' }]}>
+            <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => {
+                    if (isUnread) {
+                        dispatch(markHistoryRead({ id: item.id, year: item.occurrenceYear }));
+                    }
+                }}
+                style={[styles.card, {
+                    backgroundColor: colors.SECONDARY_BACKGROUND,
+                    borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+                    opacity: isUnread ? 1 : 0.8,
+                    borderWidth: 0.5,
+                }]}
+            >
+                <View style={[styles.avatar, { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }]}>
                     <StyledText style={[styles.avatarText, { color: colors.PRIMARY_TEXT }]}>
                         {item.name.charAt(0).toUpperCase()}
                     </StyledText>
@@ -76,59 +109,129 @@ const BirthdayHistoryPage = () => {
 
                 <View style={styles.cardContent}>
                     <View style={styles.nameRow}>
-                        <StyledText style={[styles.name, { color: colors.PRIMARY_TEXT }]} numberOfLines={1}>
+                        <StyledText style={[
+                            styles.name,
+                            {
+                                color: colors.PRIMARY_TEXT,
+                                fontSize: 14,
+                                fontWeight: isUnread ? "600" : "500"
+                            }
+                        ]} numberOfLines={1}>
                             {item.name}
                         </StyledText>
-                        <View style={[styles.yearBadge, { backgroundColor: colors.TAB_BAR }]}>
-                            <StyledText style={{ fontSize: 10, fontWeight: '700', color: colors.PRIMARY_TEXT }}>
-                                {item.occurrenceYear}
-                            </StyledText>
-                        </View>
                     </View>
 
                     <View style={styles.infoRow}>
-                        <StyledText style={[styles.dateText, { color: colors.SECTION_TEXT }]}>
+                        <StyledText style={[styles.dateText, { color: colors.SECTION_TEXT, fontSize: 11 }]}>
                             {formatOccurrenceDate(item.occurrenceDate)}
                         </StyledText>
                         <View style={styles.dot} />
-                        <StyledText style={[styles.dateText, { color: colors.SECTION_TEXT }]}>
+                        <StyledText style={[styles.dateText, { color: colors.SECTION_TEXT, fontSize: 11 }]}>
                             {item.ageAtThatTime} {t("birthday_age")}
+                        </StyledText>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                        <Ionicons
+                            name={wasGreeted ? "checkmark-done-circle" : "close-circle-outline"}
+                            size={12}
+                            color={wasGreeted ? "#4ECDC4" : colors.SECTION_TEXT}
+                        />
+                        <StyledText style={{
+                            fontSize: 10,
+                            fontWeight: '600',
+                            color: wasGreeted ? "#4ECDC4" : colors.SECTION_TEXT
+                        }}>
+                            {wasGreeted ? t("stats_birthday_greeted") : t("stats_birthday_missed")}
                         </StyledText>
                     </View>
                 </View>
 
-                <View style={styles.statusSection}>
-                    {isGreetingRecordedForThisYear ? (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                            <Ionicons
-                                name={wasGreeted ? "checkmark-done-circle" : "close-circle-outline"}
-                                size={16}
-                                color={wasGreeted ? "#4ECDC4" : colors.SECTION_TEXT}
-                            />
-                            <StyledText style={{
-                                fontSize: 10,
-                                fontWeight: '700',
-                                color: wasGreeted ? "#4ECDC4" : colors.SECTION_TEXT
-                            }}>
-                                {wasGreeted ? t("birthday_greeting_sent") : t("birthday_greeting_not_sent")}
-                            </StyledText>
-                        </View>
-                    ) : (
-                        <View style={{ opacity: 0.5 }}>
-                            <Ionicons name="calendar-clear-outline" size={16} color={colors.SECTION_TEXT} />
-                        </View>
-                    )}
-                </View>
-            </View>
+                {!wasGreeted && (
+                    <TouchableOpacity
+                        onPress={() => setConfirmTarget(item)}
+                        hitSlop={20}
+                        style={{
+                            padding: 6,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Ionicons name="checkmark-done" size={14} color={colors.PRIMARY_TEXT} />
+                    </TouchableOpacity>
+                )}
+
+                {isUnread && (
+                    <View style={{ justifyContent: 'center', marginLeft: 4 }}>
+                        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.CHECKBOX_SUCCESS }} />
+                    </View>
+                )}
+            </TouchableOpacity>
         );
     };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-            <StyledHeader title={t("birthday_history")} />
+            <StyledHeader
+                title={t("birthday_history")}
+                rightSection={
+                    historyItems.some(item => !item.readHistory?.includes(item.occurrenceYear)) && (
+                        <TouchableOpacity onPress={handleMarkAllAsRead} hitSlop={10}>
+                            <Ionicons name="checkmark-done-outline" size={22} color={colors.CHECKBOX_SUCCESS} />
+                        </TouchableOpacity>
+                    )
+                }
+            />
+
+            <View style={{ paddingVertical: 12 }}>
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={[
+                        { key: 'all', label: t('all') },
+                        { key: 'greeted', label: t('stats_birthday_greeted') },
+                        { key: 'missed', label: t('stats_birthday_missed') },
+                    ]}
+                    keyExtractor={(item) => item.key}
+                    contentContainerStyle={{ paddingHorizontal: 20, gap: 8, flexGrow: 1, justifyContent: 'center' }}
+                    renderItem={({ item }) => {
+                        const isSelected = selectedFilter === item.key;
+                        return (
+                            <TouchableOpacity
+                                onPress={() => setSelectedFilter(item.key as any)}
+                                style={{
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 6,
+                                    borderRadius: 16,
+                                    backgroundColor: isSelected ? '#234E94' : (isDark ? 'transparent' : 'rgba(0, 0, 0, 0.05)'),
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <StyledText style={{
+                                    color: isSelected ? '#fff' : colors.PLACEHOLDER,
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? '700' : '500',
+                                    marginBottom: isSelected ? 4 : 0,
+                                }}>
+                                    {item.label}
+                                </StyledText>
+                                {isSelected && (
+                                    <View style={{
+                                        width: 4,
+                                        height: 4,
+                                        borderRadius: 2,
+                                        backgroundColor: '#fff',
+                                    }} />
+                                )}
+                            </TouchableOpacity>
+                        )
+                    }}
+                />
+            </View>
 
             <FlatList
-                data={historyItems}
+                data={filteredItems}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => `${item.id}-${item.occurrenceYear}-${index}`}
                 contentContainerStyle={styles.list}
@@ -141,6 +244,18 @@ const BirthdayHistoryPage = () => {
                     </View>
                 }
             />
+
+            <IsGreetingModal
+                isOpen={!!confirmTarget}
+                onClose={() => setConfirmTarget(null)}
+                onConfirm={() => {
+                    if (confirmTarget) {
+                        dispatch(markHistoryGreeted({ id: confirmTarget.id, year: confirmTarget.occurrenceYear }));
+                    }
+                }}
+                name={confirmTarget?.name}
+                year={confirmTarget?.occurrenceYear}
+            />
         </View>
     );
 };
@@ -151,7 +266,7 @@ const styles = StyleSheet.create({
     },
     list: {
         paddingHorizontal: 20,
-        paddingTop: 15,
+        paddingTop: 5,
         paddingBottom: 40,
     },
     card: {
@@ -229,7 +344,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
-    }
+    },
 });
 
 export default BirthdayHistoryPage;

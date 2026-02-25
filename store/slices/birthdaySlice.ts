@@ -53,6 +53,7 @@ export const birthdaySlice = createSlice({
                         ...b,
                         greetingSent: true,
                         greetingYear: action.payload.year,
+                        greetedHistory: Array.from(new Set([...(b.greetedHistory || []), action.payload.year]))
                     }
                     : b
             );
@@ -64,6 +65,20 @@ export const birthdaySlice = createSlice({
                     ? { ...b, greetingSent: false }
                     : b
             );
+        },
+        markHistoryGreeted: (state, action: PayloadAction<{ id: string; year: number }>) => {
+            const b = state.birthdays.find(b => b.id === action.payload.id);
+            if (b) {
+                if (!b.greetedHistory) b.greetedHistory = [];
+                if (!b.greetedHistory.includes(action.payload.year)) {
+                    b.greetedHistory.push(action.payload.year);
+                }
+                // Also update the main status if it's the current year
+                if (action.payload.year === new Date().getFullYear()) {
+                    b.greetingSent = true;
+                    b.greetingYear = action.payload.year;
+                }
+            }
         },
         markHistoryRead: (state, action: PayloadAction<{ id: string; year: number }>) => {
             const b = state.birthdays.find(b => b.id === action.payload.id);
@@ -96,6 +111,7 @@ export const {
     resetGreetingForNewYear,
     markHistoryRead,
     markAllHistoryRead,
+    markHistoryGreeted,
 } = birthdaySlice.actions;
 
 export const selectBirthdays = (state: { birthday: BirthdayState }): Birthday[] =>

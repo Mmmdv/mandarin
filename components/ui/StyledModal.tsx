@@ -37,13 +37,13 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
                     }),
                     Animated.timing(fadeAnim, {
                         toValue: 1,
-                        duration: 600,
+                        duration: 300,
                         useNativeDriver: true
                     })
                 ]).start();
             } else if (expectsKeyboard) {
                 // Fallback: if keyboard doesn't open for some reason, show it anyway after 1s
-                const timer = setTimeout(() => setIsReady(true), 5000);
+                const timer = setTimeout(() => setIsReady(true), 2000);
                 return () => clearTimeout(timer);
             }
         }
@@ -60,7 +60,7 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
                 }),
                 Animated.timing(fadeAnim, {
                     toValue: 1,
-                    duration: 600,
+                    duration: 300,
                     useNativeDriver: true
                 })
             ]).start();
@@ -106,12 +106,14 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
             onRequestClose={onClose}
             animationType="fade"
             transparent={true}
+            statusBarTranslucent={true}
         >
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{ flex: 1 }}
+                style={{ flex: 1, backgroundColor: 'transparent' }}
             >
                 <ScrollView
+                    style={{ flex: 1, backgroundColor: isDark ? "rgba(0, 0, 0, 0.78)" : "rgba(0, 0, 0, 0.4)" }}
                     contentContainerStyle={styles.scrollContainer}
                     keyboardShouldPersistTaps="handled"
                     bounces={false}
@@ -120,7 +122,6 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
                         style={[
                             styles.modalBackgroundContainer,
                             {
-                                backgroundColor: isDark ? "rgba(0, 0, 0, 0.78)" : "rgba(0, 0, 0, 0.4)",
                                 justifyContent: isPositionBottom ? 'flex-end' : 'center',
                                 paddingBottom: isPositionBottom ? 10 : 0
                             }

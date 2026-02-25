@@ -114,6 +114,32 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
         setViewMode(prev => prev === "card" ? "list" : "card");
     }, []);
 
+    const unreadHistoryCount = useMemo(() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let count = 0;
+
+        birthdays.forEach(b => {
+            const bDate = new Date(b.date);
+            const createdDate = new Date(b.createdAt);
+            createdDate.setHours(0, 0, 0, 0);
+
+            const startYear = createdDate.getFullYear();
+            const endYear = today.getFullYear();
+
+            for (let year = startYear; year <= endYear; year++) {
+                const occurrence = new Date(year, bDate.getMonth(), bDate.getDate());
+                occurrence.setHours(0, 0, 0, 0);
+
+                if (occurrence >= createdDate && occurrence < today) {
+                    const isUnread = !b.readHistory || !b.readHistory.includes(year);
+                    if (isUnread) count++;
+                }
+            }
+        });
+        return count;
+    }, [birthdays]);
+
     const toggleSection = (
         setter: React.Dispatch<React.SetStateAction<boolean>>,
         anim: Animated.Value,
@@ -577,21 +603,46 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                             height: 38,
                             justifyContent: 'center',
                             alignItems: 'center',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                            backgroundColor: colors.SECONDARY_BACKGROUND,
                             borderRadius: 12,
                             borderWidth: 0.2,
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                            position: 'relative'
                         }}
                     >
-                        <Ionicons name="time-outline" size={22} color={colors.PRIMARY_TEXT} />
+                        <Ionicons name="time" size={22} color={colors.PRIMARY_TEXT} />
+                        {unreadHistoryCount > 0 && (
+                            <View style={{
+                                position: 'absolute',
+                                top: -5,
+                                right: -5,
+                                backgroundColor: '#FF6B6B',
+                                borderRadius: 10,
+                                minWidth: 18,
+                                height: 18,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                paddingHorizontal: 4,
+                                borderWidth: 2,
+                                borderColor: isDark ? colors.SECONDARY_BACKGROUND : '#fff',
+                            }}>
+                                <StyledText style={{
+                                    color: '#fff',
+                                    fontSize: 9,
+                                    fontWeight: 'bold',
+                                }}>
+                                    {unreadHistoryCount > 99 ? '99+' : unreadHistoryCount}
+                                </StyledText>
+                            </View>
+                        )}
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={toggleViewMode}
                         style={[styles.viewToggleButton, {
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                            backgroundColor: colors.SECONDARY_BACKGROUND
                         }]}
+                        hitSlop={8}
                     >
                         <Ionicons
                             name={viewMode === "card" ? "list" : "grid"}

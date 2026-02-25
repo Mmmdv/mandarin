@@ -25,6 +25,11 @@ type GreetingModalProps = {
 };
 
 const GREETING_KEYS = [
+    "birthday_greeting_6",
+    "birthday_greeting_7",
+    "birthday_greeting_8",
+    "birthday_greeting_9",
+    "birthday_greeting_10",
     "birthday_greeting_1",
     "birthday_greeting_2",
     "birthday_greeting_3",
@@ -151,11 +156,6 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
                                     ]}>
                                         {msg}
                                     </StyledText>
-                                    {isSelected && (
-                                        <View style={styles.selectedIndicator}>
-                                            <Ionicons name="checkmark-circle" size={20} color={BIRTHDAY_PRIMARY} />
-                                        </View>
-                                    )}
                                 </TouchableOpacity>
                             );
                         })}
@@ -163,17 +163,32 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
                 </View>
 
                 {/* Footer */}
-                <View style={[modalStyles.buttonsContainer, { marginTop: 6 }]}>
-                    <StyledButton
-                        label={t("close")}
-                        onPress={onClose}
-                        variant="dark_button"
-                    />
-                    <StyledButton
-                        label="Göndər"
-                        onPress={handleShare}
-                        variant="dark_button"
-                    />
+                <View style={{ marginTop: 14, gap: 16, width: '100%' }}>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={styles.secondaryActionButton}
+                        onPress={() => finalizeSend("")}
+                    >
+                        <Ionicons name="checkmark-done" size={18} color={colors.SECTION_TEXT} />
+                        <StyledText style={styles.secondaryActionButtonText}>
+                            {t("birthday_already_greeted")}
+                        </StyledText>
+                    </TouchableOpacity>
+
+                    <View style={[modalStyles.buttonsContainer, { marginTop: 0 }]}>
+                        <StyledButton
+                            label={t("close")}
+                            onPress={onClose}
+                            variant="dark_button"
+                            style={{ flex: 1 }}
+                        />
+                        <StyledButton
+                            label={t("tab_breathing_title") === "Breathing" ? "Send" : "Göndər"}
+                            onPress={handleShare}
+                            variant="dark_button"
+                            style={{ flex: 1, backgroundColor: BIRTHDAY_PRIMARY }}
+                        />
+                    </View>
                 </View>
             </View>
         </StyledModal>

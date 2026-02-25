@@ -176,6 +176,7 @@ export function useStatsLogic(period: Period) {
         const { start, end } = getDateRange(period);
         let greeted = 0;
         let missed = 0;
+        let upcoming = 0;
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -200,13 +201,15 @@ export function useStatsLogic(period: Period) {
                         greeted++;
                     } else if (occurrence < today) {
                         missed++;
+                    } else {
+                        upcoming++;
                     }
                 }
             }
         });
 
-        const total = greeted + missed;
-        return total === 0 ? null : { greeted, missed, total };
+        const total = greeted + missed + upcoming;
+        return total === 0 ? null : { greeted, missed, upcoming, total };
     }, [period, birthdayState.birthdays]);
 
     return {

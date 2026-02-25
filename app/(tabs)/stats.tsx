@@ -5,6 +5,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native";
 
 // Refactored Components & Hooks
+import { BirthdayStats } from "@/components/features/stats/BirthdayStats";
 import { BreathingStats } from "@/components/features/stats/BreathingStats";
 import { useStatsLogic } from "@/components/features/stats/hooks";
 import { MoodStats } from "@/components/features/stats/MoodStats";
@@ -28,6 +29,7 @@ export default function Stats() {
         weightMetrics,
         weightChartData,
         ratingMetrics,
+        birthdayData,
     } = useStatsLogic(period);
 
     const filterChips = useMemo(() => [
@@ -97,6 +99,7 @@ export default function Stats() {
                 }
             >
                 <TodoStats todoData={todoData} colors={colors} isDark={isDark} t={t} />
+                <BirthdayStats birthdayData={birthdayData} colors={colors} isDark={isDark} t={t} />
                 <BreathingStats breathingData={breathingData} colors={colors} isDark={isDark} t={t} />
                 <MoodStats moodMetrics={moodMetrics} colors={colors} isDark={isDark} t={t} />
                 <WeightStats weightMetrics={weightMetrics} weightChartData={weightChartData} colors={colors} isDark={isDark} t={t} />
