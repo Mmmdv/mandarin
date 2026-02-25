@@ -42,8 +42,8 @@ export const styles = StyleSheet.create({
     },
     taskItem: {
         borderRadius: 10,
-        paddingVertical: 16, // Increased further
-        paddingHorizontal: 12,
+        paddingVertical: 21, // Increased height
+        paddingHorizontal: 14,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,

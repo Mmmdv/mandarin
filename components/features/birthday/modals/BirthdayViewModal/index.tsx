@@ -51,18 +51,23 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
-                <View style={[modalStyles.iconContainer, {
-                    backgroundColor: colors.SECONDARY_BACKGROUND,
-                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 2,
-                    elevation: 2
-                }]}>
-                    <Ionicons name="eye-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
-                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center', width: '100%' }}>
+                    <View style={[modalStyles.iconContainer, {
+                        backgroundColor: colors.SECONDARY_BACKGROUND,
+                        shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 2,
+                        elevation: 2,
+                        width: 42,
+                        height: 42,
+                        borderRadius: 21
+                    }]}>
+                        <Ionicons name="eye-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
+                    </View>
 
-                <StyledText style={styles.headerText}>{t("birthday_info")}</StyledText>
+                    <StyledText style={styles.headerText}>{t("birthday_info")}</StyledText>
+                </View>
 
                 <View style={modalStyles.divider} />
 
@@ -78,8 +83,6 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
                             </StyledText>
                         </View>
                     </View>
-
-
 
                     <View style={[styles.tableRow, styles.tableRowBorder]}>
                         <View style={styles.tableLabelColumn}>

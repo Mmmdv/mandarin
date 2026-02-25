@@ -24,33 +24,15 @@ export async function registerForLocalNotificationsAsync() {
     }
 }
 
-const ICON_MAP: Record<string, string> = {
-    'list': '',
-    'gift': '🎁',
-    'videocam': '🎬',
-    'film': '🎬',
-    'cart': '🛒',
-    'calendar': '🎫',
-    'ticket': '🎫',
-    'wallet': '💰',
-    'checkbox': '✅',
-    'wind': '🌬️',
-    'weather-windy': '🌬️',
-    'air': '🌬️',
-};
-
-export async function schedulePushNotification(title: string, body: string, triggerDate: Date, categoryIcon?: string) {
+export async function schedulePushNotification(title: string, body: string, triggerDate: Date, categoryIcon?: string, data?: Record<string, any>) {
     const trigger = triggerDate.getTime() - Date.now();
     if (trigger <= 0) return; // Don't schedule past dates
-
-    const emoji = categoryIcon ? (ICON_MAP[categoryIcon] || '') : '';
-    const displayTitle = emoji ? `${emoji} ${title}` : title;
-
     return await Notifications.scheduleNotificationAsync({
         content: {
-            title: displayTitle,
+            title: title,
             body: body,
             sound: true,
+            data: data || {},
         },
         trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,

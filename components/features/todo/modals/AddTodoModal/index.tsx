@@ -240,6 +240,11 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
             setInputError(false)
             setIsFocused(false)
             picker.resetState(undefined)
+
+            // Auto focus input with a small delay for modal transition
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 100);
         }
     }, [isOpen])
 
@@ -262,21 +267,26 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     };
 
     return (
-        <StyledModal isOpen={isOpen} onClose={onClose}>
+        <StyledModal isOpen={isOpen} onClose={onClose} expectsKeyboard={true}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={themedLocalStyles.container}>
-                    <View style={[modalStyles.iconContainer, {
-                        backgroundColor: colors.SECONDARY_BACKGROUND,
-                        shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 2,
-                        elevation: 2
-                    }]}>
-                        <Ionicons name="add" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, justifyContent: 'center', width: '100%', marginBottom: 4 }}>
+                        <View style={[modalStyles.iconContainer, {
+                            backgroundColor: colors.SECONDARY_BACKGROUND,
+                            shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.3,
+                            shadowRadius: 2,
+                            elevation: 2,
+                            width: 42,
+                            height: 42,
+                            borderRadius: 21,
+                            flexShrink: 0
+                        }]}>
+                            <Ionicons name="add" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
+                        </View>
+                        <StyledText style={[themedLocalStyles.headerText, { textAlign: 'left' }]}>{t("add")}</StyledText>
                     </View>
-
-                    <StyledText style={themedLocalStyles.headerText}>{t("add")}</StyledText>
 
                     <View style={modalStyles.divider} />
 
@@ -284,16 +294,17 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                     <View style={themedLocalStyles.tableContainer}>
                         <View style={[
                             themedLocalStyles.tableRow,
+                            { flexDirection: 'column', alignItems: 'flex-start', gap: 8 },
                             inputError && themedLocalStyles.inputError
                         ]}>
-                            <View style={themedLocalStyles.tableLabelColumn}>
+                            <View style={[themedLocalStyles.tableLabelColumn, { flex: 0, width: '100%' }]}>
                                 <Ionicons name="document-text-outline" size={18} color={colors.SECTION_TEXT} />
                                 <StyledText style={themedLocalStyles.tableLabelText}>{t("title")} *</StyledText>
                             </View>
-                            <View style={themedLocalStyles.tableValueColumn}>
+                            <View style={[themedLocalStyles.tableValueColumn, { flex: 0, width: '100%', alignItems: 'flex-start', paddingLeft: 28 }]}>
                                 <TextInput
                                     ref={inputRef}
-                                    style={themedLocalStyles.tableValueText}
+                                    style={[themedLocalStyles.tableValueText, { textAlign: 'left', fontSize: 14, width: '100%' }]}
                                     placeholder={t("todo_placeholder")}
                                     placeholderTextColor={colors.PLACEHOLDER}
                                     value={title}

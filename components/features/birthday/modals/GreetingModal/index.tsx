@@ -91,20 +91,25 @@ const GreetingModal: React.FC<GreetingModalProps> = ({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose}>
             <View style={styles.container}>
-                <View style={[
-                    modalStyles.iconContainer,
-                    {
-                        backgroundColor: colors.SECONDARY_BACKGROUND,
-                        shadowColor: BIRTHDAY_PRIMARY,
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 2,
-                        elevation: 2
-                    }]}>
-                    <Ionicons name="paper-plane" size={28} color={BIRTHDAY_PRIMARY} />
-                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center', width: '100%' }}>
+                    <View style={[
+                        modalStyles.iconContainer,
+                        {
+                            backgroundColor: colors.SECONDARY_BACKGROUND,
+                            shadowColor: BIRTHDAY_PRIMARY,
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.3,
+                            shadowRadius: 2,
+                            elevation: 2,
+                            width: 42,
+                            height: 42,
+                            borderRadius: 21
+                        }]}>
+                        <Ionicons name="paper-plane" size={28} color={BIRTHDAY_PRIMARY} />
+                    </View>
 
-                <StyledText style={styles.headerText}>{t("birthday_send_greeting")}</StyledText>
+                    <StyledText style={styles.headerText}>{t("birthday_send_greeting")}</StyledText>
+                </View>
                 <View style={modalStyles.divider} />
 
                 <View style={styles.recipientCard}>

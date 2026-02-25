@@ -1,4 +1,6 @@
 import { schedulePushNotification } from "@/constants/notifications";
+import { formatDateToCustomString } from "@/helpers/date";
+import { useTheme } from "@/hooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { selectAppSettings } from "@/store/slices/appSlice";
 import {
@@ -21,6 +23,7 @@ const useBirthday = () => {
     const dispatch = useAppDispatch();
     const settings = useAppSelector(selectAppSettings);
     const notifications = useAppSelector(state => state.notification.notifications);
+    const { t, lang } = useTheme();
 
     const onAddBirthday = async (
         name: string,
@@ -46,17 +49,26 @@ const useBirthday = () => {
                 notifDate.setFullYear(notifDate.getFullYear() + 1);
             }
 
+            const formattedDate = formatDateToCustomString(notifDate, lang);
+            const bodyMessage = t('birthday_notification_today_body')
+                .replace('{{name}}', name);
+            const bodyMessageNotification = t('birthday_notification_body')
+                .replace('{{name}}', name)
+                .replace('{{date}}', formattedDate);
+
             notificationId = await schedulePushNotification(
-                "Ad günü xatırlatması",
-                `Bugün ${name} ad günüdür!`,
-                notifDate
+                t('birthday_notification_title'),
+                bodyMessage,
+                notifDate,
+                "gift",
+                { type: "birthday", id }
             );
 
             if (notificationId) {
                 dispatch(addNotification({
                     id: notificationId,
-                    title: "Ad günü xatırlatması",
-                    body: `Bugün ${name} ad günüdür!`,
+                    title: t('birthday_notification_title'),
+                    body: bodyMessageNotification,
                     date: notifDate.toISOString(),
                     categoryIcon: "gift",
                 }));
@@ -179,18 +191,28 @@ const useBirthday = () => {
         }
 
         // Schedule new notification
+        const formattedDate = formatDateToCustomString(newDate, lang);
         const displayName = birthday.name;
+        const rescheduleMessage = t('birthday_notification_today_body')
+            .replace('{{name}}', displayName);
+
+        const rescheduleMessageNotification = t('birthday_notification_body')
+            .replace('{{name}}', displayName)
+            .replace('{{date}}', formattedDate);
+
         const notificationId = await schedulePushNotification(
-            "Ad günü xatırlatması",
-            `Bugün ${displayName} ad günüdür!`,
-            newDate
+            t('birthday_notification_title'),
+            rescheduleMessage,
+            newDate,
+            "gift",
+            { type: "birthday", id: birthdayId }
         );
 
         if (notificationId) {
             dispatch(addNotification({
                 id: notificationId,
-                title: "Ad günü xatırlatması",
-                body: `Bugün ${displayName} ad günüdür!`,
+                title: t('birthday_notification_title'),
+                body: rescheduleMessageNotification,
                 date: newDate.toISOString(),
                 categoryIcon: "gift",
             }));

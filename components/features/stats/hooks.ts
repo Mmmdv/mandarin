@@ -6,6 +6,7 @@ import { Period, filterByPeriod, getDateRange } from './utils';
 export function useStatsLogic(period: Period) {
     const appState = useAppSelector((state: RootState) => state.app);
     const todoState = useAppSelector((state: RootState) => state.todo);
+    const birthdayState = useAppSelector((state: RootState) => state.birthday);
     const todayState: any = useAppSelector(selectTodayData);
 
     const filteredDailyData = useMemo(() => {
@@ -171,6 +172,43 @@ export function useStatsLogic(period: Period) {
         };
     }, [filteredDailyData]);
 
+    const birthdayData = useMemo(() => {
+        const { start, end } = getDateRange(period);
+        let greeted = 0;
+        let missed = 0;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        birthdayState.birthdays.forEach(b => {
+            const bDate = new Date(b.date);
+            const createdDate = new Date(b.createdAt);
+            createdDate.setHours(0, 0, 0, 0);
+
+            const startYear = start.getFullYear();
+            const endYear = Math.max(end.getFullYear(), today.getFullYear());
+
+            for (let year = startYear; year <= endYear; year++) {
+                const occurrence = new Date(year, bDate.getMonth(), bDate.getDate());
+                occurrence.setHours(0, 0, 0, 0);
+
+                if (occurrence >= start && occurrence <= end && occurrence >= createdDate) {
+                    const isGreetingRecordedForThisYear = b.greetingYear === year;
+                    const wasGreeted = isGreetingRecordedForThisYear && b.greetingSent;
+
+                    if (wasGreeted) {
+                        greeted++;
+                    } else if (occurrence < today) {
+                        missed++;
+                    }
+                }
+            }
+        });
+
+        const total = greeted + missed;
+        return total === 0 ? null : { greeted, missed, total };
+    }, [period, birthdayState.birthdays]);
+
     return {
         isDark: appState.theme === 'dark',
         todoData,
@@ -179,6 +217,7 @@ export function useStatsLogic(period: Period) {
         weightMetrics,
         weightChartData,
         ratingMetrics,
+        birthdayData,
         lang: appState.lang
     };
 }

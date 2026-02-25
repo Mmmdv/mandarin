@@ -25,26 +25,26 @@ const SortControls: React.FC<SortControlsProps> = ({
     return (
         <View style={sortStyles.sortContainer}>
             <TouchableOpacity
-                style={[sortStyles.sortButton, { backgroundColor: isDark ? colors.PRIMARY_ACTIVE_BUTTON : colors.PRIMARY_INACTIVE_BUTTON }]}
+                style={[sortStyles.sortButton, { backgroundColor: colors.PRIMARY_ACTIVE_BUTTON }]}
                 onPress={onToggleSortBy}
             >
                 <Ionicons
                     name={sortBy === "date" ? "calendar" : "text"}
                     size={14}
-                    color={colors.PRIMARY_TEXT}
+                    color={colors.PRIMARY_ACTIVE_BUTTON_TEXT}
                 />
-                <StyledText style={[sortStyles.sortText, { color: colors.PRIMARY_TEXT }]}>
+                <StyledText style={[sortStyles.sortText, { color: colors.PRIMARY_ACTIVE_BUTTON_TEXT }]}>
                     {sortBy === "date" ? t("sort_date") : t("sort_text")}
                 </StyledText>
             </TouchableOpacity>
             <TouchableOpacity
-                style={[sortStyles.sortButton, { backgroundColor: isDark ? colors.PRIMARY_ACTIVE_BUTTON : colors.PRIMARY_INACTIVE_BUTTON }]}
+                style={[sortStyles.sortButton, { backgroundColor: colors.PRIMARY_ACTIVE_BUTTON }]}
                 onPress={onToggleSortOrder}
             >
                 <Ionicons
                     name={sortOrder === "asc" ? "arrow-up" : "arrow-down"}
                     size={14}
-                    color={colors.PRIMARY_TEXT}
+                    color={colors.PRIMARY_ACTIVE_BUTTON_TEXT}
                 />
             </TouchableOpacity>
         </View>

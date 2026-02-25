@@ -18,10 +18,11 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         elevation: 10,
     },
     headerText: {
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: "600",
         color: colors.PRIMARY_TEXT,
         textAlign: "center",
+        opacity: 0.9,
     },
     recipientCard: {
         flexDirection: "row",

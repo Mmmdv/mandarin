@@ -65,6 +65,26 @@ export const birthdaySlice = createSlice({
                     : b
             );
         },
+        markHistoryRead: (state, action: PayloadAction<{ id: string; year: number }>) => {
+            const b = state.birthdays.find(b => b.id === action.payload.id);
+            if (b) {
+                if (!b.readHistory) b.readHistory = [];
+                if (!b.readHistory.includes(action.payload.year)) {
+                    b.readHistory.push(action.payload.year);
+                }
+            }
+        },
+        markAllHistoryRead: (state, action: PayloadAction<{ id: string; year: number }[]>) => {
+            action.payload.forEach(({ id, year }) => {
+                const b = state.birthdays.find(b => b.id === id);
+                if (b) {
+                    if (!b.readHistory) b.readHistory = [];
+                    if (!b.readHistory.includes(year)) {
+                        b.readHistory.push(year);
+                    }
+                }
+            });
+        },
     },
 });
 
@@ -74,6 +94,8 @@ export const {
     editBirthday,
     markGreetingSent,
     resetGreetingForNewYear,
+    markHistoryRead,
+    markAllHistoryRead,
 } = birthdaySlice.actions;
 
 export const selectBirthdays = (state: { birthday: BirthdayState }): Birthday[] =>

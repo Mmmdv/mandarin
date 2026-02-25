@@ -15,6 +15,15 @@ export const getFullFormatDate = (date: Date, lang: string = 'az') => {
     return `${day} ${month} ${year}`;
 }
 
+export const formatDateToCustomString = (date: Date, lang: string): string => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(-2);
+    const months = getMonthNames(lang);
+    const month = months[date.getMonth()];
+
+    return `${day}-${month}-${year}`;
+};
+
 export const formatDate = (dateString: string, lang: string = 'az') => {
     const date = new Date(dateString)
     const months = getMonthNames(lang);

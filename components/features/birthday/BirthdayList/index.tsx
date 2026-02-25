@@ -20,6 +20,7 @@ import {
     UIManager,
     View
 } from "react-native";
+import SortControls, { SortBy, SortOrder } from "../../todo/TodoList/SortControls";
 import BirthdayMenuModal from "../modals/BirthdayMenuModal";
 import BirthdayViewModal from "../modals/BirthdayViewModal";
 import DeleteBirthdayModal from "../modals/DeleteBirthdayModal";
@@ -75,13 +76,30 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
     const [menuTarget, setMenuTarget] = useState<Birthday | null>(null);
     const [menuAnchor, setMenuAnchor] = useState<{ x: number, y: number, width: number, height: number } | undefined>(undefined);
 
+    const [allSortBy, setAllSortBy] = useState<SortBy>("date");
+    const [allSortOrder, setAllSortOrder] = useState<SortOrder>("asc");
+
     const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
     const otherBirthdays = useMemo(() => {
         const todayIds = new Set(todayBirthdays.map(b => b.id));
         const upcomingIds = new Set(upcomingBirthdays.map(b => b.id));
-        return birthdays.filter(b => !todayIds.has(b.id) && !upcomingIds.has(b.id));
-    }, [birthdays, todayBirthdays, upcomingBirthdays]);
+        const filtered = birthdays.filter(b => !todayIds.has(b.id) && !upcomingIds.has(b.id));
+
+        return [...filtered].sort((a, b) => {
+            if (allSortBy === "date") {
+                const dateA = new Date(a.date).getTime();
+                const dateB = new Date(b.date).getTime();
+                return allSortOrder === "asc" ? dateA - dateB : dateB - dateA;
+            } else {
+                const textA = a.name.toLowerCase();
+                const textB = b.name.toLowerCase();
+                return allSortOrder === "asc"
+                    ? textA.localeCompare(textB, lang)
+                    : textB.localeCompare(textA, lang);
+            }
+        });
+    }, [birthdays, todayBirthdays, upcomingBirthdays, allSortBy, allSortOrder, lang]);
 
     const [todayExpanded, setTodayExpanded] = useState(true);
     const [upcomingExpanded, setUpcomingExpanded] = useState(false);
@@ -127,6 +145,16 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
             LayoutAnimation.configureNext(toggleAnimation);
             return newValue;
         });
+    };
+
+    const handleToggleSortBy = () => {
+        LayoutAnimation.configureNext(toggleAnimation);
+        setAllSortBy(prev => prev === "date" ? "text" : "date");
+    };
+
+    const handleToggleSortOrder = () => {
+        LayoutAnimation.configureNext(toggleAnimation);
+        setAllSortOrder(prev => prev === "asc" ? "desc" : "asc");
     };
 
     const getRotation = (anim: any) => {
@@ -642,6 +670,16 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                         </View>
                     </View>
                     <View style={styles.sectionControls}>
+                        <View style={styles.sortZone}>
+                            {allExpanded && otherBirthdays.length > 0 && (
+                                <SortControls
+                                    sortBy={allSortBy}
+                                    sortOrder={allSortOrder}
+                                    onToggleSortBy={handleToggleSortBy}
+                                    onToggleSortOrder={handleToggleSortOrder}
+                                />
+                            )}
+                        </View>
                         <View style={{ flex: 1 }} />
                         <View style={styles.chevronZone}>
                             <Animated.View style={{ transform: [{ rotate: getRotation(allAnimation) }] }}>
@@ -762,6 +800,7 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                                 </View>
                             </View>
                             <View style={styles.sectionControls}>
+                                <View style={styles.sortZone} />
                                 <View style={{ flex: 1 }} />
                                 <View style={styles.chevronZone}>
                                     <Animated.View style={{ transform: [{ rotate: getRotation(allAnimation) }] }}>

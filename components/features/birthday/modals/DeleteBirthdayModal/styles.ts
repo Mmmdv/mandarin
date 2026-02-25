@@ -18,10 +18,10 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER, // More distinct border in light mode
     },
     headerText: {
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: "bold",
         textAlign: 'center',
-        opacity: 0.8,
+        opacity: 0.9,
         color: colors.PRIMARY_TEXT,
     },
     messageText: {

@@ -49,7 +49,7 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 6,
-        width: 175,
+        width: 210,
         zIndex: 2,
     },
     sectionTitleCard: {
@@ -62,7 +62,7 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 2,
         borderRadius: 10,
-        marginLeft: 4,
+        marginLeft: 2,
     },
     cardBadgeText: {
         fontSize: 12,
@@ -90,6 +90,12 @@ export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         zIndex: 2,
+    },
+    sortZone: {
+        width: 80,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 5,
     },
     chevronZone: {
         width: 24,

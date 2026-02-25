@@ -4,9 +4,10 @@ export const getEditStyles = (colors: any, isDark: boolean) => StyleSheet.create
     container: {
         borderRadius: 24,
         borderWidth: 1,
-        padding: 24,
-        minWidth: 340,
-        gap: 12,
+        padding: 20,
+        width: 340,
+        maxWidth: '95%',
+        gap: 10,
         alignItems: 'center',
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 10 },
@@ -46,7 +47,7 @@ export const getEditStyles = (colors: any, isDark: boolean) => StyleSheet.create
     },
     tableRow: {
         flexDirection: 'row',
-        paddingVertical: 14,
+        paddingVertical: 12,
         paddingHorizontal: 12,
         alignItems: 'center',
     },
@@ -77,10 +78,10 @@ export const getEditStyles = (colors: any, isDark: boolean) => StyleSheet.create
         textAlign: 'right',
     },
     headerText: {
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: "bold",
         textAlign: 'center',
-        opacity: 0.8,
+        opacity: 0.9,
         color: colors.PRIMARY_TEXT,
     },
     inputWrapper: {

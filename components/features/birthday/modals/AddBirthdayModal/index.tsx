@@ -6,7 +6,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Contacts from 'expo-contacts';
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Keyboard,
     Platform,
@@ -46,6 +46,8 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     const [dateError, setDateError] = useState(false);
     const [contactSelected, setContactSelected] = useState(false);
 
+    const inputRef = useRef<TextInput>(null);
+
     useEffect(() => {
         if (isOpen) {
             setName("");
@@ -54,6 +56,11 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
             setNameError(false);
             setDateError(false);
             setContactSelected(false);
+
+            // Auto focus input
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 100);
         }
     }, [isOpen]);
 
@@ -127,21 +134,24 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     };
 
     return (
-        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
+        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true} expectsKeyboard={true}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={viewStyles.container}>
-                    <View
-                        style={[
-                            modalStyles.iconContainer,
-                            addStyles.iconContainer,
-                        ]}
-                    >
-                        <Ionicons name="gift-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
-                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center', width: '100%' }}>
+                        <View
+                            style={[
+                                modalStyles.iconContainer,
+                                addStyles.iconContainer,
+                                { width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center' }
+                            ]}
+                        >
+                            <Ionicons name="gift-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
+                        </View>
 
-                    <StyledText style={viewStyles.headerText}>
-                        {t("birthday_add")}
-                    </StyledText>
+                        <StyledText style={viewStyles.headerText}>
+                            {t("birthday_add")}
+                        </StyledText>
+                    </View>
 
                     <View style={modalStyles.divider} />
 
@@ -163,6 +173,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                                 </View>
                                 <View style={viewStyles.tableValueColumn}>
                                     <TextInput
+                                        ref={inputRef}
                                         style={[
                                             viewStyles.tableValueText,
                                             addStyles.inputInline,

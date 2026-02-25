@@ -187,10 +187,10 @@ const NotificationsPage = () => {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     data={[
+                        { key: 'all', label: t('all') || 'Hamısı' },
                         { key: 'day', label: t('tab_today') || 'Bugün' },
                         { key: 'week', label: t('stats_week') || 'Həftəlik' },
                         { key: 'month', label: t('stats_month') || 'Aylıq' },
-                        { key: 'all', label: t('all') || 'Hamısı' },
                     ]}
                     keyExtractor={(item) => item.key}
                     contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 16, paddingBottom: 4, flexGrow: 1, justifyContent: 'center' }}

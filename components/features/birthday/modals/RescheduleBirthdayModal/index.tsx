@@ -2,6 +2,7 @@ import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
+import { formatDateToCustomString } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -58,15 +59,7 @@ export function RescheduleBirthdayModal({
     };
 
     const formatDateOnly = (d: Date) => {
-        const day = d.getDate().toString().padStart(2, "0");
-        const months = ["Yan", "Fev", "Mar", "Apr", "May", "İyn", "İyl", "Avq", "Sen", "Okt", "Noy", "Dek"];
-        const enMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const ruMonths = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
-
-        const monthNames = lang === 'az' ? months : lang === 'ru' ? ruMonths : enMonths;
-        const month = monthNames[d.getMonth()];
-        const year = d.getFullYear();
-        return `${day} ${month} ${year}`;
+        return formatDateToCustomString(d, lang);
     };
 
     const formatTimeOnly = (d: Date) => {
@@ -84,18 +77,21 @@ export function RescheduleBirthdayModal({
     return (
         <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
             <View style={styles.container}>
-                <View
-                    style={[
-                        modalStyles.iconContainer,
-                        localStyles.iconContainer,
-                    ]}
-                >
-                    <Ionicons name="notifications-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
-                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center', width: '100%' }}>
+                    <View
+                        style={[
+                            modalStyles.iconContainer,
+                            localStyles.iconContainer,
+                            { width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center' }
+                        ]}
+                    >
+                        <Ionicons name="notifications-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
+                    </View>
 
-                <StyledText style={styles.headerText}>
-                    {t("edit")}
-                </StyledText>
+                    <StyledText style={styles.headerText}>
+                        {t("edit")}
+                    </StyledText>
+                </View>
 
                 <View style={modalStyles.divider} />
 

@@ -1,17 +1,71 @@
-import { useTheme } from "@/hooks/useTheme"
-import React, { useEffect, useState } from "react"
-import { Keyboard, KeyboardAvoidingView, LayoutAnimation, Modal, Platform, Pressable, ScrollView, StyleSheet, UIManager } from "react-native"
+import { useTheme } from "@/hooks/useTheme";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Dimensions, Keyboard, KeyboardAvoidingView, LayoutAnimation, Modal, Platform, Pressable, ScrollView, StyleSheet, UIManager } from "react-native";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 type StyledModalProps = {
     isOpen: boolean
     onClose: () => void
     children: React.ReactNode
     closeOnOverlayPress?: boolean
+    expectsKeyboard?: boolean
 }
 
-const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, closeOnOverlayPress = true }) => {
+const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, closeOnOverlayPress = true, expectsKeyboard = false }) => {
     const { colors, isDark } = useTheme();
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    const [isReady, setIsReady] = useState(!expectsKeyboard);
+
+    const slideAnim = useRef(new Animated.Value(30)).current;
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (!isOpen) {
+            setIsReady(!expectsKeyboard);
+            slideAnim.setValue(30);
+            fadeAnim.setValue(0);
+        } else {
+            if (!expectsKeyboard) {
+                // Regular modal opening animation
+                Animated.parallel([
+                    Animated.spring(slideAnim, {
+                        toValue: 0,
+                        useNativeDriver: true,
+                        tension: 50,
+                        friction: 8
+                    }),
+                    Animated.timing(fadeAnim, {
+                        toValue: 1,
+                        duration: 600,
+                        useNativeDriver: true
+                    })
+                ]).start();
+            } else if (expectsKeyboard) {
+                // Fallback: if keyboard doesn't open for some reason, show it anyway after 1s
+                const timer = setTimeout(() => setIsReady(true), 5000);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [isOpen, expectsKeyboard]);
+
+    useEffect(() => {
+        if (isReady && isOpen) {
+            Animated.parallel([
+                Animated.spring(slideAnim, {
+                    toValue: 0,
+                    useNativeDriver: true,
+                    tension: 50,
+                    friction: 8
+                }),
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 600,
+                    useNativeDriver: true
+                })
+            ]).start();
+        }
+    }, [isReady, isOpen]);
 
     useEffect(() => {
         if (Platform.OS === 'android') {
@@ -27,6 +81,7 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
             () => {
                 LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                 setKeyboardVisible(true);
+                if (expectsKeyboard) setIsReady(true);
             }
         );
         const keyboardDidHideListener = Keyboard.addListener(
@@ -42,6 +97,8 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
             keyboardDidShowListener.remove();
         };
     }, []);
+
+    const isPositionBottom = expectsKeyboard || isKeyboardVisible;
 
     return (
         <Modal
@@ -64,7 +121,8 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
                             styles.modalBackgroundContainer,
                             {
                                 backgroundColor: isDark ? "rgba(0, 0, 0, 0.78)" : "rgba(0, 0, 0, 0.4)",
-                                paddingBottom: isKeyboardVisible ? 20 : 0
+                                justifyContent: isPositionBottom ? 'flex-end' : 'center',
+                                paddingBottom: isPositionBottom ? 10 : 0
                             }
                         ]}
                         onPress={() => {
@@ -74,15 +132,25 @@ const StyledModal: React.FC<StyledModalProps> = ({ isOpen, onClose, children, cl
                             }
                         }}
                     >
-                        <Pressable
+                        <Animated.View
                             style={[
                                 styles.contentContainer,
-                                { backgroundColor: 'transparent', padding: 0, width: 'auto' }
+                                {
+                                    backgroundColor: 'transparent',
+                                    padding: 0,
+                                    width: 'auto',
+                                    opacity: fadeAnim,
+                                    transform: [{ translateY: slideAnim }]
+                                }
                             ]}
-                            onPress={() => { }}
                         >
-                            {children}
-                        </Pressable>
+                            <Pressable
+                                style={{ width: '100%', alignItems: 'center' }}
+                                onPress={() => { }}
+                            >
+                                {children}
+                            </Pressable>
+                        </Animated.View>
                     </Pressable>
                 </ScrollView>
             </KeyboardAvoidingView>
