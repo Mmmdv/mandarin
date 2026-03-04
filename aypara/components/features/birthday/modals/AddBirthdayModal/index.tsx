@@ -254,7 +254,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                       setName(text);
                       if (nameError) setNameError(false);
                     }}
-                    placeholder={t("birthday_name")}
+                    placeholder={t("todo_placeholder")}
                     autoFocus={true}
                     blurOnSubmit={false}
                     showSoftInputOnFocus={true}
@@ -284,7 +284,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
                 </View>
                 <View style={viewStyles.tableValueColumn}>
                   <StyledText style={viewStyles.tableValueText}>
-                    {date ? formatDateDisplay(date) : t("birthday_date")}
+                    {date ? formatDateDisplay(date) : t("select_placeholder")}
                   </StyledText>
                 </View>
               </TouchableOpacity>

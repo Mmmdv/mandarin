@@ -11,7 +11,7 @@ export default function Index() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       if (UIManager.setLayoutAnimationEnabledExperimental) {
         UIManager.setLayoutAnimationEnabledExperimental(true);
       }
@@ -31,14 +31,26 @@ export default function Index() {
     onClearArchive,
   } = useTodo();
 
-  const handleAddTodo = (title: string, reminder?: string, notificationId?: string) => {
-    onAddTodo(title, reminder, notificationId);
-  }
+  const handleAddTodo = (
+    title: string,
+    reminder?: string,
+    notificationId?: string,
+    category?: string,
+  ) => {
+    onAddTodo(title, reminder, notificationId, category);
+  };
 
   return (
     <GestureWrapper>
-      <View style={[styles.container, { backgroundColor: colors.PRIMARY_BACKGROUND }]}>
-        <StatusBar barStyle={isDark ? "light-content" : "dark-content"}></StatusBar>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: colors.PRIMARY_BACKGROUND },
+        ]}
+      >
+        <StatusBar
+          barStyle={isDark ? "light-content" : "dark-content"}
+        ></StatusBar>
         <TodoList
           todos={todos}
           onDeleteTodo={onDeleteTodo}

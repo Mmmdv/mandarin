@@ -1,7 +1,7 @@
 import { useTheme } from "@/hooks/useTheme";
 import {
-    incrementUsage,
-    selectIsBreathingActive,
+  incrementUsage,
+  selectIsBreathingActive,
 } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
 // import analytics from "@react-native-firebase/analytics";
@@ -28,6 +28,9 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const [isAddBirthdayModalOpen, setIsAddBirthdayModalOpen] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | undefined>(
+    undefined,
+  );
   const { onAddTodo } = useTodo();
   const { onAddBirthday } = useBirthday();
   const isBreathingActive = useSelector(selectIsBreathingActive);
@@ -61,8 +64,10 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
     title: string,
     reminder?: string,
     notificationId?: string,
+    category?: string,
   ) => {
-    onAddTodo(title, reminder, notificationId);
+    onAddTodo(title, reminder, notificationId, category);
+    setSuccessMessage(t("task_added_success"));
 
     // Only show success modal if NOT on the todo tab
     const currentRouteName = state.routes[state.index].name;
@@ -75,6 +80,7 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
 
   const handleAddBirthday = (name: string, date: string, phone?: string) => {
     onAddBirthday(name, date, phone);
+    setSuccessMessage(t("birthday_added_success"));
 
     // Only show success modal if NOT on the birthday tab
     const currentRouteName = state.routes[state.index].name;
@@ -287,6 +293,7 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
       <TaskSuccessModal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
+        message={successMessage}
       />
     </View>
   );

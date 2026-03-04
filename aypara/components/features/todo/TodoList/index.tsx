@@ -834,9 +834,6 @@ const TodoList: React.FC<TodoListProps> = ({
                       checkTodo={onCheckTodo}
                       editTodo={onEditTodo}
                       retryTodo={onRetryTodo}
-                      categoryTitle={categoryTitle}
-                      categoryIcon={categoryIcon}
-                      category="todo"
                       viewMode={viewMode}
                       onOpenMenu={(anchor) => handleOpenMenu(item, anchor)}
                       onPress={() => {
@@ -977,9 +974,6 @@ const TodoList: React.FC<TodoListProps> = ({
                       editTodo={onEditTodo}
                       archiveTodo={onArchiveTodo}
                       retryTodo={onRetryTodo}
-                      categoryTitle={categoryTitle}
-                      categoryIcon={categoryIcon}
-                      category="done"
                       viewMode={viewMode}
                       onOpenMenu={(anchor) => handleOpenMenu(item, anchor)}
                       onPress={() => {
@@ -1118,9 +1112,6 @@ const TodoList: React.FC<TodoListProps> = ({
                   editTodo={onEditTodo}
                   archiveTodo={onArchiveTodo}
                   retryTodo={onRetryTodo}
-                  categoryTitle={categoryTitle}
-                  categoryIcon={categoryIcon}
-                  category="archive"
                   viewMode={viewMode}
                   onOpenMenu={(anchor) => handleOpenMenu(item, anchor)}
                   onPress={() => {
@@ -1249,6 +1240,7 @@ const TodoList: React.FC<TodoListProps> = ({
             reminder={menuTarget.reminder}
             reminderCancelled={menuTarget.reminderCancelled}
             notificationId={menuTarget.notificationId}
+            category={menuTarget.category}
           />
         </>
       )}

@@ -6,6 +6,7 @@ export const TODO_CATEGORIES = [
   { id: "health", label: "category_health", icon: "medkit-outline" },
   { id: "dev", label: "category_dev", icon: "bulb-outline" },
   { id: "sport", label: "category_sport", icon: "barbell-outline" },
+  { id: "car", label: "category_car", icon: "car-outline" },
 ] as const;
 
 export type TodoCategoryId = (typeof TODO_CATEGORIES)[number]["id"];

@@ -80,6 +80,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
   );
 
   const inputRef = useRef<TextInput>(null);
+  const categoryScrollRef = useRef<ScrollView>(null);
 
   const picker = useDateTimePicker({
     initialDate: reminder ? new Date(reminder) : undefined,
@@ -107,7 +108,14 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, title, reminder, category]);
 
+  useEffect(() => {
+    if (selectedCategory) {
+      categoryScrollRef.current?.scrollTo({ x: 0, animated: true });
+    }
+  }, [selectedCategory]);
+
   const formatDateOnly = (date: Date) => {
+    if (!date || isNaN(date.getTime())) return "";
     const day = date.getDate().toString().padStart(2, "0");
     const months = [
       "Yan",
@@ -160,6 +168,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
   };
 
   const formatTimeOnly = (date: Date) => {
+    if (!date || isNaN(date.getTime())) return "";
     const hours = date.getHours().toString().padStart(2, "0");
     const minutes = date.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
@@ -204,6 +213,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
       picker.reminderDate?.toISOString() !== reminder
     ) {
       const displayTitle = categoryTitle || t("notifications_todo");
+
       const newId = await schedulePushNotification(
         displayTitle,
         updatedTitle,
@@ -220,7 +230,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
             body: updatedTitle,
             date: picker.reminderDate.toISOString(),
             status: "Gözlənilir",
-            categoryIcon,
+            categoryIcon: categoryIcon,
           }),
         );
       }
@@ -342,57 +352,66 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
           ]}
         >
           <ScrollView
+            ref={categoryScrollRef}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={themedLocalStyles.categoryList}
           >
-            {TODO_CATEGORIES.map((cat) => (
-              <TouchableOpacity
-                key={cat.id}
-                onPress={() => setSelectedCategory(cat.id)}
-                activeOpacity={0.7}
-                style={[
-                  themedLocalStyles.categoryItem,
-                  {
-                    backgroundColor:
-                      selectedCategory === cat.id
-                        ? isDark
-                          ? "rgba(255,255,255,0.1)"
-                          : "rgba(0,0,0,0.05)"
-                        : "transparent",
-                    borderColor:
+            {[...TODO_CATEGORIES]
+              .sort((a, b) =>
+                a.id === selectedCategory
+                  ? -1
+                  : b.id === selectedCategory
+                    ? 1
+                    : 0,
+              )
+              .map((cat) => (
+                <TouchableOpacity
+                  key={cat.id}
+                  onPress={() => setSelectedCategory(cat.id)}
+                  activeOpacity={0.7}
+                  style={[
+                    themedLocalStyles.categoryItem,
+                    {
+                      backgroundColor:
+                        selectedCategory === cat.id
+                          ? isDark
+                            ? "rgba(255,255,255,0.1)"
+                            : "rgba(0,0,0,0.05)"
+                          : "transparent",
+                      borderColor:
+                        selectedCategory === cat.id
+                          ? colors.PRIMARY_ACTIVE_BUTTON
+                          : isDark
+                            ? "rgba(255,255,255,0.1)"
+                            : "rgba(0,0,0,0.1)",
+                      borderWidth: selectedCategory === cat.id ? 1.5 : 1,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name={cat.icon as any}
+                    size={14}
+                    color={
                       selectedCategory === cat.id
                         ? colors.PRIMARY_ACTIVE_BUTTON
-                        : isDark
-                          ? "rgba(255,255,255,0.1)"
-                          : "rgba(0,0,0,0.1)",
-                    borderWidth: selectedCategory === cat.id ? 1.5 : 1,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name={cat.icon as any}
-                  size={14}
-                  color={
-                    selectedCategory === cat.id
-                      ? colors.PRIMARY_ACTIVE_BUTTON
-                      : colors.SECTION_TEXT
-                  }
-                />
-                <StyledText
-                  style={{
-                    fontSize: 11,
-                    color:
-                      selectedCategory === cat.id
-                        ? colors.PRIMARY_TEXT
-                        : colors.SECTION_TEXT,
-                    fontWeight: selectedCategory === cat.id ? "700" : "500",
-                  }}
-                >
-                  {t(cat.label as any)}
-                </StyledText>
-              </TouchableOpacity>
-            ))}
+                        : colors.SECTION_TEXT
+                    }
+                  />
+                  <StyledText
+                    style={{
+                      fontSize: 11,
+                      color:
+                        selectedCategory === cat.id
+                          ? colors.PRIMARY_TEXT
+                          : colors.SECTION_TEXT,
+                      fontWeight: selectedCategory === cat.id ? "700" : "500",
+                    }}
+                  >
+                    {t(cat.label as any)}
+                  </StyledText>
+                </TouchableOpacity>
+              ))}
           </ScrollView>
         </View>
 
@@ -423,34 +442,34 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
               >
                 {picker.reminderDate
                   ? formatDateOnly(picker.reminderDate)
-                  : t("date")}
+                  : t("select_placeholder")}
               </StyledText>
             </View>
           </TouchableOpacity>
 
-          {/* Time Row */}
-          <TouchableOpacity
+          <View
             style={[
               themedLocalStyles.tableRow,
               themedLocalStyles.tableRowBorder,
+              { flexDirection: "row", alignItems: "center" },
             ]}
-            onPress={() => picker.setShowTimePicker(true)}
-            activeOpacity={0.7}
           >
-            <View style={themedLocalStyles.tableLabelColumn}>
-              <Ionicons
-                name="time-outline"
-                size={18}
-                color={colors.SECTION_TEXT}
-              />
-              <StyledText style={themedLocalStyles.tableLabelText}>
-                {t("time")}
-              </StyledText>
-            </View>
-            <View style={themedLocalStyles.tableValueColumn}>
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-              >
+            <TouchableOpacity
+              onPress={() => picker.setShowTimePicker(true)}
+              activeOpacity={0.7}
+              style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+            >
+              <View style={themedLocalStyles.tableLabelColumn}>
+                <Ionicons
+                  name="time-outline"
+                  size={18}
+                  color={colors.SECTION_TEXT}
+                />
+                <StyledText style={themedLocalStyles.tableLabelText}>
+                  {t("time")}
+                </StyledText>
+              </View>
+              <View style={[themedLocalStyles.tableValueColumn, { flex: 1 }]}>
                 <StyledText
                   style={[
                     themedLocalStyles.tableValueText,
@@ -459,25 +478,24 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                 >
                   {picker.reminderDate
                     ? formatTimeOnly(picker.reminderDate)
-                    : t("time")}
+                    : t("select_placeholder")}
                 </StyledText>
-                {picker.reminderDate && (
-                  <TouchableOpacity
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      picker.setReminderDate(undefined);
-                    }}
-                  >
-                    <Ionicons
-                      name="close-circle"
-                      size={16}
-                      color={colors.SECTION_TEXT}
-                    />
-                  </TouchableOpacity>
-                )}
               </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+            {picker.reminderDate && (
+              <TouchableOpacity
+                onPress={() => picker.setReminderDate(undefined)}
+                hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+                style={{ paddingLeft: 10 }}
+              >
+                <Ionicons
+                  name="close-circle"
+                  size={18}
+                  color={colors.SECTION_TEXT}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View

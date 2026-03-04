@@ -1,5 +1,6 @@
 import StyledCheckBox from "@/components/ui/StyledCheckBox";
 import StyledText from "@/components/ui/StyledText";
+import { TODO_CATEGORIES } from "@/constants/todo";
 import { formatDate } from "@/helpers/date";
 import { hyphenateText } from "@/helpers/text";
 import { useTheme } from "@/hooks/useTheme";
@@ -36,8 +37,6 @@ type TodoItemProps = Todo & {
     categoryIcon?: string,
   ) => void;
   archiveTodo?: (id: Todo["id"]) => void;
-  categoryTitle?: string;
-  categoryIcon?: string;
   category?: string;
   viewMode?: "list" | "card";
   onOpenMenu?: (anchor: {
@@ -49,25 +48,8 @@ type TodoItemProps = Todo & {
   onPress?: () => void;
 };
 
-const getCategoryIcon = (category?: string) => {
-  switch (category) {
-    case "work":
-      return "briefcase-outline";
-    case "home":
-      return "home-outline";
-    case "family":
-      return "people-outline";
-    case "health":
-      return "heart-outline";
-    case "dev":
-      return "bulb-outline";
-    case "sport":
-      return "fitness-outline";
-    case "personal":
-      return "person-outline";
-    default:
-      return "person-outline";
-  }
+const getCategoryData = (id?: string) => {
+  return TODO_CATEGORIES.find((c) => c.id === id) || TODO_CATEGORIES[0];
 };
 
 const TodoItem: React.FC<TodoItemProps> = ({
@@ -87,8 +69,6 @@ const TodoItem: React.FC<TodoItemProps> = ({
   editTodo,
   retryTodo,
   archiveTodo,
-  categoryTitle,
-  categoryIcon,
   category,
   viewMode = "list",
   onOpenMenu,
@@ -254,7 +234,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
               >
                 {hyphenateText(title)}
               </StyledText>
-              {category && category !== "personal" && (
+              {category && (
                 <View
                   style={{
                     flexDirection: "row",
@@ -264,7 +244,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   }}
                 >
                   <Ionicons
-                    name={getCategoryIcon(category) as any}
+                    name={getCategoryData(category).icon as any}
                     size={10}
                     color={colors.SECTION_TEXT}
                   />
@@ -422,7 +402,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
             >
               {hyphenateText(title)}
             </StyledText>
-            {category && category !== "personal" && (
+            {category && (
               <View
                 style={{
                   flexDirection: "row",
@@ -432,7 +412,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 }}
               >
                 <Ionicons
-                  name={getCategoryIcon(category) as any}
+                  name={getCategoryData(category).icon as any}
                   size={10}
                   color={colors.SECTION_TEXT}
                 />
