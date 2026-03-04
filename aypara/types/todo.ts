@@ -1,4 +1,8 @@
-export type ReminderStatus = 'Gözlənilir' | 'Dəyişdirilib və ləğv olunub' | 'Göndərilib' | 'Ləğv olunub';
+export type ReminderStatus =
+  | "Gözlənilir"
+  | "Dəyişdirilib və ləğv olunub"
+  | "Göndərilib"
+  | "Ləğv olunub";
 
 export interface Todo {
   id: string;
@@ -12,4 +16,5 @@ export interface Todo {
   reminder?: string;
   notificationId?: string;
   reminderCancelled?: boolean;
+  category?: string;
 }

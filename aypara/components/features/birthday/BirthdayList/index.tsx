@@ -1,3 +1,4 @@
+import EmptyState from "@/components/ui/EmptyState";
 import StyledRefreshControl from "@/components/ui/StyledRefreshControl";
 import StyledText from "@/components/ui/StyledText";
 import { toggleAnimation } from "@/constants/animations";
@@ -28,7 +29,6 @@ import GreetingModal from "../modals/GreetingModal";
 import { RescheduleBirthdayModal } from "../modals/RescheduleBirthdayModal";
 import {
     BIRTHDAY_LIGHT,
-    BIRTHDAY_PRIMARY,
     getStyles
 } from "./styles";
 
@@ -492,7 +492,6 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
     if (birthdays.length === 0) {
         return (
             <View style={{ flex: 1 }}>
-                {/* Header */}
                 <View style={styles.header}>
                     <TouchableOpacity
                         onPress={() => {
@@ -513,61 +512,14 @@ const BirthdayList: React.FC<BirthdayListProps> = ({
                         </StyledText>
                     </View>
                 </View>
-                <ScrollView
-                    style={{ flex: 1 }}
-                    contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", paddingBottom: 80 }}
-                    refreshControl={
-                        <StyledRefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                    }
-                >
-                    <View style={styles.emptyContainer}>
-                        <View
-                            style={[
-                                styles.emptyIcon,
-                                {
-                                    backgroundColor: colors.SECONDARY_BACKGROUND,
-                                    shadowColor: BIRTHDAY_PRIMARY,
-                                },
-                            ]}
-                        >
-                            <Ionicons name="gift-outline" size={64} color={BIRTHDAY_LIGHT} />
-                        </View>
-                        <StyledText
-                            style={{ fontSize: 22, fontWeight: "bold", color: colors.PRIMARY_TEXT, marginBottom: 8 }}
-                        >
-                            {t("birthday_empty_title")}
-                        </StyledText>
-                        <StyledText
-                            style={{
-                                fontSize: 16,
-                                color: colors.PLACEHOLDER,
-                                textAlign: "center",
-                                marginBottom: 32,
-                                paddingHorizontal: 40,
-                            }}
-                        >
-                            {t("birthday_empty_desc")}
-                        </StyledText>
-                        <TouchableOpacity
-                            onPress={onAddRequest}
-                            activeOpacity={0.8}
-                            style={[
-                                styles.emptyButton,
-                                {
-                                    backgroundColor: isDark ? colors.SECONDARY_BACKGROUND : colors.PRIMARY_BACKGROUND,
-                                    borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
-                                    shadowColor: BIRTHDAY_PRIMARY,
-                                    shadowOpacity: isDark ? 0.3 : 0.1,
-                                },
-                            ]}
-                        >
-                            <Ionicons name="add" size={24} color={BIRTHDAY_PRIMARY} />
-                            <StyledText style={{ color: BIRTHDAY_PRIMARY, fontSize: 16, fontWeight: "bold" }}>
-                                {t("birthday_add")}
-                            </StyledText>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
+
+                <EmptyState
+                    icon="gift-outline"
+                    title={t("birthday_empty_title")}
+                    description={t("birthday_empty_desc")}
+                    buttonText={t("birthday_add")}
+                    onPress={onAddRequest}
+                />
             </View>
         );
     }

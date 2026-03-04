@@ -1,4 +1,5 @@
 import GestureWrapper from "@/components/layout/GestureWrapper";
+import EmptyState from "@/components/ui/EmptyState";
 import StyledHeader from "@/components/ui/StyledHeader";
 import StyledText from "@/components/ui/StyledText";
 import { formatDate } from "@/helpers/date";
@@ -188,10 +189,13 @@ export default function TodayTasksScreen() {
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 20, paddingTop: 8 }]}
                     ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <Ionicons name="calendar-outline" size={64} color={colors.PLACEHOLDER} style={{ marginBottom: 16 }} />
-                            <StyledText style={{ color: colors.PLACEHOLDER, fontSize: 16 }}>{t("no_results")}</StyledText>
-                        </View>
+                        <EmptyState
+                            icon="calendar-outline"
+                            title={t("no_results")}
+                            description={t("today_no_tasks")}
+                            buttonText={t("add")}
+                            onPress={() => router.push("/(tabs)/todo")}
+                        />
                     }
                 />
             </View>
