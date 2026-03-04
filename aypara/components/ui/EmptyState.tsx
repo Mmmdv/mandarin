@@ -3,12 +3,12 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSequence,
-    withSpring,
-    withTiming,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import StyledText from "./StyledText";
 
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     borderRadius: 60,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,

@@ -8,6 +8,7 @@ import { analyzeAudio } from "@/helpers/gemini";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import OSPermissionModal from "@/layout/Modals/OSPermissionModal";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
@@ -55,15 +56,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
   categoryTitle,
   categoryIcon,
 }) => {
-  const {
-    t,
-    theme,
-    colors,
-    isDark,
-    notificationsEnabled,
-    todoNotifications,
-    lang,
-  } = useTheme();
+  const { t, theme, colors, isDark, todoNotifications, lang } = useTheme();
   const dispatch = useAppDispatch();
 
   const themedModalStyles = useMemo(() => getModalStyles(colors), [colors]);
@@ -111,7 +104,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
     let notificationId: string | undefined;
 
-    if (finalDate && notificationsEnabled && todoNotifications) {
+    if (finalDate && todoNotifications) {
       const displayTitle = categoryTitle || t("notifications_todo");
 
       notificationId = await schedulePushNotification(
@@ -156,7 +149,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
             const date = new Date(result.date);
             if (!isNaN(date.getTime())) {
               picker.setReminderDate(date);
-              if (!notificationsEnabled || !todoNotifications) {
+              if (!todoNotifications) {
                 setTimeout(() => picker.setShowPermissionModal(true), 500);
               }
             }
@@ -188,7 +181,6 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     startRecording,
     setTitle,
     picker,
-    notificationsEnabled,
     todoNotifications,
     t,
   ]);
@@ -578,7 +570,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
             {/* Date Row */}
             <TouchableOpacity
               style={themedLocalStyles.tableRow}
-              onPress={() => picker.setShowDatePicker(true)}
+              onPress={() => picker.startReminderFlow()}
               activeOpacity={0.7}
             >
               <View style={themedLocalStyles.tableLabelColumn}>
@@ -613,7 +605,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
               ]}
             >
               <TouchableOpacity
-                onPress={() => picker.setShowTimePicker(true)}
+                onPress={() => picker.startReminderFlow()}
                 activeOpacity={0.7}
                 style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
               >
@@ -956,7 +948,6 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                   onPress={() => {
                     dispatch(
                       updateAppSetting({
-                        notificationsEnabled: true,
                         todoNotifications: true,
                       }),
                     );
@@ -970,6 +961,11 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
               </View>
             </View>
           </StyledModal>
+
+          <OSPermissionModal
+            isOpen={picker.showOSPermissionModal}
+            onClose={() => picker.setShowOSPermissionModal(false)}
+          />
 
           {/* Past Date Alert Modal */}
           <StyledModal

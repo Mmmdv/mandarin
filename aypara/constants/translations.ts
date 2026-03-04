@@ -116,6 +116,9 @@ export const TRANSLATIONS = {
     category_personal: "Şəxsi",
     category_car: "Avtomobil",
     manage_notification_categories: "Bildiriş kateqoriyalarını idarə et",
+    notification_category_disabled:
+      "Bu kateqoriya üçün bildirişlər söndürülüb. Bildiriş almaq üçün tənzimləmələrdən aktiv edin.",
+    go_to_settings: "Tənzimləmələrə keç",
     start_journey: "Səyahətə başla",
     create_task: "Tapşırıq yarat",
     empty_desc: "Hələ heç bir tapşırıq yoxdur. Gününü planlaşdırmağa başla! 🚀",
@@ -131,10 +134,16 @@ export const TRANSLATIONS = {
     birthday_added_success: "Ad günü uğurla əlavə edildi!",
     past_reminder_error: "Keçmiş zamana xatırlatma təyin etmək olmur",
     attention: "Diqqət",
+    os_notifications_disabled_title: "Bildirişlər söndürülüb",
+    os_notifications_disabled:
+      "Cihaz ayarlarında tətbiq üçün bildirişlər bağlıdır. Zəhmət olmasa tənzimləmələrə keçib aktiv edin.",
+    go_to_os_settings: "Tənzimləmələrə keç",
     confirm: "Təsdiq et",
     next: "Növbəti",
     disable_notifications_confirm:
       "Bütün aktiv bildirişləri dayandırmaq istədiyinizə əminsiniz?",
+    disable_category_confirm:
+      "{{count}} aktiv bildirişiniz var. Bu kateqoriyanı söndürsəniz, bütün planlaşdırılmış bildirişlər ləğv olunacaq. Davam etmək istəyirsiniz?",
     clear_history_confirm:
       "Bütün bildiriş tarixçəsini silmək istədiyinizə əminsiniz?",
     home_plan_day: "Gününü planla, taskları yarat",
@@ -424,6 +433,9 @@ export const TRANSLATIONS = {
     category_personal: "Personal",
     category_car: "Car",
     manage_notification_categories: "Manage notification categories",
+    notification_category_disabled:
+      "Notifications are disabled for this category. Enable them in settings to receive notifications.",
+    go_to_settings: "Go to settings",
     start_journey: "Start your journey",
     create_task: "Create task",
     empty_desc: "No tasks yet. Start planning your day! 🚀",
@@ -436,12 +448,18 @@ export const TRANSLATIONS = {
     reset_success_message: "App reset. Please restart the application",
     task_added_success: "Task added successfully!",
     birthday_added_success: "Birthday added successfully!",
-    past_reminder_error: "Reminder time cannot be in the past",
+    past_reminder_error: "Cannot set a reminder for a past date",
     attention: "Attention",
+    os_notifications_disabled_title: "Notifications Disabled",
+    os_notifications_disabled:
+      "Notifications for this app are disabled in your device settings. Please go to settings and enable them.",
+    go_to_os_settings: "Go to settings",
     confirm: "Confirm",
     next: "Next",
     disable_notifications_confirm:
       "Are you sure you want to stop all active notifications?",
+    disable_category_confirm:
+      "You have {{count}} active notification(s). If you turn off this category, all scheduled notifications will be cancelled. Do you want to continue?",
     clear_history_confirm:
       "Are you sure you want to delete the entire notification history?",
     home_plan_day: "Plan your day, create tasks",
@@ -733,6 +751,9 @@ export const TRANSLATIONS = {
     category_personal: "Личное",
     category_car: "Машина",
     manage_notification_categories: "Управление категориями уведомлений",
+    notification_category_disabled:
+      "Уведомления для этой категории отключены. Включите их в настройках, чтобы получать уведомления.",
+    go_to_settings: "Перейти в настройки",
     start_journey: "Начать путешествие",
     create_task: "Создать задачу",
     empty_desc: "Задач пока нет. Начни планировать свой день! 🚀",
@@ -746,12 +767,18 @@ export const TRANSLATIONS = {
       "Приложение сброшено. Пожалуйста, перезапустите приложение",
     task_added_success: "Задача успешно добавлена!",
     birthday_added_success: "День рождения успешно добавлен!",
-    past_reminder_error: "Время напоминания не может быть в прошлом",
+    past_reminder_error: "Невозможно установить напоминание на прошедшую дату",
     attention: "Внимание",
+    os_notifications_disabled_title: "Уведомления отключены",
+    os_notifications_disabled:
+      "Уведомления для этого приложения отключены в настройках устройства. Пожалуйста, перейдите в настройки и включите их.",
+    go_to_os_settings: "Перейти в настройки",
     confirm: "Подтвердить",
     next: "Далее",
     disable_notifications_confirm:
       "Вы уверены, что хотите остановить все активные уведомления?",
+    disable_category_confirm:
+      "У вас {{count}} активных уведомлений. Если вы отключите эту категорию, все запланированные уведомления будут отменены. Продолжить?",
     clear_history_confirm:
       "Вы уверены, что хотите удалить всю историю уведомлений?",
     home_plan_day: "Планируй свой день, создавай задачи",

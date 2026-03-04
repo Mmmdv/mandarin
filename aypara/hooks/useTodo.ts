@@ -85,11 +85,7 @@ const useTodo = () => {
 
     newReminder = newDate.toISOString();
 
-    if (
-      newDate > new Date() &&
-      settings.notificationsEnabled &&
-      settings.todoNotifications
-    ) {
+    if (newDate > new Date() && settings.todoNotifications) {
       const displayTitle = categoryTitle || t("notifications_todo");
       newNotificationId = await schedulePushNotification(
         displayTitle,

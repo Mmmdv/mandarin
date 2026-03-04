@@ -1,0 +1,64 @@
+import { StyleSheet } from "react-native";
+
+export const getStyles = (colors: any, isDark: boolean) =>
+  StyleSheet.create({
+    modalContainer: {
+      backgroundColor: colors.SECONDARY_BACKGROUND,
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+      padding: 20,
+      width: 340,
+      maxWidth: "95%",
+      alignItems: "center",
+      gap: 12,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: isDark ? 0.3 : 0.2,
+      shadowRadius: isDark ? 20 : 15,
+      elevation: 10,
+    },
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 12,
+      width: "100%",
+    },
+    iconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.TAB_BAR,
+      shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    headerText: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.PRIMARY_TEXT,
+      textAlign: "center",
+    },
+    divider: {
+      height: 0.6,
+      backgroundColor: colors.PRIMARY_BORDER_DARK,
+      width: "100%",
+      opacity: 0.8,
+    },
+    messageText: {
+      fontSize: 14,
+      color: colors.PLACEHOLDER,
+      textAlign: "center",
+    },
+    buttonsContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: 10,
+      marginTop: 8,
+    },
+  });

@@ -1,151 +1,152 @@
 import { StyleSheet } from "react-native";
 
-export const getStyles = (colors: any) => StyleSheet.create({
-    container: {
-        flexDirection: "row",
-        alignContent: "center",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginVertical: 5,
-        marginHorizontal: 0,
-        backgroundColor: colors.SECONDARY_BACKGROUND,
-        borderRadius: 18,
-        paddingHorizontal: 15,
-        paddingVertical: 14,
-        overflow: "hidden",
-        position: 'relative',
-    },
-    cardContainer: {
-        width: '48.5%',
-        backgroundColor: colors.SECONDARY_BACKGROUND,
-        borderRadius: 20,
-        padding: 15,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: colors.PRIMARY_BORDER_DARK,
-        height: 160,
-        justifyContent: 'space-between',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    cardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    cardBody: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        paddingVertical: 5,
-    },
-    cardTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        lineHeight: 20,
-        letterSpacing: 0.1,
-        textAlign: 'left',
-    },
-    cardOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        borderRadius: 20,
-        zIndex: 0,
-    },
-    cardFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 'auto',
-        paddingTop: 10,
-        borderTopWidth: 0.5,
-        borderTopColor: colors.PRIMARY_BORDER_DARK,
-    },
-    cardMetadata: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    cardTime: {
-        fontSize: 7.5,
-        color: colors.PLACEHOLDER,
-        fontWeight: '600',
-    },
-    cardTimeContainer: {
-        flexDirection: 'column',
-        justifyContent: 'center',
-    },
-    cardTimeSmall: {
-        fontSize: 7.5,
-        fontWeight: '500',
-        marginTop: 1,
-        opacity: 0.8,
-    },
-    cardControls: {
-        flexDirection: 'row',
-        gap: 6,
-    },
-    customCheckbox: {
-        width: 22,
-        height: 22,
-        borderRadius: 11,
-        borderWidth: 2,
-        borderColor: colors.CHECKBOX_SUCCESS,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    customCheckboxInner: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: colors.CHECKBOX_SUCCESS,
-    },
-    controlsContainer: {
-        flexDirection: "row",
-        paddingHorizontal: 0,
-        paddingVertical: 0,
-        gap: 8,
-    },
-    checkTitleContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 15,
-        flex: 1,
-        flexShrink: 1,
-        marginRight: 25,
-        overflow: "visible",
-    },
-    checkboxWrapper: {
-        position: "relative",
-        overflow: "visible",
-    },
-    textContainer: {
-        flex: 1,
-        flexShrink: 1,
-    },
-    dateText: {
-        fontSize: 12,
-        color: colors.PLACEHOLDER,
-        marginTop: 2,
-    },
-});
-
-export const celebrationStyles = StyleSheet.create({
-    star: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        zIndex: 1000,
-    },
-})
-
 // Keep backward compatibility
 import { COLORS } from "@/constants/ui";
+
+export const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignContent: "center",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginVertical: 5,
+      marginHorizontal: 0,
+      backgroundColor: colors.SECONDARY_BACKGROUND,
+      borderRadius: 18,
+      paddingHorizontal: 15,
+      paddingVertical: 14,
+      overflow: "hidden",
+      position: "relative",
+    },
+    cardContainer: {
+      width: "48.5%",
+      backgroundColor: colors.SECONDARY_BACKGROUND,
+      borderRadius: 20,
+      padding: 15,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: colors.PRIMARY_BORDER_DARK,
+      height: 160,
+      justifyContent: "space-between",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8,
+    },
+    cardBody: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "flex-start",
+      paddingVertical: 5,
+    },
+    cardTitle: {
+      fontSize: 14,
+      fontWeight: "600",
+      lineHeight: 20,
+      letterSpacing: 0.1,
+      textAlign: "left",
+    },
+    cardOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: 20,
+      zIndex: 0,
+    },
+    cardFooter: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: "auto",
+      paddingTop: 10,
+      borderTopWidth: 0.5,
+      borderTopColor: colors.PRIMARY_BORDER_DARK,
+    },
+    cardMetadata: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+    cardTime: {
+      fontSize: 7.5,
+      color: colors.PLACEHOLDER,
+      fontWeight: "600",
+    },
+    cardTimeContainer: {
+      flexDirection: "column",
+      justifyContent: "center",
+    },
+    cardTimeSmall: {
+      fontSize: 7.5,
+      fontWeight: "500",
+      marginTop: 1,
+      opacity: 0.8,
+    },
+    cardControls: {
+      flexDirection: "row",
+      gap: 6,
+    },
+    customCheckbox: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      borderWidth: 2,
+      borderColor: colors.CHECKBOX_SUCCESS,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    customCheckboxInner: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: colors.CHECKBOX_SUCCESS,
+    },
+    controlsContainer: {
+      flexDirection: "row",
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+      gap: 8,
+    },
+    checkTitleContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 15,
+      flex: 1,
+      flexShrink: 1,
+      marginRight: 25,
+      overflow: "visible",
+    },
+    checkboxWrapper: {
+      position: "relative",
+      overflow: "visible",
+    },
+    textContainer: {
+      flex: 1,
+      flexShrink: 1,
+    },
+    dateText: {
+      fontSize: 12,
+      color: colors.PLACEHOLDER,
+      marginTop: 2,
+    },
+  });
+
+export const celebrationStyles = StyleSheet.create({
+  star: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 1000,
+  },
+});
 export const styles = getStyles(COLORS);

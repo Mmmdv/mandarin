@@ -1,21 +1,25 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { modalStyles } from "@/constants/modalStyles";
+import { getModalStyles, modalStyles } from "@/constants/modalStyles";
+import { checkSystemNotifications } from "@/constants/notifications";
 import { useTheme } from "@/hooks/useTheme";
+import OSPermissionModal from "@/layout/Modals/OSPermissionModal";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { selectAppSettings, updateAppSetting } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Contacts from "expo-contacts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-    Keyboard,
-    Platform,
-    Pressable,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Keyboard,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { getStyles as getViewStyles } from "../BirthdayViewModal/styles";
 import { getStyles as getAddStyles } from "./styles";
@@ -32,6 +36,9 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
   onAdd,
 }) => {
   const { t, colors, theme, isDark, lang } = useTheme();
+  const settings = useAppSelector(selectAppSettings);
+  const dispatch = useAppDispatch();
+
   const viewStyles = useMemo(
     () => getViewStyles(colors, isDark),
     [colors, isDark],
@@ -40,6 +47,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     () => getAddStyles(colors, isDark),
     [colors, isDark],
   );
+  const themedModalStyles = useMemo(() => getModalStyles(colors), [colors]);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -48,6 +56,8 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
   const [nameError, setNameError] = useState(false);
   const [dateError, setDateError] = useState(false);
   const [contactSelected, setContactSelected] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [showOSPermissionModal, setShowOSPermissionModal] = useState(false);
 
   const inputRef = useRef<TextInput>(null);
 
@@ -59,6 +69,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
       setNameError(false);
       setDateError(false);
       setContactSelected(false);
+      setShowPermissionModal(false);
 
       // Auto focus input immediately or with a minimal delay
       const timer = setTimeout(() => {
@@ -84,7 +95,17 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
     onClose();
   };
 
-  const handleOpenDatePicker = () => {
+  const handleOpenDatePicker = async () => {
+    const osGranted = await checkSystemNotifications();
+    if (!osGranted) {
+      setShowOSPermissionModal(true);
+      return;
+    }
+
+    if (!settings.birthdayNotifications) {
+      setShowPermissionModal(true);
+      return;
+    }
     setShowDatePicker(true);
   };
 
@@ -432,6 +453,73 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
               variant="dark_button"
             />
           </View>
+
+          {/* Permission Modal */}
+          <StyledModal
+            isOpen={showPermissionModal}
+            onClose={() => setShowPermissionModal(false)}
+            closeOnOverlayPress={true}
+          >
+            <View style={themedModalStyles.modalContainer}>
+              <View
+                style={[
+                  themedModalStyles.iconContainer,
+                  {
+                    backgroundColor: colors.TAB_BAR,
+                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 2,
+                    elevation: 2,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="notifications"
+                  size={28}
+                  color={colors.PRIMARY_ACTIVE_BUTTON}
+                />
+              </View>
+
+              <StyledText style={themedModalStyles.headerText}>
+                {t("enable_notifications")}
+              </StyledText>
+
+              <View style={themedModalStyles.divider} />
+
+              <StyledText style={themedModalStyles.messageText}>
+                {t("enable_notifications_desc")}
+              </StyledText>
+
+              <View style={themedModalStyles.buttonsContainer}>
+                <StyledButton
+                  label={t("cancel")}
+                  onPress={() => setShowPermissionModal(false)}
+                  variant="dark_button"
+                />
+                <StyledButton
+                  label={t("enable")}
+                  onPress={() => {
+                    dispatch(
+                      updateAppSetting({
+                        birthdayNotifications: true,
+                      }),
+                    );
+                    setShowPermissionModal(false);
+                    setTimeout(() => {
+                      setShowDatePicker(true);
+                    }, 300);
+                  }}
+                  variant="dark_button"
+                />
+              </View>
+            </View>
+          </StyledModal>
+
+          <OSPermissionModal
+            isOpen={showOSPermissionModal}
+            onClose={() => setShowOSPermissionModal(false)}
+          />
         </View>
       </TouchableWithoutFeedback>
     </StyledModal>

@@ -1,3 +1,4 @@
+import { checkSystemNotifications } from "@/constants/notifications";
 import { useTheme } from "@/hooks/useTheme";
 import * as Haptics from "expo-haptics";
 import { useState } from "react";
@@ -13,7 +14,7 @@ type UseDateTimePickerOptions = {
 };
 
 export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
-  const { lang, notificationsEnabled } = useTheme();
+  const { lang } = useTheme();
 
   const [reminderDate, setReminderDate] = useState<Date | undefined>(
     isValidDate(options.initialDate) ? options.initialDate : undefined,
@@ -22,14 +23,22 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [tempDate, setTempDate] = useState<Date | undefined>(undefined);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [showOSPermissionModal, setShowOSPermissionModal] = useState(false);
   const [showPastDateAlert, setShowPastDateAlert] = useState(false);
   const [pickerToReopen, setPickerToReopen] = useState<"date" | "time" | null>(
     null,
   );
 
-  const startReminderFlow = () => {
+  const startReminderFlow = async () => {
     Haptics.selectionAsync();
-    if (!notificationsEnabled || options.tabSettingEnabled === false) {
+
+    const osGranted = await checkSystemNotifications();
+    if (!osGranted) {
+      setShowOSPermissionModal(true);
+      return;
+    }
+
+    if (options.tabSettingEnabled === false) {
       setShowPermissionModal(true);
       return;
     }
@@ -263,6 +272,8 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
     tempDate,
     showPermissionModal,
     setShowPermissionModal,
+    showOSPermissionModal,
+    setShowOSPermissionModal,
     showPastDateAlert,
     setShowPastDateAlert,
     closePastDateAlert,

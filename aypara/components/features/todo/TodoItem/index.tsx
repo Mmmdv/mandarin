@@ -12,9 +12,9 @@ import * as Haptics from "expo-haptics";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, TouchableOpacity, View } from "react-native";
 import CelebrationEffect, {
-    CelebrationType,
-    createCelebrationAnimations,
-    playCelebration,
+  CelebrationType,
+  createCelebrationAnimations,
+  playCelebration,
 } from "./CelebrationEffect";
 import { getStyles } from "./styles";
 
@@ -245,12 +245,12 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 >
                   <Ionicons
                     name={getCategoryData(category).icon as any}
-                    size={10}
+                    size={11}
                     color={colors.SECTION_TEXT}
                   />
                   <StyledText
                     style={{
-                      fontSize: 9,
+                      fontSize: 10,
                       color: colors.SECTION_TEXT,
                       fontWeight: "600",
                     }}
@@ -413,12 +413,12 @@ const TodoItem: React.FC<TodoItemProps> = ({
               >
                 <Ionicons
                   name={getCategoryData(category).icon as any}
-                  size={10}
+                  size={11}
                   color={colors.SECTION_TEXT}
                 />
                 <StyledText
                   style={{
-                    fontSize: 9,
+                    fontSize: 10,
                     color: colors.SECTION_TEXT,
                     fontWeight: "600",
                   }}

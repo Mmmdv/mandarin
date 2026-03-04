@@ -1,3 +1,4 @@
+import EmptyState from "@/components/ui/EmptyState";
 import StyledButton from "@/components/ui/StyledButton";
 import StyledHeader from "@/components/ui/StyledHeader";
 import StyledModal from "@/components/ui/StyledModal";
@@ -391,16 +392,11 @@ const NotificationsPage = () => {
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons
-              name="notifications-off-outline"
-              size={64}
-              color="#666"
-              style={{ marginBottom: 16 }}
+          <View style={{ marginTop: 60 }}>
+            <EmptyState
+              icon="notifications-off-outline"
+              title={t("no_results")}
             />
-            <StyledText style={{ color: colors.PLACEHOLDER, fontSize: 16 }}>
-              {t("no_results")}
-            </StyledText>
           </View>
         }
       />
@@ -515,12 +511,6 @@ const styles = StyleSheet.create({
   itemDate: {
     fontSize: 11,
     marginBottom: 5,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 100,
   },
 });
 

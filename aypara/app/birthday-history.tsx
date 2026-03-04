@@ -330,7 +330,9 @@ const BirthdayHistoryPage = () => {
         }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
-          <EmptyState icon="calendar-outline" title={t("no_results")} />
+          <View style={{ marginTop: 60 }}>
+            <EmptyState icon="gift-outline" title={t("no_results")} />
+          </View>
         }
       />
 

@@ -35,7 +35,7 @@ const useBirthday = () => {
     let notificationId: string | undefined;
 
     // Schedule notification for birthday morning (09:00)
-    if (settings.notificationsEnabled && settings.birthdayNotifications) {
+    if (settings.birthdayNotifications) {
       const birthdayDate = new Date(date);
       const now = new Date();
       const notifDate = new Date(
