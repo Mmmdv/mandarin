@@ -1,0 +1,118 @@
+import { StyleSheet } from "react-native"
+
+export const getStyles = (colors: any, isDark: boolean) => StyleSheet.create({
+    container: {
+        width: 340,
+        maxWidth: "90%",
+        alignItems: 'center',
+        padding: 24,
+        borderRadius: 24,
+        borderWidth: 1,
+        gap: 6,
+        backgroundColor: colors.SECONDARY_BACKGROUND,
+        borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: isDark ? 0.3 : 0.2,
+        shadowRadius: 20,
+        elevation: 10,
+    },
+    headerText: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: colors.PRIMARY_TEXT,
+        textAlign: "center",
+        opacity: 0.9,
+    },
+    recipientCard: {
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 14,
+        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+        borderRadius: 18,
+        width: '100%',
+    },
+    recipientAvatar: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    recipientInfo: {
+        marginLeft: 14,
+    },
+    recipientLabel: {
+        fontSize: 11,
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    recipientName: {
+        fontSize: 17,
+        fontWeight: "700",
+        color: colors.PRIMARY_TEXT,
+    },
+    contentArea: {
+        width: '100%',
+    },
+    greetingsScroll: {
+        height: 280,
+        width: '100%',
+    },
+    greetingsContent: {
+        paddingBottom: 4,
+        paddingTop: 4,
+        flexGrow: 1,
+    },
+    greetingCard: {
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 16,
+        borderRadius: 16,
+        marginBottom: 10,
+        width: '100%',
+        backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
+        borderWidth: 1.5,
+        borderColor: 'transparent',
+    },
+    selectedGreeting: {
+        borderColor: colors.PRIMARY_ACTIVE_BUTTON,
+        backgroundColor: isDark ? 'rgba(35, 78, 148, 0.08)' : 'rgba(244, 63, 94, 0.03)',
+        shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    greetingText: {
+        flex: 1,
+        fontSize: 13,
+        lineHeight: 18,
+        color: colors.SECTION_TEXT,
+        fontWeight: '400',
+    },
+    selectedIndicator: {
+        marginLeft: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    secondaryActionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        gap: 8,
+        width: '100%',
+        justifyContent: 'center',
+        borderWidth: 0.2,
+        borderColor: colors.SECTION_TEXT
+    },
+    secondaryActionButtonText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: colors.SECTION_TEXT
+    },
+})
+
