@@ -2,7 +2,10 @@ import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { getModalStyles, modalStyles } from "@/constants/modalStyles";
-import { schedulePushNotification } from "@/constants/notifications";
+import {
+    checkSystemNotifications,
+    schedulePushNotification,
+} from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
@@ -10,8 +13,8 @@ import OSPermissionModal from "@/layout/Modals/OSPermissionModal";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
 import {
-  addNotification,
-  updateNotificationStatus,
+    addNotification,
+    updateNotificationStatus,
 } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,11 +22,11 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Platform,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Platform,
+    ScrollView,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { getEditStyles } from "./styles";
 
@@ -173,13 +176,25 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
       return;
     }
 
-    if (
-      picker.reminderDate &&
-      picker.reminderDate < new Date() &&
-      picker.reminderDate.toISOString() !== reminder
-    ) {
-      picker.setShowPastDateAlert(true);
-      return;
+    if (picker.reminderDate) {
+      const osGranted = await checkSystemNotifications();
+      if (!osGranted) {
+        picker.setShowOSPermissionModal(true);
+        return;
+      }
+
+      if (!todoNotifications) {
+        picker.setShowPermissionModal(true);
+        return;
+      }
+
+      if (
+        picker.reminderDate < new Date() &&
+        picker.reminderDate.toISOString() !== reminder
+      ) {
+        picker.setShowPastDateAlert(true);
+        return;
+      }
     }
 
     let newNotificationId = notificationId;

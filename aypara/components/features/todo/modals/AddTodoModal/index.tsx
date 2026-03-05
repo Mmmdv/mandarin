@@ -2,7 +2,10 @@ import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { getModalStyles, modalStyles } from "@/constants/modalStyles";
-import { schedulePushNotification } from "@/constants/notifications";
+import {
+    checkSystemNotifications,
+    schedulePushNotification,
+} from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
 import { analyzeAudio } from "@/helpers/gemini";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
@@ -15,24 +18,24 @@ import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
 } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Animated,
-  Keyboard,
-  Platform,
-  Pressable,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Keyboard,
+    Platform,
+    Pressable,
+    ScrollView,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from "react-native";
 import { getAddStyles } from "./styles";
 
@@ -97,9 +100,22 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     }
     const finalDate = dateOverride || picker.reminderDate;
 
-    if (finalDate && finalDate < new Date()) {
-      picker.setShowPastDateAlert(true);
-      return;
+    if (finalDate) {
+      const osGranted = await checkSystemNotifications();
+      if (!osGranted) {
+        picker.setShowOSPermissionModal(true);
+        return;
+      }
+
+      if (!todoNotifications) {
+        picker.setShowPermissionModal(true);
+        return;
+      }
+
+      if (finalDate < new Date()) {
+        picker.setShowPastDateAlert(true);
+        return;
+      }
     }
 
     let notificationId: string | undefined;
