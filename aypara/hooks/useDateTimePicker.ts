@@ -28,8 +28,14 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
   const [pickerToReopen, setPickerToReopen] = useState<"date" | "time" | null>(
     null,
   );
+  const [activeMode, setActiveMode] = useState<"date" | "time" | null>(null);
+  const [todayStart, setTodayStart] = useState(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
 
-  const startReminderFlow = async () => {
+  const startReminderFlow = async (mode?: "date" | "time") => {
     Haptics.selectionAsync();
 
     const osGranted = await checkSystemNotifications();
@@ -42,17 +48,34 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
       setShowPermissionModal(true);
       return;
     }
-    proceedWithReminder();
+    proceedWithReminder(mode);
   };
 
-  const proceedWithReminder = () => {
+  const proceedWithReminder = (mode?: "date" | "time") => {
+    setActiveMode(mode || null);
     if (Platform.OS === "ios") {
-      setTempDate(isValidDate(reminderDate) ? reminderDate : new Date());
+      let initialTemp = isValidDate(reminderDate) ? reminderDate : new Date();
+      // If the current reminder is in the past, the picker might jump or fail
+      // if minimumDate is set to today. So we ensure tempDate is at least todayStart.
+      if (initialTemp < todayStart) {
+        initialTemp = new Date(); // Start at now
+      }
+      setTempDate(initialTemp);
     }
-    if (isValidDate(reminderDate)) {
-      setShowTimePicker(true);
-    } else {
+
+    if (mode === "date") {
       setShowDatePicker(true);
+      setShowTimePicker(false);
+    } else if (mode === "time") {
+      setShowTimePicker(true);
+      setShowDatePicker(false);
+    } else {
+      // Original logic for backward compatibility
+      if (isValidDate(reminderDate)) {
+        setShowTimePicker(true);
+      } else {
+        setShowDatePicker(true);
+      }
     }
   };
 
@@ -105,29 +128,9 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
       newDate.setMinutes(reminderDate.getMinutes());
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkDate = new Date(newDate);
-    checkDate.setHours(0, 0, 0, 0);
-
-    if (checkDate < today) {
-      setPickerToReopen("date");
-      setShowDatePicker(false);
-      setTimeout(() => {
-        setShowPastDateAlert(true);
-      }, 350);
-      return;
-    }
-
     setTempDate(newDate);
+    setReminderDate(newDate); // Save the date part to reminderDate
     setShowDatePicker(false);
-    // If we came from time picker (reminderDate was set) and just changing date,
-    // we might want to go back to time or just finish.
-    // User asked: "yox yenisi təyin olunursa tarix barabanından" (if new, start from date) -> then it continues to time.
-    // If changing existing, starts from time.
-
-    // Logical flow: If it's a new one, we MUST go to time.
-    // If it's an existing one and user manually went back to date, we probably want to go back to time to confirm.
     setTimeout(() => {
       setShowTimePicker(true);
     }, 350);
@@ -147,14 +150,6 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
         const newDate = new Date(currentReminder);
         newDate.setHours(selectedTime.getHours());
         newDate.setMinutes(selectedTime.getMinutes());
-
-        if (newDate < new Date()) {
-          setPickerToReopen("time");
-          setTimeout(() => {
-            setShowPastDateAlert(true);
-          }, 100);
-          return;
-        }
 
         setReminderDate(newDate);
 
@@ -186,15 +181,6 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
       : isValidDate(reminderDate)
         ? reminderDate
         : new Date();
-
-    if (finalDate < new Date()) {
-      setPickerToReopen("time");
-      setShowTimePicker(false); // Close current picker first
-      setTimeout(() => {
-        setShowPastDateAlert(true);
-      }, 350);
-      return;
-    }
 
     setReminderDate(finalDate);
     setShowTimePicker(false);
@@ -252,6 +238,9 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
   };
 
   const resetState = (initialDate?: Date) => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    setTodayStart(d);
     setReminderDate(isValidDate(initialDate) ? initialDate : undefined);
     setShowDatePicker(false);
     setShowTimePicker(false);
@@ -259,6 +248,7 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
     setShowPermissionModal(false);
     setShowPastDateAlert(false);
     setPickerToReopen(null);
+    setActiveMode(null);
   };
 
   return {
@@ -276,6 +266,9 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
     setShowOSPermissionModal,
     showPastDateAlert,
     setShowPastDateAlert,
+    activeMode,
+    todayStart,
+    setPickerToReopen,
     closePastDateAlert,
 
     // Actions

@@ -4,20 +4,28 @@ import StyledText from "@/components/ui/StyledText";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
-import { Linking, View } from "react-native";
+import { View } from "react-native";
 import { getStyles } from "./styles";
 
-type OSPermissionModalProps = {
+type NotificationPermissionModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onConfirm: () => void;
+  onCancel?: () => void;
+  title?: string;
+  description?: string;
 };
 
-const OSPermissionModal: React.FC<OSPermissionModalProps> = ({
-  isOpen,
-  onClose,
-}) => {
+const NotificationPermissionModal: React.FC<
+  NotificationPermissionModalProps
+> = ({ isOpen, onClose, onConfirm, onCancel, title, description }) => {
   const { t, colors, isDark } = useTheme();
   const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+
+  const handleCancel = () => {
+    if (onCancel) onCancel();
+    onClose();
+  };
 
   return (
     <StyledModal isOpen={isOpen} onClose={onClose}>
@@ -25,36 +33,35 @@ const OSPermissionModal: React.FC<OSPermissionModalProps> = ({
         <View style={styles.headerRow}>
           <View style={styles.iconContainer}>
             <Ionicons
-              name="warning-outline"
+              name="notifications-outline"
               size={28}
               color={colors.PRIMARY_ACTIVE_BUTTON}
             />
           </View>
 
           <StyledText style={styles.headerText}>
-            {t("os_notifications_disabled_title")}
+            {title || t("enable_notifications")}
           </StyledText>
         </View>
 
         <View style={styles.divider} />
 
         <StyledText style={styles.messageText}>
-          {t("os_notifications_disabled")}
+          {description || t("enable_notifications_desc")}
         </StyledText>
 
         <View style={styles.buttonsContainer}>
           <StyledButton
             label={t("cancel")}
-            onPress={onClose}
+            onPress={handleCancel}
             variant="dark_button"
+            style={{ flex: 1 }}
           />
           <StyledButton
-            label={t("go_to_os_settings")}
-            onPress={() => {
-              onClose();
-              Linking.openSettings();
-            }}
+            label={t("enable")}
+            onPress={onConfirm}
             variant="dark_button"
+            style={{ flex: 1 }}
           />
         </View>
       </View>
@@ -62,4 +69,4 @@ const OSPermissionModal: React.FC<OSPermissionModalProps> = ({
   );
 };
 
-export default OSPermissionModal;
+export default NotificationPermissionModal;

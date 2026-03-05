@@ -1,41 +1,43 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { getModalStyles, modalStyles } from "@/constants/modalStyles";
 import {
-    checkSystemNotifications,
-    schedulePushNotification,
+  checkSystemNotifications,
+  schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
 import { analyzeAudio } from "@/helpers/gemini";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import IOSPickerModal from "@/layout/Modals/IOSPickerModal";
+import NotificationPermissionModal from "@/layout/Modals/NotificationPermissionModal";
 import OSPermissionModal from "@/layout/Modals/OSPermissionModal";
+import PastDateModal from "@/layout/Modals/PastDateModal";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Animated,
-    Keyboard,
-    Platform,
-    Pressable,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Keyboard,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { getAddStyles } from "./styles";
 
@@ -59,10 +61,9 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
   categoryTitle,
   categoryIcon,
 }) => {
-  const { t, theme, colors, isDark, todoNotifications, lang } = useTheme();
+  const { t, colors, isDark, todoNotifications, lang } = useTheme();
   const dispatch = useAppDispatch();
 
-  const themedModalStyles = useMemo(() => getModalStyles(colors), [colors]);
   const themedLocalStyles = useMemo(
     () => getAddStyles(colors, isDark),
     [colors, isDark],
@@ -113,6 +114,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
       }
 
       if (finalDate < new Date()) {
+        picker.setPickerToReopen(null); // No need to reopen after save click unless desired
         picker.setShowPastDateAlert(true);
         return;
       }
@@ -328,7 +330,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
   const formatDateOnly = (date: Date) => {
     const day = date.getDate().toString().padStart(2, "0");
-    const months = [
+    const az = [
       "Yan",
       "Fev",
       "Mar",
@@ -342,7 +344,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
       "Noy",
       "Dek",
     ];
-    const enMonths = [
+    const en = [
       "Jan",
       "Feb",
       "Mar",
@@ -356,7 +358,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
       "Nov",
       "Dec",
     ];
-    const ruMonths = [
+    const ru = [
       "Янв",
       "Фев",
       "Мар",
@@ -370,12 +372,8 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
       "Ноя",
       "Дек",
     ];
-
-    const monthNames =
-      lang === "az" ? months : lang === "ru" ? ruMonths : enMonths;
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
+    const months = lang === "az" ? az : lang === "ru" ? ru : en;
+    return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
 
   const formatTimeOnly = (date: Date) => {
@@ -388,33 +386,8 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     <StyledModal isOpen={isOpen} onClose={onClose} expectsKeyboard={true}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={themedLocalStyles.container}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 12,
-              justifyContent: "center",
-              width: "100%",
-              marginBottom: 4,
-            }}
-          >
-            <View
-              style={[
-                modalStyles.iconContainer,
-                {
-                  backgroundColor: colors.SECONDARY_BACKGROUND,
-                  shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 2,
-                  elevation: 2,
-                  width: 42,
-                  height: 42,
-                  borderRadius: 21,
-                  flexShrink: 0,
-                },
-              ]}
-            >
+          <View style={themedLocalStyles.headerRow}>
+            <View style={themedLocalStyles.headerIconContainer}>
               <Ionicons
                 name="add"
                 size={28}
@@ -426,7 +399,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
             </StyledText>
           </View>
 
-          <View style={modalStyles.divider} />
+          <View style={themedLocalStyles.divider} />
 
           {/* 1. Title Section */}
           <View style={themedLocalStyles.tableContainer}>
@@ -586,7 +559,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
             {/* Date Row */}
             <TouchableOpacity
               style={themedLocalStyles.tableRow}
-              onPress={() => picker.startReminderFlow()}
+              onPress={() => picker.startReminderFlow("date")}
               activeOpacity={0.7}
             >
               <View style={themedLocalStyles.tableLabelColumn}>
@@ -621,7 +594,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
               ]}
             >
               <TouchableOpacity
-                onPress={() => picker.startReminderFlow()}
+                onPress={() => picker.startReminderFlow("time")}
                 activeOpacity={0.7}
                 style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
               >
@@ -687,12 +660,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
 
           {/* Voice Interaction Modal */}
           <StyledModal isOpen={isRecording || isAnalyzing} onClose={() => {}}>
-            <View
-              style={[
-                themedModalStyles.modalContainer,
-                { minHeight: 280, paddingVertical: 30 },
-              ]}
-            >
+            <View style={themedLocalStyles.voiceModalContainer}>
               <View style={themedLocalStyles.visualizerContainer}>
                 {isRecording ? (
                   <View style={themedLocalStyles.barsRow}>
@@ -786,7 +754,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
               mode="date"
               display="default"
               onChange={picker.onChangeDate}
-              minimumDate={new Date()}
+              minimumDate={picker.todayStart}
               locale={picker.getLocale()}
             />
           )}
@@ -803,104 +771,9 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
           )}
 
           {/* iOS Pickers */}
-          {Platform.OS === "ios" && (
-            <StyledModal
-              isOpen={picker.showDatePicker || picker.showTimePicker}
-              onClose={picker.closePickers}
-            >
-              <View style={themedModalStyles.modalContainer}>
-                <View
-                  style={[
-                    themedModalStyles.iconContainer,
-                    {
-                      backgroundColor: colors.TAB_BAR,
-                      shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 2,
-                      elevation: 2,
-                    },
-                  ]}
-                >
-                  <Ionicons
-                    name={picker.showDatePicker ? "calendar" : "time"}
-                    size={28}
-                    color={colors.PRIMARY_ACTIVE_BUTTON}
-                  />
-                </View>
+          <IOSPickerModal picker={picker} />
 
-                <StyledText style={themedModalStyles.headerText}>
-                  {picker.showDatePicker ? t("date") : t("time")}
-                </StyledText>
-
-                <View style={modalStyles.divider} />
-
-                <View
-                  style={{
-                    width: "100%",
-                    height: 150,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    overflow: "hidden",
-                  }}
-                >
-                  <DateTimePicker
-                    value={picker.tempDate || picker.reminderDate || new Date()}
-                    mode={picker.showDatePicker ? "date" : "time"}
-                    display="spinner"
-                    onChange={
-                      picker.showDatePicker
-                        ? picker.onChangeDate
-                        : picker.onChangeTime
-                    }
-                    minimumDate={picker.showDatePicker ? new Date() : undefined}
-                    locale={picker.getLocale()}
-                    textColor={colors.PRIMARY_TEXT}
-                    themeVariant={theme}
-                    style={{ width: "100%", transform: [{ scale: 0.85 }] }}
-                  />
-                </View>
-
-                <View
-                  style={[
-                    themedModalStyles.buttonsContainer,
-                    { marginTop: 20 },
-                  ]}
-                >
-                  <StyledButton
-                    label={picker.showTimePicker ? t("back") : t("close")}
-                    onPress={
-                      picker.showTimePicker
-                        ? picker.goBackToDatePicker
-                        : picker.closePickers
-                    }
-                    variant="dark_button"
-                    style={{ flex: 1 }}
-                  />
-                  <StyledButton
-                    label={
-                      picker.showDatePicker
-                        ? picker.reminderDate
-                          ? t("back")
-                          : t("next")
-                        : t("save")
-                    }
-                    onPress={
-                      picker.showDatePicker
-                        ? picker.reminderDate
-                          ? picker.goBackToTimePicker
-                          : picker.confirmDateIOS
-                        : picker.confirmTimeIOS
-                    }
-                    variant="dark_button"
-                    style={{ flex: 1 }}
-                  />
-                </View>
-              </View>
-            </StyledModal>
-          )}
-
-          <View style={[modalStyles.buttonsContainer, { marginTop: 8 }]}>
+          <View style={[themedLocalStyles.buttonsContainer, { marginTop: 8 }]}>
             <StyledButton
               label={t("cancel")}
               onPress={onClose}
@@ -915,119 +788,28 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
           </View>
 
           {/* Permission Modal */}
-          <StyledModal
+          <NotificationPermissionModal
             isOpen={picker.showPermissionModal}
             onClose={() => picker.setShowPermissionModal(false)}
-          >
-            <View style={themedModalStyles.modalContainer}>
-              <View
-                style={[
-                  themedModalStyles.iconContainer,
-                  {
-                    backgroundColor: colors.TAB_BAR,
-                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 2,
-                    elevation: 2,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="notifications"
-                  size={28}
-                  color={colors.PRIMARY_ACTIVE_BUTTON}
-                />
-              </View>
-
-              <StyledText style={themedModalStyles.headerText}>
-                {t("enable_notifications")}
-              </StyledText>
-
-              <View style={modalStyles.divider} />
-
-              <StyledText style={themedModalStyles.messageText}>
-                {t("enable_notifications_desc")}
-              </StyledText>
-
-              <View style={themedModalStyles.buttonsContainer}>
-                <StyledButton
-                  label={t("cancel")}
-                  onPress={() => {
-                    picker.setShowPermissionModal(false);
-                    picker.setReminderDate(undefined);
-                  }}
-                  variant="dark_button"
-                />
-                <StyledButton
-                  label={t("enable")}
-                  onPress={() => {
-                    dispatch(
-                      updateAppSetting({
-                        todoNotifications: true,
-                      }),
-                    );
-                    picker.setShowPermissionModal(false);
-                    setTimeout(() => {
-                      picker.proceedWithReminder();
-                    }, 300);
-                  }}
-                  variant="dark_button"
-                />
-              </View>
-            </View>
-          </StyledModal>
+            onCancel={() => picker.setReminderDate(undefined)}
+            onConfirm={() => {
+              dispatch(updateAppSetting({ todoNotifications: true }));
+              picker.setShowPermissionModal(false);
+              setTimeout(() => {
+                picker.proceedWithReminder();
+              }, 300);
+            }}
+          />
 
           <OSPermissionModal
             isOpen={picker.showOSPermissionModal}
             onClose={() => picker.setShowOSPermissionModal(false)}
           />
 
-          {/* Past Date Alert Modal */}
-          <StyledModal
+          <PastDateModal
             isOpen={picker.showPastDateAlert}
-            onClose={() => picker.setShowPastDateAlert(false)}
-          >
-            <View style={themedModalStyles.modalContainer}>
-              <View
-                style={[
-                  themedModalStyles.iconContainer,
-                  {
-                    backgroundColor: colors.TAB_BAR,
-                    shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 2,
-                    elevation: 2,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name="alert-circle"
-                  size={28}
-                  color={colors.PRIMARY_ACTIVE_BUTTON}
-                />
-              </View>
-
-              <StyledText style={themedModalStyles.headerText}>
-                {t("attention")}
-              </StyledText>
-
-              <View style={modalStyles.divider} />
-
-              <StyledText style={themedModalStyles.messageText}>
-                {t("past_reminder_error")}
-              </StyledText>
-
-              <View style={themedModalStyles.buttonsContainer}>
-                <StyledButton
-                  label={t("close")}
-                  onPress={picker.closePastDateAlert}
-                  variant="dark_button"
-                />
-              </View>
-            </View>
-          </StyledModal>
+            onClose={picker.closePastDateAlert}
+          />
         </View>
       </TouchableWithoutFeedback>
     </StyledModal>

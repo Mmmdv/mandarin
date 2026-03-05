@@ -247,8 +247,13 @@ export const TRANSLATIONS = {
     reduced_motion_title: "Animasiyalar söndürülüb",
     reduced_motion_message:
       "Cihazınızda animasiyalar deaktiv edilib. Tətbiqin tam gözəlliyini görmək üçün animasiyaları yandırın.",
-    reduced_motion_open_settings: "Parametrlərə keç",
+    reduced_motion_open_settings: "Tənzimləmələrə keç",
     reduced_motion_dismiss: "Bir daha göstərmə",
+    reduced_motion_android_path: "Tənzimləmələr → Tərtibatçı seçimləri",
+    reduced_motion_android_desc:
+      "Pəncərə animasiyası → 1x\nKeçid animasiyası → 1x\nAnimasiya müddəti → 1x",
+    reduced_motion_ios_path: "Tənzimləmələr → Əlçatanlıq → Hərəkət",
+    reduced_motion_ios_desc: "Hərəkəti azaldın → OFF",
     birthday_add: "Ad günü əlavə et",
     birthday_name: "Ad və soyad",
     birthday_name_placeholder: "Ad və soyad daxil edin...",
@@ -567,6 +572,11 @@ export const TRANSLATIONS = {
       "Animations are disabled on your device. Enable them to experience the app's full visual experience",
     reduced_motion_open_settings: "Open settings",
     reduced_motion_dismiss: "Don't show again",
+    reduced_motion_android_path: "Settings → Developer Options",
+    reduced_motion_android_desc:
+      "Window animation scale → 1x\nTransition animation scale → 1x\nAnimator duration scale → 1x",
+    reduced_motion_ios_path: "Settings → Accessibility → Motion",
+    reduced_motion_ios_desc: "Reduce Motion → OFF",
     birthday_add: "Add birthday",
     birthday_name: "Full name",
     birthday_name_placeholder: "Enter full name...",
@@ -886,6 +896,11 @@ export const TRANSLATIONS = {
       "Анимации отключены на вашем устройстве. Включите их, чтобы насладиться полным визуальным опытом приложения",
     reduced_motion_open_settings: "Открыть настройки",
     reduced_motion_dismiss: "Больше не показывать",
+    reduced_motion_android_path: "Настройки → Параметры разработчика",
+    reduced_motion_android_desc:
+      "Анимация окон → 1x\nАнимация переходов → 1x\nДлительность анимации → 1x",
+    reduced_motion_ios_path: "Настройки → Универсальный доступ → Движение",
+    reduced_motion_ios_desc: "Уменьшение движения → ВЫКЛ",
     birthday_add: "Добавить день рождения",
     birthday_name: "Имя и фамилия",
     birthday_name_placeholder: "Введите имя и фамилию...",

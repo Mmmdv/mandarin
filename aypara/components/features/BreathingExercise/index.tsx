@@ -2,6 +2,7 @@ import TaskSuccessModal from "@/components/features/todo/modals/TaskSuccessModal
 import StyledText from "@/components/ui/StyledText";
 import { schedulePushNotification } from "@/constants/notifications";
 import { useTheme } from "@/hooks/useTheme";
+import NotificationPermissionModal from "@/layout/Modals/NotificationPermissionModal";
 import {
     logBreathingSession,
     setBreathingActive,
@@ -92,6 +93,7 @@ export default function BreathingExercise() {
 
   const [reminderScheduled, setReminderScheduled] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   const handleStart = () => {
     setIsCompleted(false);
@@ -106,9 +108,8 @@ export default function BreathingExercise() {
 
       const { status } = await Notifications.getPermissionsAsync();
       if (status !== "granted") {
-        const { status: newStatus } =
-          await Notifications.requestPermissionsAsync();
-        if (newStatus !== "granted") return;
+        setShowPermissionModal(true);
+        return;
       }
 
       // Schedule for 24 hours from now
@@ -711,6 +712,20 @@ export default function BreathingExercise() {
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
         message={t("breathing_reminder_scheduled")}
+      />
+
+      <NotificationPermissionModal
+        isOpen={showPermissionModal}
+        onClose={() => setShowPermissionModal(false)}
+        onConfirm={async () => {
+          setShowPermissionModal(false);
+          const { status } = await Notifications.requestPermissionsAsync();
+          if (status === "granted") {
+            setTimeout(() => {
+              scheduleBreathingReminder();
+            }, 300);
+          }
+        }}
       />
     </View>
   );

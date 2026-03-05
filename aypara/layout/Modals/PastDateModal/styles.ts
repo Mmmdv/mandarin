@@ -2,13 +2,13 @@ import { StyleSheet } from "react-native";
 
 export const getStyles = (colors: any, isDark: boolean) =>
   StyleSheet.create({
-    container: {
+    modalContainer: {
       backgroundColor: colors.SECONDARY_BACKGROUND,
       borderRadius: 24,
       borderWidth: 1,
       borderColor: isDark ? colors.PRIMARY_BORDER_DARK : colors.PRIMARY_BORDER,
       padding: 20,
-      width: 340,
+      width: 320,
       maxWidth: "95%",
       alignItems: "center",
       gap: 10,
@@ -58,5 +58,12 @@ export const getStyles = (colors: any, isDark: boolean) =>
       color: colors.PLACEHOLDER,
       textAlign: "center",
       lineHeight: 20,
+      paddingHorizontal: 10,
+    },
+    buttonsContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      width: "100%",
+      marginTop: 8,
     },
   });

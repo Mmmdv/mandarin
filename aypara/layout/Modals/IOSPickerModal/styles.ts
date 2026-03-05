@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const getStyles = (colors: any, isDark: boolean) =>
   StyleSheet.create({
-    container: {
+    modalContainer: {
       backgroundColor: colors.SECONDARY_BACKGROUND,
       borderRadius: 24,
       borderWidth: 1,
@@ -53,10 +53,18 @@ export const getStyles = (colors: any, isDark: boolean) =>
       opacity: 0.8,
       marginVertical: 4,
     },
-    messageText: {
-      fontSize: 14,
-      color: colors.PLACEHOLDER,
-      textAlign: "center",
-      lineHeight: 20,
+    pickerContainer: {
+      width: "100%",
+      height: 150,
+      justifyContent: "center",
+      alignItems: "center",
+      overflow: "hidden",
+    },
+    buttonsContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      width: "100%",
+      marginTop: 20,
+      gap: 10,
     },
   });
