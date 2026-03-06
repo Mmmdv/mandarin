@@ -91,9 +91,27 @@ export const notificationSlice = createSlice({
       const categoryTitle = action.payload;
       state.notifications.forEach((n) => {
         const nDate = new Date(n.date);
-        // Use includes to match even if there are emojis in the title
+
+        if (n.status === "Göndərilib") {
+          return; // don't cancel already sent notifications
+        }
+
         if (!categoryTitle || n.title.includes(categoryTitle)) {
           if (n.status === "Gözlənilir" || nDate > now) {
+            n.status = "Ləğv olunub";
+          }
+        }
+      });
+    },
+    cancelNotificationsByIds: (state, action: PayloadAction<string[]>) => {
+      const ids = action.payload;
+      const now = new Date();
+      state.notifications.forEach((n) => {
+        if (ids.includes(n.id)) {
+          if (
+            n.status !== "Göndərilib" &&
+            (n.status === "Gözlənilir" || new Date(n.date) > now)
+          ) {
             n.status = "Ləğv olunub";
           }
         }
@@ -114,6 +132,7 @@ export const {
   deleteNotification,
   markAsRead,
   cancelAllNotifications,
+  cancelNotificationsByIds,
   updateNotificationStatus,
   removeNotification,
 } = notificationSlice.actions;

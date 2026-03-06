@@ -3,8 +3,8 @@ import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import {
-  checkSystemNotifications,
-  schedulePushNotification,
+    checkSystemNotifications,
+    schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
@@ -16,8 +16,8 @@ import PastDateModal from "@/layout/Modals/PastDateModal";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
 import {
-  addNotification,
-  updateNotificationStatus,
+    addNotification,
+    updateNotificationStatus,
 } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,13 +25,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  LayoutAnimation,
-  Platform,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  UIManager,
-  View,
+    LayoutAnimation,
+    Platform,
+    ScrollView,
+    TextInput,
+    TouchableOpacity,
+    UIManager,
+    View,
 } from "react-native";
 import { getEditStyles } from "./styles";
 
@@ -372,6 +372,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
             ref={categoryScrollRef}
             horizontal
             showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
             contentContainerStyle={themedLocalStyles.categoryList}
           >
             {[...TODO_CATEGORIES]

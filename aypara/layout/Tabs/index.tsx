@@ -6,6 +6,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 // import analytics from "@react-native-firebase/analytics";
 import AddBirthdayModal from "@/components/features/birthday/modals/AddBirthdayModal";
+import AddIterativeTodoModal from "@/components/features/todo/modals/AddIterativeTodoModal";
 import AddTodoModal from "@/components/features/todo/modals/AddTodoModal";
 import TaskSuccessModal from "@/components/features/todo/modals/TaskSuccessModal";
 import useBirthday from "@/hooks/useBirthday";
@@ -25,6 +26,7 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const dispatch = useDispatch();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddIterativeModalOpen, setIsAddIterativeModalOpen] = useState(false);
   const [isAddBirthdayModalOpen, setIsAddBirthdayModalOpen] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -280,11 +282,26 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
           setIsAddMenuOpen(false);
           setTimeout(() => setIsAddModalOpen(true), 300);
         }}
+        onAddIterativeTask={() => {
+          setIsAddMenuOpen(false);
+          setTimeout(() => setIsAddIterativeModalOpen(true), 300);
+        }}
         onAddBirthday={() => {
           setIsAddMenuOpen(false);
           setTimeout(() => setIsAddBirthdayModalOpen(true), 300);
         }}
         onAddMovie={() => {}}
+      />
+
+      <AddIterativeTodoModal
+        isOpen={isAddIterativeModalOpen}
+        onClose={() => setIsAddIterativeModalOpen(false)}
+        onAdd={handleAddTodo}
+        categoryTitle={t("notifications_todo")}
+        categoryIcon="repeat-outline"
+        initialCategory={
+          state.routes[state.index].name === "breathing" ? "health" : "personal"
+        }
       />
 
       <AddBirthdayModal

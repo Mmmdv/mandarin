@@ -3,6 +3,7 @@ import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { formatDate, formatDuration } from "@/helpers/date";
+import { getReminderStatusProps } from "@/helpers/reminder";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppSelector } from "@/store";
 import {
@@ -47,6 +48,13 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
     notificationId ? selectNotificationById(state, notificationId) : undefined,
   );
   const reminderStatus: NotificationStatus | undefined = notification?.status;
+
+  const { isCrossedOut, iconName, iconColor, opacity } = getReminderStatusProps(
+    reminderStatus,
+    reminderCancelled,
+    !!completedAt,
+    colors,
+  );
 
   return (
     <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
@@ -199,34 +207,29 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
               </View>
               <View style={styles.tableValueColumn}>
                 <View
-                  style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+                  style={[
+                    {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6,
+                    },
+                    { opacity: opacity },
+                  ]}
                 >
-                  {reminderStatus === "Göndərilib" ? (
-                    <Ionicons
-                      name="checkmark-done"
-                      size={14}
-                      color={colors.CHECKBOX_SUCCESS}
-                    />
-                  ) : reminderStatus === "Ləğv olunub" ||
-                    reminderStatus === "Dəyişdirilib və ləğv olunub" ||
-                    reminderCancelled ||
-                    completedAt ? (
-                    <Ionicons
-                      name="notifications-off"
-                      size={14}
-                      color={colors.ERROR_INPUT_TEXT}
-                    />
-                  ) : (
-                    <Ionicons
-                      name="hourglass-outline"
-                      size={14}
-                      color={colors.REMINDER}
-                    />
-                  )}
+                  <Ionicons
+                    name={iconName as any}
+                    size={14}
+                    color={iconColor}
+                  />
                   <StyledText
                     style={[
                       styles.tableValueText,
-                      { color: colors.SECTION_TEXT },
+                      {
+                        color: colors.SECTION_TEXT,
+                        textDecorationLine: isCrossedOut
+                          ? "line-through"
+                          : "none",
+                      },
                     ]}
                   >
                     {formatDate(reminder, lang)}

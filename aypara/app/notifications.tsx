@@ -5,6 +5,7 @@ import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { getModalStyles } from "@/constants/modalStyles";
 import { formatDate, translateReminderStatus } from "@/helpers/date";
+import { getReminderStatusProps } from "@/helpers/reminder";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
@@ -108,24 +109,11 @@ const NotificationsPage = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
-      let statusColor = "#FFB74D";
-      let statusIcon: any = "hourglass-outline";
       let statusLabelRaw = item.status || "Gözlənilir";
       let statusLabel = translateReminderStatus(statusLabelRaw, t);
 
-      if (
-        item.status === "Ləğv olunub" ||
-        item.status === "Dəyişdirilib və ləğv olunub"
-      ) {
-        statusColor = colors.ERROR_INPUT_TEXT;
-        statusIcon = "notifications-off";
-      } else if (item.status === "Göndərilib") {
-        statusColor = colors.CHECKBOX_SUCCESS;
-        statusIcon = "checkmark-done-outline";
-      } else {
-        statusColor = "#FFB74D";
-        statusIcon = "hourglass-outline";
-      }
+      const { iconName: statusIcon, iconColor: statusColor } =
+        getReminderStatusProps(statusLabelRaw, false, false, colors);
 
       const isUnread = !item.read;
 

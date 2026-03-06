@@ -50,7 +50,7 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type AddTodoModalProps = {
+type AddIterativeTodoModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (
@@ -64,7 +64,7 @@ type AddTodoModalProps = {
   initialCategory?: string;
 };
 
-const AddTodoModal: React.FC<AddTodoModalProps> = ({
+const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
   isOpen,
   onClose,
   onAdd,
@@ -831,4 +831,4 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
   );
 };
 
-export default AddTodoModal;
+export default AddIterativeTodoModal;

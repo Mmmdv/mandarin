@@ -5,6 +5,8 @@ import React from "react";
 import { View } from "react-native";
 import { styles } from "./styles";
 
+import { getReminderStatusProps } from "@/helpers/reminder";
+
 interface ReminderBadgeProps {
   reminder?: string;
   reminderStatus?: string;
@@ -26,15 +28,12 @@ const ReminderBadge: React.FC<ReminderBadgeProps> = ({
 }) => {
   if (!reminder) return null;
 
-  const isCrossedOut =
-    reminderStatus === "Ləğv olunub" ||
-    reminderStatus === "Dəyişdirilib və ləğv olunub" ||
-    reminderCancelled;
-
-  const isSent =
-    reminderStatus === "Göndərilib" ||
-    "Ləğv olunub" ||
-    "Dəyişdirilib və ləğv olunub";
+  const { isCrossedOut, iconName, iconColor, opacity } = getReminderStatusProps(
+    reminderStatus,
+    reminderCancelled,
+    false, // No completedAt locally in this badge typically, but handled outside
+    colors,
+  );
 
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
@@ -46,7 +45,7 @@ const ReminderBadge: React.FC<ReminderBadgeProps> = ({
             borderColor: colors.REMINDER + (isDark ? "40" : "30"),
             paddingVertical: viewMode === "card" ? 2 : 2.5,
             paddingHorizontal: viewMode === "card" ? 5 : 6,
-            opacity: isSent ? 0.5 : 1,
+            opacity: opacity,
           },
         ]}
       >
@@ -68,25 +67,11 @@ const ReminderBadge: React.FC<ReminderBadgeProps> = ({
       </View>
       {reminderStatus && (
         <View style={{ marginLeft: 2 }}>
-          {isCrossedOut ? (
-            <Ionicons
-              name="notifications-off"
-              size={viewMode === "card" ? 11 : 12}
-              color={colors.ERROR_INPUT_TEXT}
-            />
-          ) : isSent ? (
-            <Ionicons
-              name="checkmark-done-outline"
-              size={viewMode === "card" ? 11 : 12}
-              color={colors.CHECKBOX_SUCCESS}
-            />
-          ) : (
-            <Ionicons
-              name="hourglass-outline"
-              size={viewMode === "card" ? 11 : 12}
-              color="#FFD166"
-            />
-          )}
+          <Ionicons
+            name={iconName as any}
+            size={viewMode === "card" ? 11 : 12}
+            color={iconColor}
+          />
         </View>
       )}
     </View>

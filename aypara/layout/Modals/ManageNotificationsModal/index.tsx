@@ -11,8 +11,8 @@ import {
 } from "@/store/slices/appSlice";
 import { editBirthday, selectBirthdays } from "@/store/slices/birthdaySlice";
 import {
-    cancelAllNotifications,
-    updateNotificationStatus,
+    cancelNotificationsByIds,
+    updateNotificationStatus
 } from "@/store/slices/notificationSlice";
 import { cancelAllReminders, selectTodos } from "@/store/slices/todoSlice";
 import { Ionicons } from "@expo/vector-icons";
@@ -69,9 +69,11 @@ const ManageNotificationsModal: React.FC<ManageNotificationsModalProps> = ({
     dispatch(updateAppSetting({ [key]: false }));
 
     if (key === "todoNotifications") {
+      const idsToCancel: string[] = [];
       try {
         for (const todo of todos) {
           if (todo.notificationId && !todo.isCompleted && !todo.isArchived) {
+            idsToCancel.push(todo.notificationId);
             await Notifications.cancelScheduledNotificationAsync(
               todo.notificationId,
             );
@@ -82,7 +84,9 @@ const ManageNotificationsModal: React.FC<ManageNotificationsModalProps> = ({
       }
 
       dispatch(cancelAllReminders());
-      dispatch(cancelAllNotifications(t("tab_todo")));
+      if (idsToCancel.length > 0) {
+        dispatch(cancelNotificationsByIds(idsToCancel));
+      }
     }
 
     if (key === "birthdayNotifications") {

@@ -186,9 +186,12 @@ export const todoSlice = createSlice({
       state.todos = state.todos.filter((todo) => !todo.isArchived);
     },
     cancelAllReminders: (state) => {
+      const now = new Date();
       state.todos = state.todos.map((todo) => {
         if (todo.reminder && !todo.isCompleted && !todo.isArchived) {
-          return { ...todo, reminderCancelled: true };
+          if (new Date(todo.reminder) > now) {
+            return { ...todo, reminderCancelled: true };
+          }
         }
         return todo;
       });

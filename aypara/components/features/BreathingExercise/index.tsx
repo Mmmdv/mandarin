@@ -6,9 +6,9 @@ import NotificationPermissionModal from "@/layout/Modals/NotificationPermissionM
 import OSPermissionModal from "@/layout/Modals/OSPermissionModal";
 import { useAppDispatch } from "@/store";
 import {
-    logBreathingSession,
-    setBreathingActive,
-    updateAppSetting,
+  logBreathingSession,
+  setBreathingActive,
+  updateAppSetting,
 } from "@/store/slices/appSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
 import { addTodo } from "@/store/slices/todoSlice";
@@ -20,18 +20,18 @@ import * as Haptics from "expo-haptics";
 import * as Notifications from "expo-notifications";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-    Animated,
-    Easing,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  Animated,
+  Easing,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 import {
-    COLORS_THEME,
-    PHASE_DURATIONS,
-    Phase,
-    SOUNDS,
-    getMotivationalMessages,
+  COLORS_THEME,
+  PHASE_DURATIONS,
+  Phase,
+  SOUNDS,
+  getMotivationalMessages,
 } from "./constants";
 import { getStyles } from "./styles";
 
@@ -124,10 +124,11 @@ export default function BreathingExercise() {
       // Schedule for 24 hours from now
       const reminderDate = new Date();
       reminderDate.setDate(reminderDate.getDate() + 1);
+      //reminderDate.setMinutes(reminderDate.getMinutes() + 10);
 
       const displayTitle = t("breathing_reminder_title");
       const body = t("breathing_reminder_title");
-      const categoryIcon = "medkit-outline";
+      const categoryIcon = "list-outline";
 
       const notificationId = await schedulePushNotification(
         displayTitle,
