@@ -1,46 +1,51 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
+import { setupCalendarLocales } from "@/config/calendar";
 import {
-    checkSystemNotifications,
-    schedulePushNotification,
+  checkSystemNotifications,
+  schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
+import { getShortMonthName } from "@/helpers/date";
 import { analyzeAudio } from "@/helpers/gemini";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import DateSelectionModal from "@/layout/Modals/DateSelectionModal";
 import IOSPickerModal from "@/layout/Modals/IOSPickerModal";
 import NotificationPermissionModal from "@/layout/Modals/NotificationPermissionModal";
 import OSPermissionModal from "@/layout/Modals/OSPermissionModal";
 import PastDateModal from "@/layout/Modals/PastDateModal";
+import TimeSelectionModal from "@/layout/Modals/TimeSelectionModal";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Animated,
-    Keyboard,
-    LayoutAnimation,
-    Platform,
-    Pressable,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    UIManager,
-    View,
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Keyboard,
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  UIManager,
+  View,
 } from "react-native";
+import { Calendar } from "react-native-calendars";
 import { getAddStyles } from "./styles";
 
 if (
@@ -58,6 +63,7 @@ type AddIterativeTodoModalProps = {
     reminder?: string,
     notificationId?: string,
     category?: string,
+    iterativeDates?: { date: string; notificationId?: string }[],
   ) => void;
   categoryTitle?: string;
   categoryIcon?: string;
@@ -87,6 +93,33 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
     initialCategory || "personal",
   );
 
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  useEffect(() => {
+    setupCalendarLocales(lang);
+  }, [lang]);
+
+  const toggleDate = (dateString: string) => {
+    setSelectedDates((prev) => {
+      if (prev.includes(dateString))
+        return prev.filter((d) => d !== dateString);
+      return [...prev, dateString];
+    });
+  };
+
+  const markedDates = useMemo(() => {
+    const marks: any = {};
+    selectedDates.forEach((d) => {
+      marks[d] = {
+        selected: true,
+        selectedColor: colors.TINT,
+        textColor: "#ffffff",
+      };
+    });
+    return marks;
+  }, [selectedDates, colors.TINT]);
+
   const inputRef = useRef<TextInput>(null);
 
   const { startRecording, stopRecording, isRecording } = useVoiceRecorder();
@@ -112,52 +145,107 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
       setInputError(true);
       return;
     }
-    const finalDate = dateOverride || picker.reminderDate;
 
-    if (finalDate) {
-      const osGranted = await checkSystemNotifications();
-      if (!osGranted) {
-        picker.setShowOSPermissionModal(true);
-        return;
-      }
+    // Determine the base time from dateOverride (voice) or picker
+    const timeToUse = dateOverride || picker.reminderDate;
 
-      if (!todoNotifications) {
-        picker.setShowPermissionModal(true);
-        return;
-      }
+    if (!timeToUse) {
+      picker.setShowTimeSelectionAlert(true);
+      return;
+    }
 
-      if (finalDate < new Date()) {
-        picker.setPickerToReopen(null); // No need to reopen after save click unless desired
+    if (selectedDates.length === 0) {
+      picker.setShowDateSelectionAlert(true);
+      return;
+    }
+
+    const osGranted = await checkSystemNotifications();
+    if (!osGranted) {
+      picker.setShowOSPermissionModal(true);
+      return;
+    }
+
+    if (!todoNotifications) {
+      picker.setShowPermissionModal(true);
+      return;
+    }
+
+    // Build all candidate dates array including their times
+    const allParsedDates = [...selectedDates].sort().map((ds) => {
+      // ds is 'YYYY-MM-DD', but new Date('YYYY-MM-DD') creates it in UTC.
+      // We need it in local.
+      const parts = ds.split("-").map(Number);
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+
+      d.setHours(timeToUse.getHours(), timeToUse.getMinutes(), 0, 0);
+      return d;
+    });
+
+    const now = new Date();
+    // Validate that ALL selected dates with their specific time are in the future
+    for (const d of allParsedDates) {
+      if (d < now) {
+        picker.setPickerToReopen(null);
         picker.setShowPastDateAlert(true);
         return;
       }
     }
 
-    let notificationId: string | undefined;
+    const iterativeDatesArray: { date: string; notificationId?: string }[] = [];
 
-    if (finalDate && todoNotifications) {
+    if (todoNotifications) {
       const displayTitle = categoryTitle || t("notifications_todo");
 
-      notificationId = await schedulePushNotification(
-        displayTitle,
-        title,
-        finalDate,
-        categoryIcon,
-      );
-      if (notificationId) {
-        dispatch(
-          addNotification({
-            id: notificationId,
-            title: displayTitle,
-            body: title,
-            date: finalDate.toISOString(),
-            categoryIcon: categoryIcon,
-          }),
-        );
+      // we must loop through each date and schedule push notifications
+      for (const d of allParsedDates) {
+        let nid: string | undefined = undefined;
+        try {
+          nid = await schedulePushNotification(
+            displayTitle,
+            title,
+            d,
+            categoryIcon,
+          );
+          if (nid) {
+            dispatch(
+              addNotification({
+                id: nid,
+                title: displayTitle,
+                body: title,
+                date: d.toISOString(),
+                categoryIcon: categoryIcon,
+              }),
+            );
+          }
+        } catch {
+          // silently fail if one notification fails
+        }
+        iterativeDatesArray.push({
+          date: d.toISOString(),
+          notificationId: nid,
+        });
+      }
+    } else {
+      // Just record dates without notification ids
+      for (const d of allParsedDates) {
+        iterativeDatesArray.push({
+          date: d.toISOString(),
+          notificationId: undefined,
+        });
       }
     }
 
-    onAdd(title, finalDate?.toISOString(), notificationId, selectedCategory);
+    // Pass the first date as the default reminder, and pass ALL dates to iterativeDates for internal tracking
+    if (iterativeDatesArray.length > 0) {
+      onAdd(
+        title,
+        iterativeDatesArray[0].date,
+        iterativeDatesArray[0].notificationId,
+        selectedCategory,
+        iterativeDatesArray, // Pass full array instead of restDates
+      );
+    }
+
     onClose();
   }
 
@@ -323,6 +411,8 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
       setTitle("");
       setInputError(false);
       setSelectedCategory(initialCategory || "personal");
+      setSelectedDates([]);
+      setIsCalendarOpen(false);
       picker.resetState(undefined);
 
       // Auto focus input immediately or with a minimal delay
@@ -341,52 +431,20 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
     }
   }, [selectedCategory]);
 
-  const formatDateOnly = (date: Date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const az = [
-      "Yan",
-      "Fev",
-      "Mar",
-      "Apr",
-      "May",
-      "İyn",
-      "İyl",
-      "Avq",
-      "Sen",
-      "Okt",
-      "Noy",
-      "Dek",
-    ];
-    const en = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const ru = [
-      "Янв",
-      "Фев",
-      "Мар",
-      "Апр",
-      "Май",
-      "Июн",
-      "Июл",
-      "Авг",
-      "Сен",
-      "Окт",
-      "Ноя",
-      "Дек",
-    ];
-    const months = lang === "az" ? az : lang === "ru" ? ru : en;
-    return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  const getBalancedRows = (items: string[], maxPerRow: number = 5) => {
+    const n = items.length;
+    if (n === 0) return [];
+
+    const rows = [];
+    const rowCount = Math.ceil(n / maxPerRow);
+    let start = 0;
+
+    for (let i = 0; i < rowCount; i++) {
+      const rowSize = Math.ceil((n - start) / (rowCount - i));
+      rows.push(items.slice(start, start + rowSize));
+      start += rowSize;
+    }
+    return rows;
   };
 
   const formatTimeOnly = (date: Date) => {
@@ -571,10 +629,12 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
 
           {/* 2. Reminder Section */}
           <View style={[themedLocalStyles.tableContainer, { marginTop: 3 }]}>
-            {/* Date Row */}
             <TouchableOpacity
-              style={themedLocalStyles.tableRow}
-              onPress={() => picker.startReminderFlow("date")}
+              style={[
+                themedLocalStyles.tableRow,
+                { height: "auto", minHeight: 48, paddingVertical: 10 },
+              ]}
+              onPress={() => setIsCalendarOpen(true)}
               activeOpacity={0.7}
             >
               <View style={themedLocalStyles.tableLabelColumn}>
@@ -587,17 +647,84 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
                   {t("date")}
                 </StyledText>
               </View>
-              <View style={themedLocalStyles.tableValueColumn}>
-                <StyledText
-                  style={[
-                    themedLocalStyles.tableValueText,
-                    !picker.reminderDate && { color: colors.PLACEHOLDER },
-                  ]}
-                >
-                  {picker.reminderDate
-                    ? formatDateOnly(picker.reminderDate)
-                    : t("select_placeholder")}
-                </StyledText>
+              <View
+                style={[themedLocalStyles.tableValueColumn, { paddingLeft: 4 }]}
+              >
+                {selectedDates.length === 0 ? (
+                  <StyledText
+                    style={[
+                      themedLocalStyles.tableValueText,
+                      { color: colors.PLACEHOLDER },
+                    ]}
+                  >
+                    {t("select_placeholder")}
+                  </StyledText>
+                ) : (
+                  <View
+                    style={{ width: "100%", gap: 6, alignItems: "flex-end" }}
+                  >
+                    {getBalancedRows([...selectedDates].sort(), 5).map(
+                      (row, rowIndex) => (
+                        <View
+                          key={rowIndex}
+                          style={themedLocalStyles.miniCalendarWrapper}
+                        >
+                          {row.map((d) => {
+                            const dateObj = new Date(d + "T12:00:00");
+                            return (
+                              <View
+                                key={d}
+                                style={[
+                                  themedLocalStyles.miniCalendarContainer,
+                                  {
+                                    backgroundColor: isDark
+                                      ? "rgba(255,255,255,0.05)"
+                                      : "#ffffff",
+                                    borderColor:
+                                      colors.PRIMARY_ACTIVE_BUTTON + "40",
+                                  },
+                                ]}
+                              >
+                                <View
+                                  style={[
+                                    themedLocalStyles.miniCalendarHeader,
+                                    {
+                                      backgroundColor:
+                                        colors.PRIMARY_ACTIVE_BUTTON,
+                                    },
+                                  ]}
+                                >
+                                  <StyledText
+                                    style={
+                                      themedLocalStyles.miniCalendarHeaderText
+                                    }
+                                  >
+                                    {getShortMonthName(dateObj, lang)}
+                                  </StyledText>
+                                </View>
+                                <View
+                                  style={themedLocalStyles.miniCalendarBody}
+                                >
+                                  <StyledText
+                                    style={[
+                                      themedLocalStyles.miniCalendarBodyText,
+                                      { color: colors.PRIMARY_TEXT },
+                                    ]}
+                                  >
+                                    {dateObj
+                                      .getDate()
+                                      .toString()
+                                      .padStart(2, "0")}
+                                  </StyledText>
+                                </View>
+                              </View>
+                            );
+                          })}
+                        </View>
+                      ),
+                    )}
+                  </View>
+                )}
               </View>
             </TouchableOpacity>
 
@@ -788,6 +915,53 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
           {/* iOS Pickers */}
           <IOSPickerModal picker={picker} />
 
+          {/* Calendar Modal */}
+          <StyledModal
+            isOpen={isCalendarOpen}
+            onClose={() => setIsCalendarOpen(false)}
+          >
+            <View
+              style={{
+                width: "100%",
+                backgroundColor: colors.SECONDARY_BACKGROUND,
+                borderRadius: 16,
+                padding: 16,
+              }}
+            >
+              <Calendar
+                minDate={new Date().toISOString().split("T")[0]}
+                onDayPress={(day: any) => toggleDate(day.dateString)}
+                markedDates={markedDates}
+                theme={{
+                  calendarBackground: colors.SECONDARY_BACKGROUND,
+                  textSectionTitleColor: colors.SECTION_TEXT,
+                  selectedDayBackgroundColor: colors.TINT,
+                  selectedDayTextColor: "#ffffff",
+                  todayTextColor: colors.TINT,
+                  dayTextColor: colors.PRIMARY_TEXT,
+                  textDisabledColor: colors.PLACEHOLDER,
+                  dotColor: colors.TINT,
+                  selectedDotColor: "#ffffff",
+                  arrowColor: colors.TINT,
+                  monthTextColor: colors.PRIMARY_TEXT,
+                  indicatorColor: colors.TINT,
+                  textDayFontWeight: "500",
+                  textMonthFontWeight: "bold",
+                  textDayHeaderFontWeight: "600",
+                  textDayFontSize: 15,
+                  textMonthFontSize: 16,
+                  textDayHeaderFontSize: 13,
+                }}
+              />
+              <StyledButton
+                label={t("save")}
+                onPress={() => setIsCalendarOpen(false)}
+                variant="dark_button"
+                style={{ marginTop: 20 }}
+              />
+            </View>
+          </StyledModal>
+
           <View style={[themedLocalStyles.buttonsContainer, { marginTop: 8 }]}>
             <StyledButton
               label={t("cancel")}
@@ -824,6 +998,16 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
           <PastDateModal
             isOpen={picker.showPastDateAlert}
             onClose={picker.closePastDateAlert}
+          />
+
+          <TimeSelectionModal
+            isOpen={picker.showTimeSelectionAlert}
+            onClose={() => picker.setShowTimeSelectionAlert(false)}
+          />
+
+          <DateSelectionModal
+            isOpen={picker.showDateSelectionAlert}
+            onClose={() => picker.setShowDateSelectionAlert(false)}
           />
         </View>
       </TouchableWithoutFeedback>

@@ -1,14 +1,13 @@
 import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
-import { modalStyles } from "@/constants/modalStyles";
-import { formatDate, formatDuration } from "@/helpers/date";
+import { formatDate, formatDuration, getShortMonthName } from "@/helpers/date";
 import { getReminderStatusProps } from "@/helpers/reminder";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppSelector } from "@/store";
 import {
-    NotificationStatus,
-    selectNotificationById,
+  NotificationStatus,
+  selectNotificationById,
 } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,6 +26,14 @@ type ViewTodoModalProps = {
   reminderCancelled?: boolean;
   notificationId?: string;
   category?: string;
+  isIterative?: boolean;
+  completedCount?: number;
+  iterativeDates?: {
+    date: string;
+    notificationId?: string;
+    isDone?: boolean;
+    doneAt?: string;
+  }[];
 };
 
 const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
@@ -40,9 +47,15 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
   reminderCancelled,
   notificationId,
   category,
+  isIterative,
+  completedCount,
+  iterativeDates,
 }) => {
   const { t, lang, colors, isDark } = useTheme();
-  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+  const themedLocalStyles = useMemo(
+    () => getStyles(colors, isDark),
+    [colors, isDark],
+  );
 
   const notification = useAppSelector((state) =>
     notificationId ? selectNotificationById(state, notificationId) : undefined,
@@ -56,81 +69,67 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
     colors,
   );
 
+  const getBalancedRows = (items: any[], maxPerRow: number = 5) => {
+    const n = items.length;
+    if (n === 0) return [];
+    const rows = [];
+    const rowCount = Math.ceil(n / maxPerRow);
+    let start = 0;
+    for (let i = 0; i < rowCount; i++) {
+      const rowSize = Math.ceil((n - start) / (rowCount - i));
+      rows.push(items.slice(start, start + rowSize));
+      start += rowSize;
+    }
+    return rows;
+  };
+
   return (
     <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
-      <View style={styles.container}>
-        <View
-          style={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            alignItems: "center",
-            gap: 12,
-            justifyContent: "center",
-            width: "100%",
-            marginBottom: 4,
-          }}
-        >
-          <View
-            style={[
-              modalStyles.iconContainer,
-              {
-                backgroundColor: colors.SECONDARY_BACKGROUND,
-                shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 2,
-                elevation: 2,
-                width: 42,
-                height: 42,
-                borderRadius: 21,
-                flexShrink: 0,
-              },
-            ]}
-          >
+      <View style={themedLocalStyles.container}>
+        <View style={themedLocalStyles.headerRow}>
+          <View style={themedLocalStyles.headerIconContainer}>
             <Ionicons
               name="eye-outline"
               size={28}
               color={colors.PRIMARY_ACTIVE_BUTTON}
             />
           </View>
-          <StyledText style={[styles.headerText, { textAlign: "left" }]}>
+          <StyledText style={themedLocalStyles.headerText}>
             {t("task_details")}
           </StyledText>
         </View>
 
-        <View style={modalStyles.divider} />
+        <View style={themedLocalStyles.divider} />
 
-        {/* Table-like Date Section */}
-        <View style={styles.tableContainer}>
+        <View style={themedLocalStyles.tableContainer}>
+          {/* Title Row - Vertical Layout */}
           <View
             style={[
-              styles.tableRow,
+              themedLocalStyles.tableRow,
               { flexDirection: "column", alignItems: "flex-start", gap: 8 },
             ]}
           >
-            <View style={[styles.tableLabelColumn, { flex: 0, width: "100%" }]}>
+            <View style={[themedLocalStyles.tableLabelColumn, { flex: 0 }]}>
               <Ionicons
                 name="document-text-outline"
                 size={18}
                 color={colors.SECTION_TEXT}
               />
-              <StyledText style={styles.tableLabelText}>
+              <StyledText style={themedLocalStyles.tableLabelText}>
                 {t("title")}
               </StyledText>
             </View>
             <View
               style={[
-                styles.tableValueColumn,
-                {
-                  flex: 0,
-                  width: "100%",
-                  alignItems: "flex-start",
-                  paddingLeft: 28,
-                },
+                themedLocalStyles.tableValueColumn,
+                { flex: 0, paddingLeft: 28, alignItems: "flex-start" },
               ]}
             >
               <StyledText
-                style={[styles.tableValueText, { textAlign: "left" }]}
+                style={[
+                  themedLocalStyles.tableValueText,
+                  { textAlign: "left" },
+                ]}
               >
                 {title}
               </StyledText>
@@ -138,74 +137,52 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
           </View>
         </View>
 
-        {category && (
-          <View style={[styles.tableContainer, { marginTop: 0 }]}>
-            <View style={styles.tableRow}>
-              <View style={styles.tableLabelColumn}>
+        <View style={[themedLocalStyles.tableContainer, { marginTop: 4 }]}>
+          {/* Category */}
+          {category && (
+            <View style={themedLocalStyles.tableRow}>
+              <View style={themedLocalStyles.tableLabelColumn}>
                 <Ionicons
                   name="grid-outline"
                   size={18}
                   color={colors.SECTION_TEXT}
                 />
-                <StyledText style={styles.tableLabelText}>
+                <StyledText style={themedLocalStyles.tableLabelText}>
                   {t("category")}
                 </StyledText>
               </View>
-              <View style={styles.tableValueColumn}>
+              <View style={themedLocalStyles.tableValueColumn}>
                 <StyledText
                   style={[
-                    styles.tableValueText,
+                    themedLocalStyles.tableValueText,
                     { color: colors.SECTION_TEXT },
                   ]}
                 >
-                  {t(`category_${category}` as any)}
+                  {t(("category_" + category) as any)}
                 </StyledText>
               </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {/* Other Parameters Section */}
-        <View style={[styles.tableContainer, { marginTop: 0 }]}>
-          <View style={styles.tableRow}>
-            <View style={styles.tableLabelColumn}>
-              <Ionicons
-                name="speedometer-outline"
-                size={18}
-                color={colors.SECTION_TEXT}
-              />
-              <StyledText style={styles.tableLabelText}>
-                {completedAt ? t("execution_time") : t("time_elapsed")}
-              </StyledText>
-            </View>
-            <View style={styles.tableValueColumn}>
-              <StyledText
-                style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}
-              >
-                {completedAt
-                  ? formatDuration(updatedAt || createdAt, completedAt, t)
-                  : formatDuration(
-                      updatedAt || createdAt,
-                      new Date().toISOString(),
-                      t,
-                    )}
-              </StyledText>
-            </View>
-          </View>
-
+          {/* Reminder */}
           {reminder && (
-            <View style={[styles.tableRow, styles.tableRowBorder]}>
-              <View style={styles.tableLabelColumn}>
+            <View
+              style={[
+                themedLocalStyles.tableRow,
+                themedLocalStyles.tableRowBorder,
+              ]}
+            >
+              <View style={themedLocalStyles.tableLabelColumn}>
                 <Ionicons
                   name="alarm-outline"
                   size={18}
                   color={colors.SECTION_TEXT}
                 />
-                <StyledText style={styles.tableLabelText}>
+                <StyledText style={themedLocalStyles.tableLabelText}>
                   {t("reminder")}
                 </StyledText>
               </View>
-              <View style={styles.tableValueColumn}>
+              <View style={themedLocalStyles.tableValueColumn}>
                 <View
                   style={[
                     {
@@ -223,7 +200,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
                   />
                   <StyledText
                     style={[
-                      styles.tableValueText,
+                      themedLocalStyles.tableValueText,
                       {
                         color: colors.SECTION_TEXT,
                         textDecorationLine: isCrossedOut
@@ -239,66 +216,188 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
             </View>
           )}
 
-          <View style={[styles.tableRow, styles.tableRowBorder]}>
-            <View style={styles.tableLabelColumn}>
-              <Ionicons name="add" size={18} color={colors.SECTION_TEXT} />
-              <StyledText style={styles.tableLabelText}>
+          {/* Iterative Dates */}
+          {isIterative && iterativeDates && iterativeDates.length > 0 && (
+            <View
+              style={[
+                themedLocalStyles.tableRow,
+                themedLocalStyles.tableRowBorder,
+                { flexDirection: "column", alignItems: "flex-start", gap: 10 },
+              ]}
+            >
+              <View
+                style={[
+                  themedLocalStyles.tableLabelColumn,
+                  { flex: 0, width: "100%" },
+                ]}
+              >
+                <Ionicons
+                  name="repeat-outline"
+                  size={18}
+                  color={colors.SECTION_TEXT}
+                />
+                <StyledText style={themedLocalStyles.tableLabelText}>
+                  {t("menu_add_iterative")} ({completedCount || 0}/
+                  {iterativeDates.length})
+                </StyledText>
+              </View>
+              <View style={themedLocalStyles.iterativeContainer}>
+                {getBalancedRows(iterativeDates, 5).map((row, rowIdx) => (
+                  <View
+                    key={rowIdx}
+                    style={themedLocalStyles.miniCalendarWrapper}
+                  >
+                    {row.map((item, idx) => {
+                      const dateObj = new Date(item.date);
+                      const isDone = item.isDone;
+                      return (
+                        <View
+                          key={idx}
+                          style={[
+                            themedLocalStyles.miniCalendarContainer,
+                            isDone && {
+                              borderColor: colors.CHECKBOX_SUCCESS + "40",
+                            },
+                          ]}
+                        >
+                          <View
+                            style={[
+                              themedLocalStyles.miniCalendarHeader,
+                              isDone && {
+                                backgroundColor: colors.CHECKBOX_SUCCESS,
+                              },
+                            ]}
+                          >
+                            <StyledText
+                              style={themedLocalStyles.miniCalendarHeaderText}
+                            >
+                              {getShortMonthName(dateObj, lang)}
+                            </StyledText>
+                          </View>
+                          <View style={themedLocalStyles.miniCalendarBody}>
+                            {isDone ? (
+                              <Ionicons
+                                name="checkmark-sharp"
+                                size={12}
+                                color={colors.CHECKBOX_SUCCESS}
+                              />
+                            ) : (
+                              <StyledText
+                                style={[
+                                  themedLocalStyles.miniCalendarBodyText,
+                                  { color: colors.PRIMARY_TEXT },
+                                ]}
+                              >
+                                {dateObj.getDate().toString().padStart(2, "0")}
+                              </StyledText>
+                            )}
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+          {/* Time Elapsed / Execution Time */}
+          <View
+            style={[
+              themedLocalStyles.tableRow,
+              themedLocalStyles.tableRowBorder,
+            ]}
+          >
+            <View style={themedLocalStyles.tableLabelColumn}>
+              <Ionicons
+                name="timer-outline"
+                size={18}
+                color={colors.SECTION_TEXT}
+              />
+              <StyledText style={themedLocalStyles.tableLabelText}>
+                {completedAt ? t("execution_time") : t("time_elapsed")}
+              </StyledText>
+            </View>
+            <View style={themedLocalStyles.tableValueColumn}>
+              <StyledText style={themedLocalStyles.tableValueText}>
+                {formatDuration(
+                  createdAt,
+                  completedAt || new Date().toISOString(),
+                  t,
+                )}
+              </StyledText>
+            </View>
+          </View>
+
+          {/* Created At */}
+          <View
+            style={[
+              themedLocalStyles.tableRow,
+              themedLocalStyles.tableRowBorder,
+            ]}
+          >
+            <View style={themedLocalStyles.tableLabelColumn}>
+              <Ionicons
+                name="calendar-clear-outline"
+                size={18}
+                color={colors.SECTION_TEXT}
+              />
+              <StyledText style={themedLocalStyles.tableLabelText}>
                 {t("created")}
               </StyledText>
             </View>
-            <View style={styles.tableValueColumn}>
-              <StyledText
-                style={[styles.tableValueText, { color: colors.SECTION_TEXT }]}
-              >
+            <View style={themedLocalStyles.tableValueColumn}>
+              <StyledText style={themedLocalStyles.tableValueText}>
                 {formatDate(createdAt, lang)}
               </StyledText>
             </View>
           </View>
 
+          {/* Updated At */}
           {updatedAt && (
-            <View style={[styles.tableRow, styles.tableRowBorder]}>
-              <View style={styles.tableLabelColumn}>
+            <View
+              style={[
+                themedLocalStyles.tableRow,
+                themedLocalStyles.tableRowBorder,
+              ]}
+            >
+              <View style={themedLocalStyles.tableLabelColumn}>
                 <Ionicons
-                  name="create-outline"
+                  name="sync-outline"
                   size={18}
                   color={colors.SECTION_TEXT}
                 />
-                <StyledText style={styles.tableLabelText}>
+                <StyledText style={themedLocalStyles.tableLabelText}>
                   {t("edited")}
                 </StyledText>
               </View>
-              <View style={styles.tableValueColumn}>
-                <StyledText
-                  style={[
-                    styles.tableValueText,
-                    { color: colors.SECTION_TEXT },
-                  ]}
-                >
+              <View style={themedLocalStyles.tableValueColumn}>
+                <StyledText style={themedLocalStyles.tableValueText}>
                   {formatDate(updatedAt, lang)}
                 </StyledText>
               </View>
             </View>
           )}
 
+          {/* Completed At */}
           {completedAt && (
-            <View style={[styles.tableRow, styles.tableRowBorder]}>
-              <View style={styles.tableLabelColumn}>
+            <View
+              style={[
+                themedLocalStyles.tableRow,
+                themedLocalStyles.tableRowBorder,
+              ]}
+            >
+              <View style={themedLocalStyles.tableLabelColumn}>
                 <Ionicons
-                  name="checkmark-done-outline"
+                  name="checkmark-circle-outline"
                   size={18}
                   color={colors.SECTION_TEXT}
                 />
-                <StyledText style={styles.tableLabelText}>
+                <StyledText style={themedLocalStyles.tableLabelText}>
                   {t("completed")}
                 </StyledText>
               </View>
-              <View style={styles.tableValueColumn}>
-                <StyledText
-                  style={[
-                    styles.tableValueText,
-                    { color: colors.SECTION_TEXT },
-                  ]}
-                >
+              <View style={themedLocalStyles.tableValueColumn}>
+                <StyledText style={themedLocalStyles.tableValueText}>
                   {formatDate(completedAt, lang)}
                 </StyledText>
               </View>
@@ -306,12 +405,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
           )}
         </View>
 
-        <View
-          style={[
-            modalStyles.buttonsContainer,
-            { justifyContent: "center", marginTop: 8 },
-          ]}
-        >
+        <View style={{ marginTop: 12, width: "100%" }}>
           <StyledButton
             label={t("close")}
             onPress={onClose}

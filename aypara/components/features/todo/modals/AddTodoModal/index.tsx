@@ -2,10 +2,11 @@ import StyledButton from "@/components/ui/StyledButton";
 import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import {
-    checkSystemNotifications,
-    schedulePushNotification,
+  checkSystemNotifications,
+  schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
+import { getFullFormatDate } from "@/helpers/date";
 import { analyzeAudio } from "@/helpers/gemini";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
@@ -20,26 +21,26 @@ import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Animated,
-    Keyboard,
-    LayoutAnimation,
-    Platform,
-    Pressable,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    UIManager,
-    View,
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Keyboard,
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  UIManager,
+  View,
 } from "react-native";
 import { getAddStyles } from "./styles";
 
@@ -342,51 +343,8 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
   }, [selectedCategory]);
 
   const formatDateOnly = (date: Date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const az = [
-      "Yan",
-      "Fev",
-      "Mar",
-      "Apr",
-      "May",
-      "İyn",
-      "İyl",
-      "Avq",
-      "Sen",
-      "Okt",
-      "Noy",
-      "Dek",
-    ];
-    const en = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const ru = [
-      "Янв",
-      "Фев",
-      "Мар",
-      "Апр",
-      "Май",
-      "Июн",
-      "Июл",
-      "Авг",
-      "Сен",
-      "Окт",
-      "Ноя",
-      "Дек",
-    ];
-    const months = lang === "az" ? az : lang === "ru" ? ru : en;
-    return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    if (!date || isNaN(date.getTime())) return "";
+    return getFullFormatDate(date, lang);
   };
 
   const formatTimeOnly = (date: Date) => {

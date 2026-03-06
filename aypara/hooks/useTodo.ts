@@ -53,6 +53,29 @@ const useTodo = () => {
     );
   };
 
+  const onAddIterativeTodo = (
+    title: Todo["title"],
+    nextReminder?: string,
+    nextNotificationId?: string,
+    category?: string,
+    iterativeDates?: { date: string; notificationId?: string }[],
+  ) => {
+    dispatch(
+      addTodo({
+        id: generateId(),
+        title,
+        isCompleted: false,
+        createdAt: new Date().toISOString(),
+        reminder: nextReminder,
+        notificationId: nextNotificationId,
+        category,
+        isIterative: true,
+        completedCount: 0,
+        iterativeDates,
+      }),
+    );
+  };
+
   const onRetryTodo = async (
     id: Todo["id"],
     delayType: "hour" | "day" | "week" | "month",
@@ -130,7 +153,7 @@ const useTodo = () => {
           await Notifications.cancelScheduledNotificationAsync(
             todo.notificationId,
           );
-        } catch (error) {
+        } catch {
           // silently ignore
         }
         dispatch(
@@ -165,7 +188,7 @@ const useTodo = () => {
           await Notifications.cancelScheduledNotificationAsync(
             todo.notificationId,
           );
-        } catch (error) {
+        } catch {
           // silently ignore
         }
         // Instead of deleting, mark as cancelled so it stays in history as 'Ləğv olunub'
@@ -192,7 +215,7 @@ const useTodo = () => {
           await Notifications.cancelScheduledNotificationAsync(
             todo.notificationId,
           );
-        } catch (error) {
+        } catch {
           // silently ignore
         }
         dispatch(
@@ -222,7 +245,7 @@ const useTodo = () => {
             await Notifications.cancelScheduledNotificationAsync(
               todo.notificationId,
             );
-          } catch (error) {
+          } catch {
             // silently ignore
           }
           dispatch(
@@ -244,6 +267,7 @@ const useTodo = () => {
 
   return {
     onAddTodo,
+    onAddIterativeTodo,
     onRetryTodo, // Added
     onDeleteTodo,
     onEditTodo,

@@ -7,6 +7,7 @@ import {
     schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
+import { getFullFormatDate } from "@/helpers/date";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
 import { useTheme } from "@/hooks/useTheme";
 import IOSPickerModal from "@/layout/Modals/IOSPickerModal";
@@ -123,55 +124,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
 
   const formatDateOnly = (date: Date) => {
     if (!date || isNaN(date.getTime())) return "";
-    const day = date.getDate().toString().padStart(2, "0");
-    const months = [
-      "Yan",
-      "Fev",
-      "Mar",
-      "Apr",
-      "May",
-      "İyn",
-      "İyl",
-      "Avq",
-      "Sen",
-      "Okt",
-      "Noy",
-      "Dek",
-    ];
-    const enMonths = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const ruMonths = [
-      "Янв",
-      "Фев",
-      "Мар",
-      "Апр",
-      "Май",
-      "Июн",
-      "Июл",
-      "Авг",
-      "Сен",
-      "Окт",
-      "Ноя",
-      "Дек",
-    ];
-
-    const monthNames =
-      lang === "az" ? months : lang === "ru" ? ruMonths : enMonths;
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
+    return getFullFormatDate(date, lang);
   };
 
   const formatTimeOnly = (date: Date) => {

@@ -1241,6 +1241,9 @@ const TodoList: React.FC<TodoListProps> = ({
             reminderCancelled={menuTarget.reminderCancelled}
             notificationId={menuTarget.notificationId}
             category={menuTarget.category}
+            isIterative={menuTarget.isIterative}
+            completedCount={menuTarget.completedCount}
+            iterativeDates={menuTarget.iterativeDates}
           />
         </>
       )}

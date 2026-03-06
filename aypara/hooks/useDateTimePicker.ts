@@ -25,6 +25,8 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [showOSPermissionModal, setShowOSPermissionModal] = useState(false);
   const [showPastDateAlert, setShowPastDateAlert] = useState(false);
+  const [showTimeSelectionAlert, setShowTimeSelectionAlert] = useState(false);
+  const [showDateSelectionAlert, setShowDateSelectionAlert] = useState(false);
   const [pickerToReopen, setPickerToReopen] = useState<"date" | "time" | null>(
     null,
   );
@@ -247,6 +249,8 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
     setTempDate(undefined);
     setShowPermissionModal(false);
     setShowPastDateAlert(false);
+    setShowTimeSelectionAlert(false);
+    setShowDateSelectionAlert(false);
     setPickerToReopen(null);
     setActiveMode(null);
   };
@@ -266,6 +270,10 @@ export function useDateTimePicker(options: UseDateTimePickerOptions = {}) {
     setShowOSPermissionModal,
     showPastDateAlert,
     setShowPastDateAlert,
+    showTimeSelectionAlert,
+    setShowTimeSelectionAlert,
+    showDateSelectionAlert,
+    setShowDateSelectionAlert,
     activeMode,
     todayStart,
     setPickerToReopen,

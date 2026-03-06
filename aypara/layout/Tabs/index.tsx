@@ -33,7 +33,7 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const [successMessage, setSuccessMessage] = useState<string | undefined>(
     undefined,
   );
-  const { onAddTodo } = useTodo();
+  const { onAddTodo, onAddIterativeTodo } = useTodo();
   const { onAddBirthday } = useBirthday();
   const isBreathingActive = useSelector(selectIsBreathingActive);
 
@@ -69,6 +69,31 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
     category?: string,
   ) => {
     onAddTodo(title, reminder, notificationId, category);
+    setSuccessMessage(t("task_added_success"));
+
+    // Only show success modal if NOT on the todo tab
+    const currentRouteName = state.routes[state.index].name;
+    if (currentRouteName !== "todo") {
+      setTimeout(() => {
+        setIsSuccessModalOpen(true);
+      }, 500);
+    }
+  };
+
+  const handleAddIterativeTodo = (
+    title: string,
+    nextReminder?: string,
+    nextNotificationId?: string,
+    category?: string,
+    iterativeDates?: { date: string; notificationId?: string }[],
+  ) => {
+    onAddIterativeTodo(
+      title,
+      nextReminder,
+      nextNotificationId,
+      category,
+      iterativeDates,
+    );
     setSuccessMessage(t("task_added_success"));
 
     // Only show success modal if NOT on the todo tab
@@ -296,9 +321,9 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
       <AddIterativeTodoModal
         isOpen={isAddIterativeModalOpen}
         onClose={() => setIsAddIterativeModalOpen(false)}
-        onAdd={handleAddTodo}
+        onAdd={handleAddIterativeTodo}
         categoryTitle={t("notifications_todo")}
-        categoryIcon="repeat-outline"
+        categoryIcon="list"
         initialCategory={
           state.routes[state.index].name === "breathing" ? "health" : "personal"
         }

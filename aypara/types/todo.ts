@@ -17,4 +17,13 @@ export interface Todo {
   notificationId?: string;
   reminderCancelled?: boolean;
   category?: string;
+  isIterative?: boolean;
+  successorId?: string;
+  completedCount?: number;
+  iterativeDates?: {
+    date: string; // ISO string
+    notificationId?: string;
+    isDone?: boolean;
+    doneAt?: string;
+  }[];
 }

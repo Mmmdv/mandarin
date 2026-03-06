@@ -3,6 +3,7 @@ import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import { checkSystemNotifications } from "@/constants/notifications";
+import { getFullFormatDate } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import NotificationPermissionModal from "@/layout/Modals/NotificationPermissionModal";
 import OSPermissionModal from "@/layout/Modals/OSPermissionModal";
@@ -144,55 +145,8 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
   };
 
   const formatDateDisplay = (date: Date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const months = [
-      "Yan",
-      "Fev",
-      "Mar",
-      "Apr",
-      "May",
-      "İyn",
-      "İyl",
-      "Avq",
-      "Sen",
-      "Okt",
-      "Noy",
-      "Dek",
-    ];
-    const enMonths = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const ruMonths = [
-      "Янв",
-      "Фев",
-      "Мар",
-      "Апр",
-      "Май",
-      "Июн",
-      "Июл",
-      "Авг",
-      "Сен",
-      "Окт",
-      "Ноя",
-      "Дек",
-    ];
-
-    const monthNames =
-      lang === "az" ? months : lang === "ru" ? ruMonths : enMonths;
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
+    if (!date || isNaN(date.getTime())) return "";
+    return getFullFormatDate(date, lang);
   };
 
   return (

@@ -89,6 +89,12 @@ export const todoSlice = createSlice({
       state.stats.totalDeleted += 1;
       ensureDaily(state, getToday()).deleted += 1;
       state.todos = state.todos.filter((todo) => todo.id !== id);
+      // Clear any stale successor links pointing to this deleted todo
+      state.todos.forEach((t) => {
+        if (t.successorId === id) {
+          t.successorId = undefined;
+        }
+      });
     },
     editTodo: (
       state: TodoState,
@@ -122,29 +128,113 @@ export const todoSlice = createSlice({
       const id = action.payload;
       ensureStats(state);
       const target = state.todos.find((todo) => todo.id === id);
-      if (target && !target.isCompleted) {
-        state.stats.totalCompleted += 1;
-        const createdTime = new Date(target.createdAt).getTime();
-        const completedTime = Date.now();
-        const durationMs = completedTime - createdTime;
-        if (durationMs > 0) {
-          state.stats.totalCompletionTimeMs += durationMs;
+      if (!target) return;
+
+      const nowStr = new Date().toISOString();
+
+      if (!target.isIterative) {
+        // --- Standard Non-Iterative Logic ---
+        const isMarkingComplete = !target.isCompleted;
+        target.isCompleted = isMarkingComplete;
+        target.completedAt = isMarkingComplete ? nowStr : undefined;
+
+        if (isMarkingComplete) {
+          state.stats.totalCompleted += 1;
+          const daily = ensureDaily(state, getToday());
+          daily.completed += 1;
+
+          const createdTime = new Date(target.createdAt).getTime();
+          const durationMs = Date.now() - createdTime;
+          if (durationMs > 0) {
+            state.stats.totalCompletionTimeMs += durationMs;
+            daily.completionTimeMs += durationMs;
+          }
+        } else {
+          state.stats.totalCompleted = Math.max(
+            0,
+            state.stats.totalCompleted - 1,
+          );
+          ensureDaily(state, getToday()).completed = Math.max(
+            0,
+            state.dailyStats[getToday()].completed - 1,
+          );
         }
-        const daily = ensureDaily(state, getToday());
-        daily.completed += 1;
-        if (durationMs > 0) daily.completionTimeMs += durationMs;
-      }
-      state.todos = state.todos.map((todo) =>
-        todo.id === id
-          ? {
-              ...todo,
-              isCompleted: !todo.isCompleted,
-              completedAt: !todo.isCompleted
-                ? new Date().toISOString()
-                : undefined,
+      } else {
+        // --- Enhanced Iterative Logic (Single Object) ---
+        if (!target.isCompleted) {
+          // Action: Mark NEXT pending date as Done
+          const nextPendingIndex = (target.iterativeDates || []).findIndex(
+            (d) => !d.isDone,
+          );
+
+          if (nextPendingIndex !== -1) {
+            const dateItem = target.iterativeDates![nextPendingIndex];
+            dateItem.isDone = true;
+            dateItem.doneAt = nowStr;
+            target.completedCount = (target.completedCount || 0) + 1;
+            target.completedAt = nowStr; // Last completion time
+
+            // Stats
+            state.stats.totalCompleted += 1;
+            ensureDaily(state, getToday()).completed += 1;
+
+            // Set next reminder if available
+            const nextOne = target.iterativeDates!.find(
+              (d, idx) => !d.isDone && idx > nextPendingIndex,
+            );
+            if (nextOne) {
+              target.reminder = nextOne.date;
+              target.notificationId = nextOne.notificationId;
+              target.isCompleted = false;
+            } else {
+              // No more dates left
+              target.isCompleted = true;
+              target.reminder = undefined;
+              target.notificationId = undefined;
             }
-          : todo,
-      );
+          } else {
+            // Edge case: button clicked but no pending dates? Mark as complete.
+            target.isCompleted = true;
+          }
+        } else {
+          // Action: Undo the LAST completed date
+          const lastDoneIndex = [...(target.iterativeDates || [])]
+            .reverse()
+            .findIndex((d) => d.isDone);
+          const actualIndex =
+            lastDoneIndex !== -1
+              ? target.iterativeDates!.length - 1 - lastDoneIndex
+              : -1;
+
+          if (actualIndex !== -1) {
+            const dateItem = target.iterativeDates![actualIndex];
+            dateItem.isDone = false;
+            dateItem.doneAt = undefined;
+            target.completedCount = Math.max(
+              0,
+              (target.completedCount || 0) - 1,
+            );
+            target.isCompleted = false;
+
+            // The recently undone date becomes the new reminder (it's now the earliest pending)
+            target.reminder = dateItem.date;
+            target.notificationId = dateItem.notificationId;
+
+            // Stats
+            state.stats.totalCompleted = Math.max(
+              0,
+              state.stats.totalCompleted - 1,
+            );
+            ensureDaily(state, getToday()).completed = Math.max(
+              0,
+              state.dailyStats[getToday()].completed - 1,
+            );
+          } else {
+            // Nothing actually done? Just toggle off
+            target.isCompleted = false;
+          }
+        }
+      }
     },
     archiveTodo: (state: TodoState, action: PayloadAction<string>) => {
       const id = action.payload;

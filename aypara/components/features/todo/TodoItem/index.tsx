@@ -46,6 +46,7 @@ type TodoItemProps = Todo & {
     height: number;
   }) => void;
   onPress?: () => void;
+  completedCount?: number;
 };
 
 const getCategoryData = (id?: string) => {
@@ -70,9 +71,12 @@ const TodoItem: React.FC<TodoItemProps> = ({
   retryTodo,
   archiveTodo,
   category,
+  isIterative,
+  iterativeDates,
   viewMode = "list",
   onOpenMenu,
   onPress,
+  completedCount,
 }) => {
   const { t, colors, isDark, lang } = useTheme();
 
@@ -234,33 +238,75 @@ const TodoItem: React.FC<TodoItemProps> = ({
               >
                 {hyphenateText(title)}
               </StyledText>
-              {category && (
-                <View
-                  style={[
-                    styles.categoryBadge,
-                    {
-                      marginTop: 6,
-                      backgroundColor: colors.REMINDER + (isDark ? "20" : "12"),
-                      borderColor: colors.REMINDER + (isDark ? "40" : "30"),
-                    },
-                  ]}
-                >
-                  <Ionicons
-                    name={getCategoryData(category).icon as any}
-                    size={11}
-                    color={colors.REMINDER}
-                  />
-                  <StyledText
-                    style={{
-                      fontSize: 10,
-                      color: colors.REMINDER,
-                      fontWeight: "700",
-                    }}
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 6,
+                  marginTop: 6,
+                  alignItems: "center",
+                }}
+              >
+                {category && (
+                  <View
+                    style={[
+                      styles.categoryBadge,
+                      {
+                        backgroundColor:
+                          colors.REMINDER + (isDark ? "20" : "12"),
+                        borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                      },
+                    ]}
                   >
-                    {t(`category_${category}` as any)}
-                  </StyledText>
-                </View>
-              )}
+                    <Ionicons
+                      name={getCategoryData(category).icon as any}
+                      size={11}
+                      color={colors.REMINDER}
+                    />
+                    <StyledText
+                      style={{
+                        fontSize: 10,
+                        color: colors.REMINDER,
+                        fontWeight: "700",
+                      }}
+                    >
+                      {t(`category_${category}` as any)}
+                    </StyledText>
+                  </View>
+                )}
+                {isIterative && (
+                  <View
+                    style={[
+                      styles.categoryBadge,
+                      {
+                        backgroundColor:
+                          colors.REMINDER + (isDark ? "20" : "12"),
+                        borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                        paddingHorizontal: 6,
+                        gap: 4,
+                      },
+                    ]}
+                  >
+                    <Ionicons
+                      name="repeat-outline"
+                      size={12}
+                      color={colors.REMINDER}
+                    />
+                    <StyledText
+                      style={{
+                        fontSize: 10,
+                        color: colors.REMINDER,
+                        fontWeight: "800",
+                      }}
+                    >
+                      {isCompleted
+                        ? 0
+                        : (iterativeDates?.length || 0) - (completedCount || 0)}
+                      x
+                    </StyledText>
+                  </View>
+                )}
+              </View>
             </View>
           </View>
         </TouchableOpacity>
@@ -394,6 +440,37 @@ const TodoItem: React.FC<TodoItemProps> = ({
                     }}
                   >
                     {t(`category_${category}` as any)}
+                  </StyledText>
+                </View>
+              )}
+              {isIterative && (
+                <View
+                  style={[
+                    styles.categoryBadge,
+                    {
+                      backgroundColor: colors.REMINDER + (isDark ? "20" : "12"),
+                      borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                      paddingHorizontal: 6,
+                      gap: 4,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="repeat-outline"
+                    size={12}
+                    color={colors.REMINDER}
+                  />
+                  <StyledText
+                    style={{
+                      fontSize: 10,
+                      color: colors.REMINDER,
+                      fontWeight: "800",
+                    }}
+                  >
+                    {isCompleted
+                      ? 0
+                      : (iterativeDates?.length || 0) - (completedCount || 0)}
+                    x
                   </StyledText>
                 </View>
               )}
