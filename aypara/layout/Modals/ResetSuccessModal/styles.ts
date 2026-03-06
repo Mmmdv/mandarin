@@ -20,6 +20,7 @@ export const getStyles = (colors: any, isDark: boolean) =>
     },
     headerRow: {
       flexDirection: "row",
+      flexWrap: "wrap",
       alignItems: "center",
       justifyContent: "center",
       gap: 12,

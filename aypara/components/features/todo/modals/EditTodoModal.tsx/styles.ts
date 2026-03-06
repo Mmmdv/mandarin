@@ -245,10 +245,10 @@ export const getEditStyles = (colors: any, isDark: boolean) =>
     categoryItem: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 8,
+      paddingVertical: 12,
       paddingHorizontal: 10,
-      borderRadius: 10,
-      borderWidth: 1,
+      borderRadius: 15,
+      borderWidth: 0.2,
       gap: 6,
     },
   });

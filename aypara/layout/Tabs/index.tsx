@@ -1,7 +1,7 @@
 import { useTheme } from "@/hooks/useTheme";
 import {
-  incrementUsage,
-  selectIsBreathingActive,
+    incrementUsage,
+    selectIsBreathingActive,
 } from "@/store/slices/appSlice";
 import { Ionicons } from "@expo/vector-icons";
 // import analytics from "@react-native-firebase/analytics";
@@ -268,6 +268,9 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         onAdd={handleAddTodo}
         categoryTitle={t("notifications_todo")}
         categoryIcon="list"
+        initialCategory={
+          state.routes[state.index].name === "breathing" ? "health" : "personal"
+        }
       />
 
       <AddMenuModal

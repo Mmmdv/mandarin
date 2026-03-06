@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import * as Localization from "expo-localization";
 
 export enum Lang {
   EN = "en",
@@ -34,8 +35,15 @@ export interface AppState {
   reducedMotionDismissed: boolean;
 }
 
+const getInitialLang = (): Lang => {
+  const deviceLanguage = Localization.getLocales()[0]?.languageCode || "en";
+  if (deviceLanguage.startsWith("az")) return Lang.AZ;
+  if (deviceLanguage.startsWith("ru")) return Lang.RU;
+  return Lang.EN;
+};
+
 const initialState: AppState = {
-  lang: Lang.EN,
+  lang: getInitialLang(),
   theme: Theme.DARK,
   todoNotifications: true,
   birthdayNotifications: true,

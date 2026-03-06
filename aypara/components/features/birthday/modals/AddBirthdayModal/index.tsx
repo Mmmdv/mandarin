@@ -207,6 +207,7 @@ const AddBirthdayModal: React.FC<AddBirthdayModalProps> = ({
           <View
             style={{
               flexDirection: "row",
+              flexWrap: "wrap",
               alignItems: "center",
               gap: 10,
               justifyContent: "center",

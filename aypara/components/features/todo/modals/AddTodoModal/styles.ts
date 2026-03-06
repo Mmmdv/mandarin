@@ -20,6 +20,7 @@ export const getAddStyles = (colors: any, isDark: boolean) =>
     },
     headerRow: {
       flexDirection: "row",
+      flexWrap: "wrap",
       alignItems: "center",
       gap: 12,
       justifyContent: "center",
@@ -192,16 +193,16 @@ export const getAddStyles = (colors: any, isDark: boolean) =>
     },
     categoryList: {
       flexDirection: "row",
-      gap: 6,
+      gap: 8,
       paddingRight: 12,
     },
     categoryItem: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 8,
+      paddingVertical: 12,
       paddingHorizontal: 10,
-      borderRadius: 10,
-      borderWidth: 1,
+      borderRadius: 15,
+      borderWidth: 0.2,
       gap: 6,
     },
     divider: {
@@ -213,6 +214,7 @@ export const getAddStyles = (colors: any, isDark: boolean) =>
     },
     buttonsContainer: {
       flexDirection: "row",
+      justifyContent: "center",
       gap: 12,
       width: "100%",
     },

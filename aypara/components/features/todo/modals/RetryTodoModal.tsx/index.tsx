@@ -57,6 +57,7 @@ const RetryTodoModal: React.FC<RetryTodoModalProps> = ({
         <View
           style={{
             flexDirection: "row",
+            flexWrap: "wrap",
             alignItems: "center",
             gap: 10,
             justifyContent: "center",

@@ -3,9 +3,12 @@ import StyledText from "@/components/ui/StyledText";
 import { schedulePushNotification } from "@/constants/notifications";
 import { useTheme } from "@/hooks/useTheme";
 import NotificationPermissionModal from "@/layout/Modals/NotificationPermissionModal";
+import OSPermissionModal from "@/layout/Modals/OSPermissionModal";
+import { useAppDispatch } from "@/store";
 import {
     logBreathingSession,
     setBreathingActive,
+    updateAppSetting,
 } from "@/store/slices/appSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
 import { addTodo } from "@/store/slices/todoSlice";
@@ -23,7 +26,6 @@ import {
     View,
     useWindowDimensions,
 } from "react-native";
-import { useDispatch } from "react-redux";
 import {
     COLORS_THEME,
     PHASE_DURATIONS,
@@ -34,9 +36,9 @@ import {
 import { getStyles } from "./styles";
 
 export default function BreathingExercise() {
-  const { colors, t, isDark } = useTheme();
+  const { colors, t, isDark, todoNotifications } = useTheme();
   const styles = getStyles(isDark, colors);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { width: screenWidth } = useWindowDimensions();
   const [isActive, setIsActive] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -94,6 +96,7 @@ export default function BreathingExercise() {
   const [reminderScheduled, setReminderScheduled] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [showOSPermissionModal, setShowOSPermissionModal] = useState(false);
 
   const handleStart = () => {
     setIsCompleted(false);
@@ -102,12 +105,18 @@ export default function BreathingExercise() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
-  const scheduleBreathingReminder = async () => {
+  const scheduleBreathingReminder = async (ignoreSettings: boolean = false) => {
     try {
       if (reminderScheduled) return;
 
       const { status } = await Notifications.getPermissionsAsync();
-      if (status !== "granted") {
+
+      if (status === "denied") {
+        setShowOSPermissionModal(true);
+        return;
+      }
+
+      if (status !== "granted" || (!todoNotifications && !ignoreSettings)) {
         setShowPermissionModal(true);
         return;
       }
@@ -118,7 +127,7 @@ export default function BreathingExercise() {
 
       const displayTitle = t("breathing_reminder_title");
       const body = t("breathing_reminder_title");
-      const categoryIcon = "list";
+      const categoryIcon = "medkit-outline";
 
       const notificationId = await schedulePushNotification(
         displayTitle,
@@ -133,6 +142,7 @@ export default function BreathingExercise() {
         title: t("breathing_reminder_title"),
         isCompleted: false,
         isArchived: false,
+        category: "health",
         createdAt: new Date().toISOString(),
         reminder: reminderDate.toISOString(),
         notificationId: notificationId,
@@ -447,7 +457,7 @@ export default function BreathingExercise() {
                 opacity: reminderScheduled ? 0.6 : 1,
               },
             ]}
-            onPress={scheduleBreathingReminder}
+            onPress={() => scheduleBreathingReminder()}
             disabled={reminderScheduled}
           >
             <Ionicons
@@ -474,6 +484,26 @@ export default function BreathingExercise() {
           isOpen={isSuccessModalOpen}
           onClose={() => setIsSuccessModalOpen(false)}
           message={t("breathing_reminder_scheduled")}
+        />
+
+        <NotificationPermissionModal
+          isOpen={showPermissionModal}
+          onClose={() => setShowPermissionModal(false)}
+          onConfirm={async () => {
+            setShowPermissionModal(false);
+            dispatch(updateAppSetting({ todoNotifications: true }));
+            const { status } = await Notifications.requestPermissionsAsync();
+            if (status === "granted") {
+              setTimeout(() => {
+                scheduleBreathingReminder(true);
+              }, 300);
+            }
+          }}
+        />
+
+        <OSPermissionModal
+          isOpen={showOSPermissionModal}
+          onClose={() => setShowOSPermissionModal(false)}
         />
       </View>
     );
@@ -719,6 +749,7 @@ export default function BreathingExercise() {
         onClose={() => setShowPermissionModal(false)}
         onConfirm={async () => {
           setShowPermissionModal(false);
+          dispatch(updateAppSetting({ todoNotifications: true }));
           const { status } = await Notifications.requestPermissionsAsync();
           if (status === "granted") {
             setTimeout(() => {
@@ -726,6 +757,11 @@ export default function BreathingExercise() {
             }, 300);
           }
         }}
+      />
+
+      <OSPermissionModal
+        isOpen={showOSPermissionModal}
+        onClose={() => setShowOSPermissionModal(false)}
       />
     </View>
   );

@@ -31,15 +31,24 @@ import {
   Alert,
   Animated,
   Keyboard,
+  LayoutAnimation,
   Platform,
   Pressable,
   ScrollView,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  UIManager,
   View,
 } from "react-native";
 import { getAddStyles } from "./styles";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 type AddTodoModalProps = {
   isOpen: boolean;
@@ -52,6 +61,7 @@ type AddTodoModalProps = {
   ) => void;
   categoryTitle?: string;
   categoryIcon?: string;
+  initialCategory?: string;
 };
 
 const AddTodoModal: React.FC<AddTodoModalProps> = ({
@@ -60,6 +70,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
   onAdd,
   categoryTitle,
   categoryIcon,
+  initialCategory,
 }) => {
   const { t, colors, isDark, todoNotifications, lang } = useTheme();
   const dispatch = useAppDispatch();
@@ -72,7 +83,9 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
   const [title, setTitle] = useState("");
   const [inputError, setInputError] = useState(false);
   const categoryScrollRef = useRef<ScrollView>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("personal");
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    initialCategory || "personal",
+  );
 
   const inputRef = useRef<TextInput>(null);
 
@@ -309,7 +322,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
     if (isOpen) {
       setTitle("");
       setInputError(false);
-      setSelectedCategory("personal");
+      setSelectedCategory(initialCategory || "personal");
       picker.resetState(undefined);
 
       // Auto focus input immediately or with a minimal delay
@@ -507,24 +520,25 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                 .map((cat) => (
                   <TouchableOpacity
                     key={cat.id}
-                    onPress={() => setSelectedCategory(cat.id)}
+                    onPress={() => {
+                      LayoutAnimation.configureNext(
+                        LayoutAnimation.Presets.spring,
+                      );
+                      setSelectedCategory(cat.id);
+                    }}
                     activeOpacity={0.7}
                     style={[
                       themedLocalStyles.categoryItem,
                       {
                         backgroundColor:
                           selectedCategory === cat.id
-                            ? isDark
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.05)"
-                            : "transparent",
+                            ? colors.REMINDER + (isDark ? "30" : "15")
+                            : colors.SECTION_TEXT + (isDark ? "10" : "08"),
                         borderColor:
                           selectedCategory === cat.id
-                            ? colors.PRIMARY_ACTIVE_BUTTON
-                            : isDark
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.1)",
-                        borderWidth: selectedCategory === cat.id ? 1.5 : 1,
+                            ? colors.REMINDER
+                            : colors.SECTION_TEXT + (isDark ? "20" : "15"),
+                        borderWidth: selectedCategory === cat.id ? 0.5 : 0.2,
                       },
                     ]}
                   >
@@ -533,16 +547,16 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                       size={14}
                       color={
                         selectedCategory === cat.id
-                          ? colors.PRIMARY_ACTIVE_BUTTON
+                          ? colors.REMINDER
                           : colors.SECTION_TEXT
                       }
                     />
                     <StyledText
                       style={{
-                        fontSize: 11,
+                        fontSize: 10,
                         color:
                           selectedCategory === cat.id
-                            ? colors.PRIMARY_TEXT
+                            ? colors.REMINDER
                             : colors.SECTION_TEXT,
                         fontWeight: selectedCategory === cat.id ? "700" : "500",
                       }}
@@ -555,7 +569,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
           </View>
 
           {/* 2. Reminder Section */}
-          <View style={[themedLocalStyles.tableContainer, { marginTop: 16 }]}>
+          <View style={[themedLocalStyles.tableContainer, { marginTop: 3 }]}>
             {/* Date Row */}
             <TouchableOpacity
               style={themedLocalStyles.tableRow}

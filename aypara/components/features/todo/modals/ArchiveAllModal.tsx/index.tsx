@@ -9,66 +9,85 @@ import { View } from "react-native";
 import { getStyles } from "./styles";
 
 type ArchiveAllModalProps = {
-    isOpen: boolean
-    onClose: () => void
-    onArchiveAll: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onArchiveAll: () => void;
 };
 
 const ArchiveAllModal: React.FC<ArchiveAllModalProps> = ({
-    isOpen,
-    onClose,
-    onArchiveAll,
+  isOpen,
+  onClose,
+  onArchiveAll,
 }) => {
-    const { colors, t, isDark } = useTheme();
-    const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
+  const { colors, t, isDark } = useTheme();
+  const styles = useMemo(() => getStyles(colors, isDark), [colors, isDark]);
 
-    const handleArchiveAll = () => {
-        onArchiveAll()
-        onClose()
-    }
+  const handleArchiveAll = () => {
+    onArchiveAll();
+    onClose();
+  };
 
-    return (
-        <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
-            <View style={styles.container}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center', width: '100%' }}>
-                    <View style={[modalStyles.iconContainer, {
-                        backgroundColor: colors.SECONDARY_BACKGROUND,
-                        shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 2,
-                        elevation: 2,
-                        width: 42,
-                        height: 42,
-                        borderRadius: 21
-                    }]}>
-                        <Ionicons name="archive-outline" size={28} color={colors.PRIMARY_ACTIVE_BUTTON} />
-                    </View>
-                    <StyledText style={styles.headerText}>{t("archive_all_completed_title")}</StyledText>
-                </View>
+  return (
+    <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
+      <View style={styles.container}>
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 10,
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          <View
+            style={[
+              modalStyles.iconContainer,
+              {
+                backgroundColor: colors.SECONDARY_BACKGROUND,
+                shadowColor: colors.PRIMARY_ACTIVE_BUTTON,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 2,
+                elevation: 2,
+                width: 42,
+                height: 42,
+                borderRadius: 21,
+              },
+            ]}
+          >
+            <Ionicons
+              name="archive-outline"
+              size={28}
+              color={colors.PRIMARY_ACTIVE_BUTTON}
+            />
+          </View>
+          <StyledText style={styles.headerText}>
+            {t("archive_all_completed_title")}
+          </StyledText>
+        </View>
 
-                <View style={[modalStyles.divider]} />
+        <View style={[modalStyles.divider]} />
 
-                <StyledText style={styles.messageText}>
-                    {t("archive_all_completed_message")}
-                </StyledText>
+        <StyledText style={styles.messageText}>
+          {t("archive_all_completed_message")}
+        </StyledText>
 
-                <View style={[modalStyles.buttonsContainer, { marginTop: 10 }]}>
-                    <StyledButton
-                        label={t("cancel")}
-                        onPress={onClose}
-                        variant="dark_button"
-                    />
-                    <StyledButton
-                        label={t("archive_button")}
-                        onPress={handleArchiveAll}
-                        variant="dark_button"
-                    />
-                </View>
-            </View>
-        </StyledModal>
-    );
+        <View style={[modalStyles.buttonsContainer, { marginTop: 10 }]}>
+          <StyledButton
+            label={t("cancel")}
+            onPress={onClose}
+            variant="dark_button"
+          />
+          <StyledButton
+            label={t("archive_button")}
+            onPress={handleArchiveAll}
+            variant="dark_button"
+          />
+        </View>
+      </View>
+    </StyledModal>
+  );
 };
 
 export default ArchiveAllModal;
-

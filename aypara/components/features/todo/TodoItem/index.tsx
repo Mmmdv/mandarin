@@ -1,7 +1,6 @@
 import StyledCheckBox from "@/components/ui/StyledCheckBox";
 import StyledText from "@/components/ui/StyledText";
 import { TODO_CATEGORIES } from "@/constants/todo";
-import { formatDate } from "@/helpers/date";
 import { hyphenateText } from "@/helpers/text";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppSelector } from "@/store";
@@ -16,6 +15,7 @@ import CelebrationEffect, {
   createCelebrationAnimations,
   playCelebration,
 } from "./CelebrationEffect";
+import ReminderBadge from "./ReminderBadge";
 import { getStyles } from "./styles";
 
 type TodoItemProps = Todo & {
@@ -236,23 +236,25 @@ const TodoItem: React.FC<TodoItemProps> = ({
               </StyledText>
               {category && (
                 <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 4,
-                    marginTop: 4,
-                  }}
+                  style={[
+                    styles.categoryBadge,
+                    {
+                      marginTop: 6,
+                      backgroundColor: colors.REMINDER + (isDark ? "20" : "12"),
+                      borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                    },
+                  ]}
                 >
                   <Ionicons
                     name={getCategoryData(category).icon as any}
                     size={11}
-                    color={colors.SECTION_TEXT}
+                    color={colors.REMINDER}
                   />
                   <StyledText
                     style={{
                       fontSize: 10,
-                      color: colors.SECTION_TEXT,
-                      fontWeight: "600",
+                      color: colors.REMINDER,
+                      fontWeight: "700",
                     }}
                   >
                     {t(`category_${category}` as any)}
@@ -266,57 +268,15 @@ const TodoItem: React.FC<TodoItemProps> = ({
         <View style={styles.cardFooter}>
           <View style={{ flex: 1 }}>
             {reminder && !isCompleted && !isArchived && (
-              <View style={styles.cardMetadata}>
-                <Ionicons
-                  name="alarm-outline"
-                  size={13}
-                  color={colors.REMINDER}
-                />
-                <View style={styles.cardTimeContainer}>
-                  <StyledText
-                    style={{
-                      fontSize: 9.5,
-                      fontWeight: "600",
-                      color: colors.REMINDER,
-                    }}
-                  >
-                    {formatDate(reminder, lang).split(" ")[0]}
-                  </StyledText>
-                  <StyledText
-                    style={[
-                      styles.cardTimeSmall,
-                      { fontSize: 9.5, color: colors.REMINDER },
-                    ]}
-                  >
-                    {formatDate(reminder, lang).split(" ")[1]}
-                  </StyledText>
-                </View>
-                {reminderStatus && (
-                  <View style={{ marginLeft: 2 }}>
-                    {reminderStatus === "Ləğv olunub" ||
-                    reminderStatus === "Dəyişdirilib və ləğv olunub" ||
-                    reminderCancelled ? (
-                      <Ionicons
-                        name="notifications-off"
-                        size={11}
-                        color={colors.ERROR_INPUT_TEXT}
-                      />
-                    ) : reminderStatus === "Göndərilib" ? (
-                      <Ionicons
-                        name="checkmark-done-outline"
-                        size={11}
-                        color={colors.CHECKBOX_SUCCESS}
-                      />
-                    ) : (
-                      <Ionicons
-                        name="hourglass-outline"
-                        size={11}
-                        color={colors.REMINDER}
-                      />
-                    )}
-                  </View>
-                )}
-              </View>
+              <ReminderBadge
+                reminder={reminder}
+                reminderStatus={reminderStatus}
+                reminderCancelled={reminderCancelled}
+                isDark={isDark}
+                colors={colors}
+                lang={lang}
+                viewMode={viewMode}
+              />
             )}
           </View>
 
@@ -402,94 +362,54 @@ const TodoItem: React.FC<TodoItemProps> = ({
             >
               {hyphenateText(title)}
             </StyledText>
-            {category && (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                  marginTop: 2,
-                }}
-              >
-                <Ionicons
-                  name={getCategoryData(category).icon as any}
-                  size={11}
-                  color={colors.SECTION_TEXT}
-                />
-                <StyledText
-                  style={{
-                    fontSize: 10,
-                    color: colors.SECTION_TEXT,
-                    fontWeight: "600",
-                  }}
-                >
-                  {t(`category_${category}` as any)}
-                </StyledText>
-              </View>
-            )}
-          </View>
-          {reminder && !isCompleted && !isArchived && (
             <View
               style={{
                 flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 6,
+                marginTop: 4,
                 alignItems: "center",
-                marginTop: 2,
-                gap: 10,
               }}
             >
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-              >
-                <Ionicons
-                  name="alarm-outline"
-                  size={14}
-                  color={colors.REMINDER}
-                />
-                <StyledText
-                  style={{
-                    color: colors.REMINDER,
-                    fontSize: 9.5,
-                    textDecorationLine:
-                      reminderStatus === "Ləğv olunub" ||
-                      reminderStatus === "Dəyişdirilib və ləğv olunub" ||
-                      reminderCancelled
-                        ? "line-through"
-                        : "none",
-                  }}
-                >
-                  {formatDate(reminder, lang)}
-                </StyledText>
-              </View>
-
-              {reminderStatus && (
+              {category && (
                 <View
-                  style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+                  style={[
+                    styles.categoryBadge,
+                    {
+                      backgroundColor: colors.REMINDER + (isDark ? "20" : "12"),
+                      borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                    },
+                  ]}
                 >
-                  {reminderStatus === "Ləğv olunub" ||
-                  reminderStatus === "Dəyişdirilib və ləğv olunub" ||
-                  reminderCancelled ? (
-                    <Ionicons
-                      name="notifications-off"
-                      size={12}
-                      color={colors.ERROR_INPUT_TEXT}
-                    />
-                  ) : reminderStatus === "Göndərilib" ? (
-                    <Ionicons
-                      name="checkmark-done-outline"
-                      size={12}
-                      color={colors.CHECKBOX_SUCCESS}
-                    />
-                  ) : (
-                    <Ionicons
-                      name="hourglass-outline"
-                      size={12}
-                      color={colors.REMINDER}
-                    />
-                  )}
+                  <Ionicons
+                    name={getCategoryData(category).icon as any}
+                    size={11}
+                    color={colors.REMINDER}
+                  />
+                  <StyledText
+                    style={{
+                      fontSize: 10,
+                      color: colors.REMINDER,
+                      fontWeight: "700",
+                    }}
+                  >
+                    {t(`category_${category}` as any)}
+                  </StyledText>
                 </View>
               )}
+              {reminder && !isCompleted && !isArchived && (
+                <ReminderBadge
+                  reminder={reminder}
+                  reminderStatus={reminderStatus}
+                  reminderCancelled={reminderCancelled}
+                  isDark={isDark}
+                  colors={colors}
+                  lang={lang}
+                  viewMode={viewMode}
+                />
+              )}
             </View>
-          )}
+          </View>
         </TouchableOpacity>
       </View>
       <View

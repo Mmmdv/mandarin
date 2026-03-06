@@ -3,8 +3,8 @@ import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import {
-    checkSystemNotifications,
-    schedulePushNotification,
+  checkSystemNotifications,
+  schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
 import { useDateTimePicker } from "@/hooks/useDateTimePicker";
@@ -16,8 +16,8 @@ import PastDateModal from "@/layout/Modals/PastDateModal";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
 import {
-    addNotification,
-    updateNotificationStatus,
+  addNotification,
+  updateNotificationStatus,
 } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,13 +25,22 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    Platform,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    View,
+  LayoutAnimation,
+  Platform,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  UIManager,
+  View,
 } from "react-native";
 import { getEditStyles } from "./styles";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 type EditTodoModalProps = {
   isOpen: boolean;
@@ -258,6 +267,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
         <View
           style={{
             flexDirection: "row",
+            flexWrap: "wrap",
             alignItems: "center",
             gap: 12,
             justifyContent: "center",
@@ -375,24 +385,25 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
               .map((cat) => (
                 <TouchableOpacity
                   key={cat.id}
-                  onPress={() => setSelectedCategory(cat.id)}
+                  onPress={() => {
+                    LayoutAnimation.configureNext(
+                      LayoutAnimation.Presets.spring,
+                    );
+                    setSelectedCategory(cat.id);
+                  }}
                   activeOpacity={0.7}
                   style={[
                     themedLocalStyles.categoryItem,
                     {
                       backgroundColor:
                         selectedCategory === cat.id
-                          ? isDark
-                            ? "rgba(255,255,255,0.1)"
-                            : "rgba(0,0,0,0.05)"
-                          : "transparent",
+                          ? colors.REMINDER + (isDark ? "30" : "15")
+                          : colors.SECTION_TEXT + (isDark ? "10" : "08"),
                       borderColor:
                         selectedCategory === cat.id
-                          ? colors.PRIMARY_ACTIVE_BUTTON
-                          : isDark
-                            ? "rgba(255,255,255,0.1)"
-                            : "rgba(0,0,0,0.1)",
-                      borderWidth: selectedCategory === cat.id ? 1.5 : 1,
+                          ? colors.REMINDER
+                          : colors.SECTION_TEXT + (isDark ? "20" : "15"),
+                      borderWidth: selectedCategory === cat.id ? 0.5 : 0.2,
                     },
                   ]}
                 >
@@ -401,16 +412,16 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     size={14}
                     color={
                       selectedCategory === cat.id
-                        ? colors.PRIMARY_ACTIVE_BUTTON
+                        ? colors.REMINDER
                         : colors.SECTION_TEXT
                     }
                   />
                   <StyledText
                     style={{
-                      fontSize: 11,
+                      fontSize: 10,
                       color:
                         selectedCategory === cat.id
-                          ? colors.PRIMARY_TEXT
+                          ? colors.REMINDER
                           : colors.SECTION_TEXT,
                       fontWeight: selectedCategory === cat.id ? "700" : "500",
                     }}
@@ -423,7 +434,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
         </View>
 
         {/* 2. Reminder Section */}
-        <View style={[themedLocalStyles.tableContainer, { marginTop: 16 }]}>
+        <View style={[themedLocalStyles.tableContainer, { marginTop: 3 }]}>
           {/* Date Row */}
           <TouchableOpacity
             style={themedLocalStyles.tableRow}

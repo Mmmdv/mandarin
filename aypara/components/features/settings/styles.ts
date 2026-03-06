@@ -40,6 +40,7 @@ export const getSettingsStyles = (colors: any) =>
     },
     headerRow: {
       flexDirection: "row",
+      flexWrap: "wrap",
       alignItems: "center",
       justifyContent: "center",
       gap: 12,

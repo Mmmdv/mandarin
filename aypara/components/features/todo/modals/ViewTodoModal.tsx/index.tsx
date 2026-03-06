@@ -6,8 +6,8 @@ import { formatDate, formatDuration } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppSelector } from "@/store";
 import {
-  NotificationStatus,
-  selectNotificationById,
+    NotificationStatus,
+    selectNotificationById,
 } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
@@ -54,6 +54,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
         <View
           style={{
             flexDirection: "row",
+            flexWrap: "wrap",
             alignItems: "center",
             gap: 12,
             justifyContent: "center",

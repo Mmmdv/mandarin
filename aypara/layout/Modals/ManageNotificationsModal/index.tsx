@@ -151,125 +151,124 @@ const ManageNotificationsModal: React.FC<ManageNotificationsModalProps> = ({
   ];
 
   return (
-    <>
-      <StyledModal isOpen={isOpen} onClose={onClose} closeOnOverlayPress={true}>
-        <View style={styles.container}>
-          <View style={styles.headerRow}>
-            <View
-              style={[
-                styles.iconContainer,
-                { shadowColor: colors.PRIMARY_ACTIVE_BUTTON },
-              ]}
-            >
-              <Ionicons
-                name="notifications-outline"
-                size={28}
-                color={colors.PRIMARY_ACTIVE_BUTTON}
-              />
+    <StyledModal
+      isOpen={isOpen || !!pendingDisable}
+      onClose={() => (pendingDisable ? setPendingDisable(null) : onClose())}
+      closeOnOverlayPress={true}
+    >
+      <View style={styles.container}>
+        {!pendingDisable ? (
+          <>
+            <View style={styles.headerRow}>
+              <View
+                style={[
+                  styles.iconContainer,
+                  { shadowColor: colors.PRIMARY_ACTIVE_BUTTON },
+                ]}
+              >
+                <Ionicons
+                  name="notifications-outline"
+                  size={28}
+                  color={colors.PRIMARY_ACTIVE_BUTTON}
+                />
+              </View>
+              <StyledText style={styles.headerText}>
+                {t("manage_notification_categories")}
+              </StyledText>
             </View>
-            <StyledText style={styles.headerText}>
-              {t("manage_notification_categories")}
-            </StyledText>
-          </View>
 
-          <View style={styles.divider} />
+            <View style={styles.divider} />
 
-          <View style={{ width: "100%" }}>
-            <View style={styles.listContainer}>
-              {subSwitches.map((item, index) => (
-                <View
-                  key={item.key}
-                  style={[
-                    styles.row,
-                    {
-                      borderBottomWidth:
-                        index < subSwitches.length - 1 ? 0.5 : 0,
-                    },
-                  ]}
-                >
+            <View style={{ width: "100%" }}>
+              <View style={styles.listContainer}>
+                {subSwitches.map((item, index) => (
                   <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 12,
-                    }}
+                    key={item.key}
+                    style={[
+                      styles.row,
+                      {
+                        borderBottomWidth:
+                          index < subSwitches.length - 1 ? 0.5 : 0,
+                      },
+                    ]}
                   >
-                    <Ionicons
-                      name={item.icon}
-                      size={20}
-                      color={colors.PRIMARY_TEXT}
-                      style={{ opacity: 0.7 }}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 12,
+                      }}
+                    >
+                      <Ionicons
+                        name={item.icon}
+                        size={20}
+                        color={colors.PRIMARY_TEXT}
+                        style={{ opacity: 0.7 }}
+                      />
+                      <StyledText style={styles.rowLabel}>
+                        {item.label}
+                      </StyledText>
+                    </View>
+                    <CustomSwitch
+                      onValueChange={(value) =>
+                        handleToggle(item.key as any, value)
+                      }
+                      value={item.value}
                     />
-                    <StyledText style={styles.rowLabel}>
-                      {item.label}
-                    </StyledText>
                   </View>
-                  <CustomSwitch
-                    onValueChange={(value) =>
-                      handleToggle(item.key as any, value)
-                    }
-                    value={item.value}
-                  />
-                </View>
-              ))}
+                ))}
+              </View>
             </View>
-          </View>
 
-          <View style={[modalStyles.buttonsContainer, { width: "100%" }]}>
-            <StyledButton
-              label={t("close")}
-              onPress={onClose}
-              variant="dark_button"
-              style={{ flex: 1 }}
-            />
-          </View>
-        </View>
-      </StyledModal>
-
-      {/* Internal Confirmation Modal */}
-      <StyledModal
-        isOpen={!!pendingDisable}
-        onClose={() => setPendingDisable(null)}
-        closeOnOverlayPress={true}
-      >
-        <View style={styles.container}>
-          <View style={styles.headerRow}>
-            <View style={[styles.iconContainer, { shadowColor: "#FF6B6B" }]}>
-              <Ionicons
-                name="notifications-off-outline"
-                size={28}
-                color="#FF6B6B"
+            <View style={[modalStyles.buttonsContainer, { width: "100%" }]}>
+              <StyledButton
+                label={t("close")}
+                onPress={onClose}
+                variant="dark_button"
+                style={{ flex: 1 }}
               />
             </View>
-            <StyledText style={styles.headerText}>{t("attention")}</StyledText>
-          </View>
+          </>
+        ) : (
+          <>
+            <View style={styles.headerRow}>
+              <View style={[styles.iconContainer, { shadowColor: "#FF6B6B" }]}>
+                <Ionicons
+                  name="notifications-off-outline"
+                  size={28}
+                  color="#FF6B6B"
+                />
+              </View>
+              <StyledText style={styles.headerText}>
+                {t("attention")}
+              </StyledText>
+            </View>
 
-          <View style={styles.divider} />
+            <View style={styles.divider} />
 
-          <StyledText style={styles.messageText}>
-            {pendingDisable
-              ? t("disable_category_confirm").replace(
-                  "{{count}}",
-                  String(pendingDisable.count),
-                )
-              : ""}
-          </StyledText>
+            <StyledText style={styles.messageText}>
+              {t("disable_category_confirm").replace(
+                "{{count}}",
+                String(pendingDisable.count),
+              )}
+            </StyledText>
 
-          <View style={[modalStyles.buttonsContainer, { marginTop: 10 }]}>
-            <StyledButton
-              label={t("cancel")}
-              onPress={() => setPendingDisable(null)}
-              variant="dark_button"
-            />
-            <StyledButton
-              label={t("confirm")}
-              onPress={confirmDisable}
-              variant="dark_button"
-            />
-          </View>
-        </View>
-      </StyledModal>
-    </>
+            <View style={[modalStyles.buttonsContainer, { marginTop: 10 }]}>
+              <StyledButton
+                label={t("cancel")}
+                onPress={() => setPendingDisable(null)}
+                variant="dark_button"
+              />
+              <StyledButton
+                label={t("confirm")}
+                onPress={confirmDisable}
+                variant="dark_button"
+              />
+            </View>
+          </>
+        )}
+      </View>
+    </StyledModal>
   );
 };
 

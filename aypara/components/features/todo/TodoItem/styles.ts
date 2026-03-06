@@ -139,6 +139,16 @@ export const getStyles = (colors: any) =>
       color: colors.PLACEHOLDER,
       marginTop: 2,
     },
+    categoryBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      paddingHorizontal: 6,
+      paddingVertical: 2.5,
+      borderRadius: 6,
+      borderWidth: 0.5,
+      alignSelf: "flex-start",
+    },
   });
 
 export const celebrationStyles = StyleSheet.create({
