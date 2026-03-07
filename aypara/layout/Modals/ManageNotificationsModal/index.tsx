@@ -12,7 +12,7 @@ import {
 import { editBirthday, selectBirthdays } from "@/store/slices/birthdaySlice";
 import {
     cancelNotificationsByIds,
-    updateNotificationStatus
+    updateNotificationStatus,
 } from "@/store/slices/notificationSlice";
 import { cancelAllReminders, selectTodos } from "@/store/slices/todoSlice";
 import { Ionicons } from "@expo/vector-icons";
@@ -47,15 +47,27 @@ const ManageNotificationsModal: React.FC<ManageNotificationsModalProps> = ({
     key: keyof UpdateAppSettingsPayload,
   ): number => {
     if (key === "todoNotifications") {
-      return todos.filter(
-        (todo) =>
+      let count = 0;
+      const now = new Date();
+      for (const todo of todos) {
+        if (todo.isCompleted || todo.isArchived) continue;
+
+        if (todo.isIterative && todo.iterativeDates) {
+          for (const dateItem of todo.iterativeDates) {
+            if (dateItem.notificationId && new Date(dateItem.date) > now) {
+              count++;
+            }
+          }
+        } else if (
           todo.notificationId &&
-          !todo.isCompleted &&
-          !todo.isArchived &&
           todo.reminder &&
-          new Date(todo.reminder) > new Date() &&
-          !todo.reminderCancelled,
-      ).length;
+          new Date(todo.reminder) > now &&
+          !todo.reminderCancelled
+        ) {
+          count++;
+        }
+      }
+      return count;
     }
     if (key === "birthdayNotifications") {
       return birthdays.filter((b) => !!b.notificationId).length;
@@ -72,7 +84,18 @@ const ManageNotificationsModal: React.FC<ManageNotificationsModalProps> = ({
       const idsToCancel: string[] = [];
       try {
         for (const todo of todos) {
-          if (todo.notificationId && !todo.isCompleted && !todo.isArchived) {
+          if (todo.isCompleted || todo.isArchived) continue;
+
+          if (todo.isIterative && todo.iterativeDates) {
+            for (const dateItem of todo.iterativeDates) {
+              if (dateItem.notificationId) {
+                idsToCancel.push(dateItem.notificationId);
+                await Notifications.cancelScheduledNotificationAsync(
+                  dateItem.notificationId,
+                );
+              }
+            }
+          } else if (todo.notificationId) {
             idsToCancel.push(todo.notificationId);
             await Notifications.cancelScheduledNotificationAsync(
               todo.notificationId,

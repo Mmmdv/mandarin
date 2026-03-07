@@ -37,7 +37,9 @@ const DateSelectionModal: React.FC<DateSelectionModalProps> = ({
 
         <View style={styles.divider} />
 
-        <StyledText style={styles.messageText}>{t("select_date")}</StyledText>
+        <StyledText style={styles.messageText}>
+          {t("select_at_least_two_dates")}
+        </StyledText>
 
         <View style={styles.buttonsContainer}>
           <StyledButton

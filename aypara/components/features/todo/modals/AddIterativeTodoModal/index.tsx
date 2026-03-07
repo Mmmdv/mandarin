@@ -3,8 +3,8 @@ import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { setupCalendarLocales } from "@/config/calendar";
 import {
-  checkSystemNotifications,
-  schedulePushNotification,
+    checkSystemNotifications,
+    schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
 import { getShortMonthName } from "@/helpers/date";
@@ -24,26 +24,26 @@ import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
 } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Animated,
-  Keyboard,
-  LayoutAnimation,
-  Platform,
-  Pressable,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  UIManager,
-  View,
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Keyboard,
+    LayoutAnimation,
+    Platform,
+    Pressable,
+    ScrollView,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    UIManager,
+    View,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { getAddStyles } from "./styles";
@@ -154,7 +154,7 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
       return;
     }
 
-    if (selectedDates.length === 0) {
+    if (selectedDates.length < 2) {
       picker.setShowDateSelectionAlert(true);
       return;
     }

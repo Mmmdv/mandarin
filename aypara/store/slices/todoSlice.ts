@@ -189,8 +189,6 @@ export const todoSlice = createSlice({
             } else {
               // No more dates left
               target.isCompleted = true;
-              target.reminder = undefined;
-              target.notificationId = undefined;
             }
           } else {
             // Edge case: button clicked but no pending dates? Mark as complete.

@@ -246,6 +246,19 @@ const TodoList: React.FC<TodoListProps> = ({
     setViewMode((prev) => (prev === "list" ? "card" : "list"));
   };
 
+  const handleCheckTodo = (id: string) => {
+    const todo = todos.find((t) => t.id === id);
+    onCheckTodo(id);
+
+    if (todo?.isIterative) {
+      setMenuTarget(todo);
+      // Small delay to allow TodoItem's celebration animation and layout transition to settle
+      setTimeout(() => {
+        setIsViewModalOpen(true);
+      }, 750);
+    }
+  };
+
   const handleOpenMenu = (
     todo: Todo,
     anchor: { x: number; y: number; width: number; height: number },
@@ -331,6 +344,10 @@ const TodoList: React.FC<TodoListProps> = ({
       </View>
     );
   }
+
+  const activeTodo = menuTarget
+    ? todos.find((t) => t.id === menuTarget.id) || menuTarget
+    : undefined;
 
   return (
     <View style={{ flex: 1, overflow: "hidden" }}>
@@ -831,7 +848,7 @@ const TodoList: React.FC<TodoListProps> = ({
                       key={item.id}
                       {...item}
                       deleteTodo={onDeleteTodo}
-                      checkTodo={onCheckTodo}
+                      checkTodo={handleCheckTodo}
                       editTodo={onEditTodo}
                       retryTodo={onRetryTodo}
                       viewMode={viewMode}
@@ -970,7 +987,7 @@ const TodoList: React.FC<TodoListProps> = ({
                       key={item.id}
                       {...item}
                       deleteTodo={onDeleteTodo}
-                      checkTodo={onCheckTodo}
+                      checkTodo={handleCheckTodo}
                       editTodo={onEditTodo}
                       archiveTodo={onArchiveTodo}
                       retryTodo={onRetryTodo}
@@ -1108,7 +1125,7 @@ const TodoList: React.FC<TodoListProps> = ({
                   key={item.id}
                   {...item}
                   deleteTodo={onDeleteTodo}
-                  checkTodo={onCheckTodo}
+                  checkTodo={handleCheckTodo}
                   editTodo={onEditTodo}
                   archiveTodo={onArchiveTodo}
                   retryTodo={onRetryTodo}
@@ -1140,7 +1157,7 @@ const TodoList: React.FC<TodoListProps> = ({
       />
 
       {/* Centralized Modals */}
-      {menuTarget && (
+      {activeTodo && (
         <>
           <TodoMenuModal
             isOpen={isMenuModalOpen}
@@ -1150,8 +1167,9 @@ const TodoList: React.FC<TodoListProps> = ({
             onDelete={() => setIsDeleteModalOpen(true)}
             onArchive={() => setIsArchiveModalOpen(true)}
             onView={() => setIsViewModalOpen(true)}
-            isCompleted={menuTarget.isCompleted}
-            isArchived={!!menuTarget.isArchived}
+            isCompleted={activeTodo.isCompleted}
+            isArchived={!!activeTodo.isArchived}
+            isIterative={!!activeTodo.isIterative}
             archiveTodoAvailable={!!onArchiveTodo}
             anchorPosition={menuAnchor}
           />
@@ -1164,7 +1182,7 @@ const TodoList: React.FC<TodoListProps> = ({
             }}
             onUpdate={(title, reminder, notificationId, category) => {
               onEditTodo(
-                menuTarget.id,
+                activeTodo.id,
                 title,
                 reminder,
                 notificationId,
@@ -1173,10 +1191,10 @@ const TodoList: React.FC<TodoListProps> = ({
               setIsEditModalOpen(false);
               setMenuTarget(undefined);
             }}
-            title={menuTarget.title}
-            reminder={menuTarget.reminder}
-            notificationId={menuTarget.notificationId}
-            category={menuTarget.category}
+            title={activeTodo.title}
+            reminder={activeTodo.reminder}
+            notificationId={activeTodo.notificationId}
+            category={activeTodo.category}
             categoryTitle={categoryTitle}
             categoryIcon={categoryIcon}
           />
@@ -1188,11 +1206,11 @@ const TodoList: React.FC<TodoListProps> = ({
               setMenuTarget(undefined);
             }}
             onDelete={() => {
-              onDeleteTodo(menuTarget.id);
+              onDeleteTodo(activeTodo.id);
               setIsDeleteModalOpen(false);
               setMenuTarget(undefined);
             }}
-            title={menuTarget.title}
+            title={activeTodo.title}
           />
 
           <ArchiveTodoModal
@@ -1202,11 +1220,11 @@ const TodoList: React.FC<TodoListProps> = ({
               setMenuTarget(undefined);
             }}
             onArchive={() => {
-              if (onArchiveTodo) onArchiveTodo(menuTarget.id);
+              if (onArchiveTodo) onArchiveTodo(activeTodo.id);
               setIsArchiveModalOpen(false);
               setMenuTarget(undefined);
             }}
-            title={menuTarget.title}
+            title={activeTodo.title}
           />
 
           <RetryTodoModal
@@ -1217,7 +1235,7 @@ const TodoList: React.FC<TodoListProps> = ({
             }}
             onRetry={(delayType) => {
               onRetryTodo(
-                menuTarget.id,
+                activeTodo.id,
                 delayType,
                 categoryTitle,
                 categoryIcon,
@@ -1233,17 +1251,18 @@ const TodoList: React.FC<TodoListProps> = ({
               setIsViewModalOpen(false);
               setMenuTarget(undefined);
             }}
-            title={menuTarget.title}
-            createdAt={menuTarget.createdAt}
-            updatedAt={menuTarget.updatedAt}
-            completedAt={menuTarget.completedAt}
-            reminder={menuTarget.reminder}
-            reminderCancelled={menuTarget.reminderCancelled}
-            notificationId={menuTarget.notificationId}
-            category={menuTarget.category}
-            isIterative={menuTarget.isIterative}
-            completedCount={menuTarget.completedCount}
-            iterativeDates={menuTarget.iterativeDates}
+            title={activeTodo.title}
+            createdAt={activeTodo.createdAt}
+            updatedAt={activeTodo.updatedAt}
+            completedAt={activeTodo.completedAt}
+            reminder={activeTodo.reminder}
+            reminderCancelled={activeTodo.reminderCancelled}
+            notificationId={activeTodo.notificationId}
+            category={activeTodo.category}
+            isCompleted={activeTodo.isCompleted}
+            isIterative={activeTodo.isIterative}
+            completedCount={activeTodo.completedCount}
+            iterativeDates={activeTodo.iterativeDates}
           />
         </>
       )}

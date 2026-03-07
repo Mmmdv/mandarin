@@ -6,8 +6,8 @@ import { getReminderStatusProps } from "@/helpers/reminder";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppSelector } from "@/store";
 import {
-  NotificationStatus,
-  selectNotificationById,
+    NotificationStatus,
+    selectNotificationById,
 } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,6 +26,7 @@ type ViewTodoModalProps = {
   reminderCancelled?: boolean;
   notificationId?: string;
   category?: string;
+  isCompleted?: boolean;
   isIterative?: boolean;
   completedCount?: number;
   iterativeDates?: {
@@ -47,6 +48,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
   reminderCancelled,
   notificationId,
   category,
+  isCompleted,
   isIterative,
   completedCount,
   iterativeDates,
@@ -65,7 +67,7 @@ const ViewTodoModal: React.FC<ViewTodoModalProps> = ({
   const { isCrossedOut, iconName, iconColor, opacity } = getReminderStatusProps(
     reminderStatus,
     reminderCancelled,
-    !!completedAt,
+    isCompleted,
     colors,
   );
 

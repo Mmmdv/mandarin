@@ -136,3 +136,8 @@ export const formatDuration = (start: string, end: string, t: any) => {
   }
   return `${diffMins} ${t("minutes_short")}`;
 };
+export const formatTimeOnly = (date: Date) => {
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+};

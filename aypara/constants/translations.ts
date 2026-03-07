@@ -11,6 +11,7 @@ export const TRANSLATIONS = {
     add: "Əlavə et",
     select_time: "Zəhmət olmasa saat seçin",
     select_date: "Zəhmət olmasa tarix seçin",
+    select_at_least_two_dates: "Ən az 2 tarix seçilməlidir",
     save: "Yadda saxla",
     cancel: "Ləğv et",
     delete: "Sil",
@@ -319,9 +320,13 @@ export const TRANSLATIONS = {
     birthday_notification_today_body:
       "Bugün {{name}} ad günüdür! \nTəbrik etmək üçün sadəcə toxun",
     birthday_already_greeted: "Artıq təbrik etmişəm",
-    birthday_confirm_greeted_title: "Təbrik etmisiniz?",
     birthday_confirm_greeted_message:
       "Bu şəxsi artıq təbrik etdiyinizi təsdiqləyirsiniz?",
+    today_tasks_empty_title: "Tapşırıq yoxdur",
+    today_tasks_empty_desc:
+      "Seçilmiş tarixdə hər hansı bir tapşırıq tapılmadı.",
+    today_no_tasks_interval: "bu saat aralığında vacib task yoxdur",
+    iterative: "Təkrar",
   },
   en: {
     welcome: "Welcome",
@@ -335,6 +340,7 @@ export const TRANSLATIONS = {
     add: "Add",
     select_time: "Please select a time",
     select_date: "Please select a date",
+    select_at_least_two_dates: "At least 2 dates must be selected",
     save: "Save",
     cancel: "Cancel",
     delete: "Delete",
@@ -644,9 +650,12 @@ export const TRANSLATIONS = {
     birthday_notification_today_body:
       "It's {{name}}'s birthday today! \nSimply click to send a greeting",
     birthday_already_greeted: "Already greeted",
-    birthday_confirm_greeted_title: "Already greeted?",
     birthday_confirm_greeted_message:
       "Do you confirm that you have already greeted this person?",
+    today_tasks_empty_title: "No Tasks",
+    today_tasks_empty_desc: "No tasks found for the selected date.",
+    today_no_tasks_interval: "no important tasks in this time interval",
+    iterative: "Iterative",
   },
   ru: {
     welcome: "Добро пожаловать",
@@ -660,6 +669,7 @@ export const TRANSLATIONS = {
     add: "Добавить",
     select_time: "Пожалуйста, выберите время",
     select_date: "Пожалуйста, выберите дату",
+    select_at_least_two_dates: "Необходимо выбрать минимум 2 даты",
     save: "Сохранить",
     cancel: "Отменить",
     delete: "Удалить",
@@ -975,6 +985,10 @@ export const TRANSLATIONS = {
     birthday_confirm_greeted_title: "Уже поздравили?",
     birthday_confirm_greeted_message:
       "Вы подтверждаете, что уже поздравили этого человека?",
+    today_tasks_empty_title: "Задач нет",
+    today_tasks_empty_desc: "Задач на выбранную дату не найдено.",
+    today_no_tasks_interval: "в этом временном интервале нет важных задач",
+    iterative: "Повтор",
   },
 };
 

@@ -144,24 +144,44 @@ const useTodo = () => {
 
   const onDeleteTodo = async (id: Todo["id"]) => {
     const todo = todos.find((t) => t.id === id);
-    if (todo && todo.notificationId) {
-      const notification = notifications.find(
-        (n) => n.id === todo.notificationId,
-      );
-      if (notification && notification.status === "Gözlənilir") {
-        try {
-          await Notifications.cancelScheduledNotificationAsync(
-            todo.notificationId,
-          );
-        } catch {
-          // silently ignore
+    if (todo) {
+      if (todo.isIterative && todo.iterativeDates) {
+        for (const dateItem of todo.iterativeDates) {
+          if (dateItem.notificationId) {
+            try {
+              await Notifications.cancelScheduledNotificationAsync(
+                dateItem.notificationId,
+              );
+            } catch {
+              /* ignore */
+            }
+            dispatch(
+              updateNotificationStatus({
+                id: dateItem.notificationId,
+                status: "Ləğv olunub",
+              }),
+            );
+          }
         }
-        dispatch(
-          updateNotificationStatus({
-            id: todo.notificationId,
-            status: "Ləğv olunub",
-          }),
+      } else if (todo.notificationId) {
+        const notification = notifications.find(
+          (n) => n.id === todo.notificationId,
         );
+        if (notification && notification.status === "Gözlənilir") {
+          try {
+            await Notifications.cancelScheduledNotificationAsync(
+              todo.notificationId,
+            );
+          } catch {
+            /* ignore */
+          }
+          dispatch(
+            updateNotificationStatus({
+              id: todo.notificationId,
+              status: "Ləğv olunub",
+            }),
+          );
+        }
       }
     }
     dispatch(deleteTodo(id));
@@ -206,24 +226,44 @@ const useTodo = () => {
 
   const onArchiveTodo = async (id: Todo["id"]) => {
     const todo = todos.find((t) => t.id === id);
-    if (todo && todo.notificationId) {
-      const notification = notifications.find(
-        (n) => n.id === todo.notificationId,
-      );
-      if (notification && notification.status === "Gözlənilir") {
-        try {
-          await Notifications.cancelScheduledNotificationAsync(
-            todo.notificationId,
-          );
-        } catch {
-          // silently ignore
+    if (todo) {
+      if (todo.isIterative && todo.iterativeDates) {
+        for (const dateItem of todo.iterativeDates) {
+          if (dateItem.notificationId) {
+            try {
+              await Notifications.cancelScheduledNotificationAsync(
+                dateItem.notificationId,
+              );
+            } catch {
+              /* ignore */
+            }
+            dispatch(
+              updateNotificationStatus({
+                id: dateItem.notificationId,
+                status: "Ləğv olunub",
+              }),
+            );
+          }
         }
-        dispatch(
-          updateNotificationStatus({
-            id: todo.notificationId,
-            status: "Ləğv olunub",
-          }),
+      } else if (todo.notificationId) {
+        const notification = notifications.find(
+          (n) => n.id === todo.notificationId,
         );
+        if (notification && notification.status === "Gözlənilir") {
+          try {
+            await Notifications.cancelScheduledNotificationAsync(
+              todo.notificationId,
+            );
+          } catch {
+            /* ignore */
+          }
+          dispatch(
+            updateNotificationStatus({
+              id: todo.notificationId,
+              status: "Ləğv olunub",
+            }),
+          );
+        }
       }
     }
     dispatch(archiveTodo(id));
