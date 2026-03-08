@@ -1,6 +1,7 @@
 import GestureWrapper from "@/components/layout/GestureWrapper";
 import StyledHeader from "@/components/ui/StyledHeader";
 import StyledText from "@/components/ui/StyledText";
+import { getLocalIsoDate } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { RootState, useAppDispatch, useAppSelector } from "@/store";
 import { Lang, Theme, updateAppSetting } from "@/store/slices/appSlice";
@@ -75,7 +76,7 @@ export default function AdminScreen() {
             for (let i = mockPeriod; i >= 0; i--) {
               const d = new Date(today);
               d.setDate(today.getDate() - i);
-              const dateStr = d.toISOString().split("T")[0];
+              const dateStr = getLocalIsoDate(d);
 
               // Lower probabilities to create realistic gaps
               if (Math.random() < 0.5) {

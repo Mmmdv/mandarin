@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export const getStyles = (colors: any) =>
+export const getStyles = (colors: any, isDark: boolean) =>
   StyleSheet.create({
     mainContainer: {
       flex: 1,
@@ -36,7 +36,7 @@ export const getStyles = (colors: any) =>
     },
     hourRow: {
       flexDirection: "row",
-      minHeight: 60,
+      minHeight: 84,
     },
     timeLabelContainer: {
       width: 65,
@@ -49,19 +49,25 @@ export const getStyles = (colors: any) =>
     },
     taskColumn: {
       flex: 1,
-      borderTopWidth: 0.5,
       paddingRight: 15,
-      paddingVertical: 5,
-      gap: 6,
+      paddingVertical: 8,
+      gap: 8,
     },
     taskCard: {
-      borderRadius: 12,
+      borderRadius: 15,
       paddingVertical: 10,
-      paddingHorizontal: 12,
-      borderWidth: 0.5,
+      paddingHorizontal: 14,
+      minHeight: 80,
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      gap: 12,
+      backgroundColor: isDark
+        ? "rgba(59, 130, 246, 0.15)"
+        : "rgba(59, 130, 246, 0.08)",
+      borderWidth: 0.3,
+      borderColor: isDark
+        ? "rgba(100, 116, 139, 0.3)"
+        : "rgba(100, 116, 139, 0.15)",
     },
     taskInfo: {
       flex: 1,
@@ -75,6 +81,7 @@ export const getStyles = (colors: any) =>
       borderRadius: 8,
       alignItems: "center",
       justifyContent: "center",
+      backgroundColor: colors.PLACEHOLDER_SECOND + "10",
     },
     taskTextContent: {
       flex: 1,
@@ -83,14 +90,21 @@ export const getStyles = (colors: any) =>
       fontSize: 14,
       fontWeight: "600",
     },
-    taskSubInfo: {
+    metadataRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      marginTop: 2,
+      marginTop: 6,
+    },
+    taskSubInfo: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      marginTop: 4,
     },
     taskTime: {
       fontSize: 11,
+      fontWeight: "500",
     },
     iterativeBadge: {
       width: 22,
@@ -103,6 +117,6 @@ export const getStyles = (colors: any) =>
       marginLeft: 4,
     },
     emptyHourSlot: {
-      height: 40,
+      height: 56,
     },
   });

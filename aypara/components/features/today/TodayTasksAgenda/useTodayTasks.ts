@@ -1,22 +1,18 @@
+import { getLocalIsoDate } from "@/helpers/date";
 import { useTheme } from "@/hooks/useTheme";
 import { selectBirthdays } from "@/store/slices/birthdaySlice";
 import { selectNotifications } from "@/store/slices/notificationSlice";
 import { selectTodos } from "@/store/slices/todoSlice";
 import { Birthday } from "@/types/birthday";
 import { Todo } from "@/types/todo";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
 import { FlatList } from "react-native";
 import { useSelector } from "react-redux";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
-const formatDateISO = (date: Date) => {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-};
+// getLocalIsoDate from helpers/date is used instead
 
 export type AgendaItem = (Todo | Birthday) & {
   isBirthday?: boolean;
@@ -29,7 +25,10 @@ export const useTodayTasks = () => {
   const notifications = useSelector(selectNotifications);
   const router = useRouter();
 
-  const [selectedDate, setSelectedDate] = useState(formatDateISO(new Date()));
+  const params = useLocalSearchParams<{ date?: string }>();
+  const [selectedDate, setSelectedDate] = useState(
+    params.date || getLocalIsoDate(),
+  );
 
   const [selectedItem, setSelectedItem] = useState<AgendaItem | null>(null);
   const [activeModal, setActiveModal] = useState<"todo" | "birthday" | null>(
@@ -53,7 +52,7 @@ export const useTodayTasks = () => {
       const date = new Date();
       date.setDate(date.getDate() + i);
       d.push({
-        full: formatDateISO(date),
+        full: getLocalIsoDate(date),
         day: date.getDate(),
         weekday: date.toLocaleDateString(
           lang === "az" ? "az-AZ" : lang === "ru" ? "ru-RU" : "en-US",
@@ -64,6 +63,11 @@ export const useTodayTasks = () => {
     }
     return d;
   }, [lang]);
+
+  const initialScrollIndex = useMemo(() => {
+    const index = dates.findIndex((d) => d.full === selectedDate);
+    return Math.max(0, index - 1);
+  }, [dates, selectedDate]);
 
   const tasksByHour = useMemo(() => {
     const map: Record<number, AgendaItem[]> = {};
@@ -77,7 +81,7 @@ export const useTodayTasks = () => {
 
       if (todo.reminder) {
         const d = new Date(todo.reminder);
-        if (formatDateISO(d) === selectedDate) {
+        if (getLocalIsoDate(d) === selectedDate) {
           const hour = d.getHours();
           if (hour >= 0 && hour < 24) {
             map[hour].push(todo);
@@ -88,7 +92,7 @@ export const useTodayTasks = () => {
       if (todo.isIterative && todo.iterativeDates) {
         todo.iterativeDates.forEach((occ) => {
           const d = new Date(occ.date);
-          if (formatDateISO(d) === selectedDate) {
+          if (getLocalIsoDate(d) === selectedDate) {
             const hour = d.getHours();
             if (hour >= 0 && hour < 24) {
               // Avoid duplicates if both standard reminder and iterative occurrence match
@@ -113,7 +117,7 @@ export const useTodayTasks = () => {
       );
       if (birthdayNotif) {
         const d = new Date(birthdayNotif.date);
-        if (formatDateISO(d) === selectedDate) {
+        if (getLocalIsoDate(d) === selectedDate) {
           const hour = d.getHours();
           if (!isNaN(hour) && hour >= 0 && hour < 24) {
             map[hour].push({
@@ -160,17 +164,6 @@ export const useTodayTasks = () => {
     }
   };
 
-  const getPriorityColor = (item: AgendaItem) => {
-    if (item.isBirthday) return "#F472B6"; // Pink for birthdays
-
-    const task = item as Todo;
-    if (task.isCompleted) return "#10B981";
-    const isOverdue = task.reminder
-      ? new Date(task.reminder) < new Date()
-      : false;
-    return isOverdue ? "#EF4444" : "#3B82F6";
-  };
-
   const handleNavigateToPage = (item: AgendaItem) => {
     if (item.isBirthday) {
       router.push("/birthday");
@@ -188,13 +181,13 @@ export const useTodayTasks = () => {
     handleDateSelect,
     handleTaskPress,
     handleNavigateToPage,
-    getPriorityColor,
     notifications,
     selectedItem,
     setSelectedItem,
     activeModal,
     setActiveModal,
     flatListRef,
+    initialScrollIndex,
     t,
   };
 };

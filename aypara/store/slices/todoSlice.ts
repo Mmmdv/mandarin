@@ -1,3 +1,4 @@
+import { getLocalIsoDate } from "@/helpers/date";
 import { Todo } from "@/types/todo";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -62,7 +63,7 @@ const defaultDaily: DailyTodoStats = {
 };
 
 function getToday(): string {
-  return new Date().toISOString().split("T")[0];
+  return getLocalIsoDate();
 }
 
 function ensureDaily(state: TodoState, date: string): DailyTodoStats {

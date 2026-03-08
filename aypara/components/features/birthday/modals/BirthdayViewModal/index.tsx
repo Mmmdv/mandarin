@@ -191,7 +191,7 @@ const BirthdayViewModal: React.FC<BirthdayViewModalProps> = ({
                   <Ionicons
                     name="hourglass-outline"
                     size={14}
-                    color={colors.REMINDER}
+                    color={colors.PLACEHOLDER_SECOND}
                   />
                 )}
                 <StyledText

@@ -162,7 +162,7 @@ export const TRANSLATIONS = {
     biometrics_desc: "Tətbiqə giriş üçün Face ID / Barmaq izi tələb olunacaq",
     biometrics_not_available: "Biometrik doğrulama cihazınızda dəstəklənmir",
     authenticate_to_open: "Tətbiqi açmaq üçün doğrulama lazımdır",
-    today_no_tasks: "Bugün vacib task yoxdur",
+    today_no_tasks: "Bugün üçün vacib tapşırıq yoxdur",
     today_have_nice_day: "Rahat günün olsun! 🎉",
     today_view_more: "Davamına bax",
     avg_mood: "Mood Ort.",
@@ -213,7 +213,7 @@ export const TRANSLATIONS = {
     mandarin_tree: "Mandarin ağacı",
     breathing_desc: "Zehnini sakitləşdir və rahatla",
     all: "Hamısı",
-    selected_date_no_tasks: "Seçilmiş tarixə vacib task yoxdur",
+    selected_date_no_tasks: "Seçilmiş tarixə vacib tapşırıq yoxdur",
     today_no_overdue_tasks: "Bugün vaxtı keçən task yoxdur",
     today_no_pending_tasks: "Bugün gözlənilən task yoxdur",
     selected_date_no_overdue_tasks: "Seçilmiş tarixə vaxtı keçən task yoxdur",
@@ -325,8 +325,8 @@ export const TRANSLATIONS = {
     today_tasks_empty_title: "Tapşırıq yoxdur",
     today_tasks_empty_desc:
       "Seçilmiş tarixdə hər hansı bir tapşırıq tapılmadı.",
-    today_no_tasks_interval: "bu saat aralığında vacib task yoxdur",
-    iterative: "Təkrar",
+    today_no_tasks_interval: "bu saat aralığında vacib tapşırıq yoxdur",
+    iterative: "Təkrarlanan",
   },
   en: {
     welcome: "Welcome",
@@ -988,7 +988,7 @@ export const TRANSLATIONS = {
     today_tasks_empty_title: "Задач нет",
     today_tasks_empty_desc: "Задач на выбранную дату не найдено.",
     today_no_tasks_interval: "в этом временном интервале нет важных задач",
-    iterative: "Повтор",
+    iterative: "Повторяющаяся",
   },
 };
 

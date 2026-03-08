@@ -1,3 +1,4 @@
+import { getLocalIsoDate } from "@/helpers/date";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import * as Localization from "expo-localization";
 
@@ -124,7 +125,7 @@ export const appSlice = createSlice({
       state.breathingStats.totalDurationSec += action.payload;
       // Daily history
       if (!state.breathingHistory) state.breathingHistory = {};
-      const today = new Date().toISOString().split("T")[0];
+      const today = getLocalIsoDate();
       if (!state.breathingHistory[today]) {
         state.breathingHistory[today] = { sessions: 0, durationSec: 0 };
       }

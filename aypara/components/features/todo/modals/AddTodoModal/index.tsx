@@ -491,11 +491,11 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                       {
                         backgroundColor:
                           selectedCategory === cat.id
-                            ? colors.REMINDER + (isDark ? "30" : "15")
+                            ? colors.PLACEHOLDER_SECOND + (isDark ? "30" : "15")
                             : colors.SECTION_TEXT + (isDark ? "10" : "08"),
                         borderColor:
                           selectedCategory === cat.id
-                            ? colors.REMINDER
+                            ? colors.PLACEHOLDER_SECOND
                             : colors.SECTION_TEXT + (isDark ? "20" : "15"),
                         borderWidth: selectedCategory === cat.id ? 0.5 : 0.2,
                       },
@@ -506,7 +506,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                       size={14}
                       color={
                         selectedCategory === cat.id
-                          ? colors.REMINDER
+                          ? colors.PLACEHOLDER_SECOND
                           : colors.SECTION_TEXT
                       }
                     />
@@ -515,7 +515,7 @@ const AddTodoModal: React.FC<AddTodoModalProps> = ({
                         fontSize: 10,
                         color:
                           selectedCategory === cat.id
-                            ? colors.REMINDER
+                            ? colors.PLACEHOLDER_SECOND
                             : colors.SECTION_TEXT,
                         fontWeight: selectedCategory === cat.id ? "700" : "500",
                       }}

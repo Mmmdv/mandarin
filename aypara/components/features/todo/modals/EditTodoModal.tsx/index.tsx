@@ -3,8 +3,8 @@ import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { modalStyles } from "@/constants/modalStyles";
 import {
-    checkSystemNotifications,
-    schedulePushNotification,
+  checkSystemNotifications,
+  schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
 import { getFullFormatDate } from "@/helpers/date";
@@ -17,8 +17,8 @@ import PastDateModal from "@/layout/Modals/PastDateModal";
 import { useAppDispatch } from "@/store";
 import { updateAppSetting } from "@/store/slices/appSlice";
 import {
-    addNotification,
-    updateNotificationStatus,
+  addNotification,
+  updateNotificationStatus,
 } from "@/store/slices/notificationSlice";
 import { Todo } from "@/types/todo";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,13 +26,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    LayoutAnimation,
-    Platform,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    UIManager,
-    View,
+  LayoutAnimation,
+  Platform,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  UIManager,
+  View,
 } from "react-native";
 import { getEditStyles } from "./styles";
 
@@ -351,11 +351,11 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     {
                       backgroundColor:
                         selectedCategory === cat.id
-                          ? colors.REMINDER + (isDark ? "30" : "15")
+                          ? colors.PLACEHOLDER_SECOND + (isDark ? "30" : "15")
                           : colors.SECTION_TEXT + (isDark ? "10" : "08"),
                       borderColor:
                         selectedCategory === cat.id
-                          ? colors.REMINDER
+                          ? colors.PLACEHOLDER_SECOND
                           : colors.SECTION_TEXT + (isDark ? "20" : "15"),
                       borderWidth: selectedCategory === cat.id ? 0.5 : 0.2,
                     },
@@ -366,7 +366,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                     size={14}
                     color={
                       selectedCategory === cat.id
-                        ? colors.REMINDER
+                        ? colors.PLACEHOLDER_SECOND
                         : colors.SECTION_TEXT
                     }
                   />
@@ -375,7 +375,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({
                       fontSize: 10,
                       color:
                         selectedCategory === cat.id
-                          ? colors.REMINDER
+                          ? colors.PLACEHOLDER_SECONDDER_SECOND
                           : colors.SECTION_TEXT,
                       fontWeight: selectedCategory === cat.id ? "700" : "500",
                     }}

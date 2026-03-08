@@ -3,8 +3,8 @@ import StyledModal from "@/components/ui/StyledModal";
 import StyledText from "@/components/ui/StyledText";
 import { setupCalendarLocales } from "@/config/calendar";
 import {
-    checkSystemNotifications,
-    schedulePushNotification,
+  checkSystemNotifications,
+  schedulePushNotification,
 } from "@/constants/notifications";
 import { TODO_CATEGORIES } from "@/constants/todo";
 import { getShortMonthName } from "@/helpers/date";
@@ -24,26 +24,26 @@ import { addNotification } from "@/store/slices/notificationSlice";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Animated,
-    Keyboard,
-    LayoutAnimation,
-    Platform,
-    Pressable,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    UIManager,
-    View,
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Keyboard,
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  UIManager,
+  View,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { getAddStyles } from "./styles";
@@ -591,11 +591,11 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
                       {
                         backgroundColor:
                           selectedCategory === cat.id
-                            ? colors.REMINDER + (isDark ? "30" : "15")
+                            ? colors.PLACEHOLDER_SECOND + (isDark ? "30" : "15")
                             : colors.SECTION_TEXT + (isDark ? "10" : "08"),
                         borderColor:
                           selectedCategory === cat.id
-                            ? colors.REMINDER
+                            ? colors.PLACEHOLDER_SECOND
                             : colors.SECTION_TEXT + (isDark ? "20" : "15"),
                         borderWidth: selectedCategory === cat.id ? 0.5 : 0.2,
                       },
@@ -606,7 +606,7 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
                       size={14}
                       color={
                         selectedCategory === cat.id
-                          ? colors.REMINDER
+                          ? colors.PLACEHOLDER_SECOND
                           : colors.SECTION_TEXT
                       }
                     />
@@ -615,7 +615,7 @@ const AddIterativeTodoModal: React.FC<AddIterativeTodoModalProps> = ({
                         fontSize: 10,
                         color:
                           selectedCategory === cat.id
-                            ? colors.REMINDER
+                            ? colors.PLACEHOLDER_SECOND
                             : colors.SECTION_TEXT,
                         fontWeight: selectedCategory === cat.id ? "700" : "500",
                       }}

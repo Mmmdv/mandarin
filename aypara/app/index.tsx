@@ -1,3 +1,4 @@
+import { getLocalIsoDate } from "@/helpers/date";
 import { useAppSelector } from "@/store";
 import { selectTodos } from "@/store/slices/todoSlice";
 import { Redirect } from "expo-router";
@@ -7,13 +8,13 @@ export default function Index() {
   const todos = useAppSelector(selectTodos);
 
   const hasTaskToday = React.useMemo(() => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getLocalIsoDate();
     return todos.some(
       (todo) =>
         !todo.isCompleted &&
         !todo.isArchived &&
         todo.reminder &&
-        todo.reminder.split("T")[0] === today,
+        getLocalIsoDate(new Date(todo.reminder)) === today,
     );
   }, [todos]);
 

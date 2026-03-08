@@ -253,20 +253,21 @@ const TodoItem: React.FC<TodoItemProps> = ({
                       styles.categoryBadge,
                       {
                         backgroundColor:
-                          colors.REMINDER + (isDark ? "20" : "12"),
-                        borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                          colors.PLACEHOLDER_SECOND + (isDark ? "20" : "12"),
+                        borderColor:
+                          colors.PLACEHOLDER_SECOND + (isDark ? "40" : "30"),
                       },
                     ]}
                   >
                     <Ionicons
                       name={getCategoryData(category).icon as any}
                       size={11}
-                      color={colors.REMINDER}
+                      color={colors.PLACEHOLDER_SECOND}
                     />
                     <StyledText
                       style={{
                         fontSize: 10,
-                        color: colors.REMINDER,
+                        color: colors.colors.PLACEHOLDER_SECOND,
                         fontWeight: "700",
                       }}
                     >
@@ -280,8 +281,9 @@ const TodoItem: React.FC<TodoItemProps> = ({
                       styles.categoryBadge,
                       {
                         backgroundColor:
-                          colors.REMINDER + (isDark ? "20" : "12"),
-                        borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                          colors.PLACEHOLDER_SECOND + (isDark ? "20" : "12"),
+                        borderColor:
+                          colors.PLACEHOLDER_SECOND + (isDark ? "40" : "30"),
                         paddingHorizontal: 6,
                         gap: 4,
                       },
@@ -290,12 +292,12 @@ const TodoItem: React.FC<TodoItemProps> = ({
                     <Ionicons
                       name="repeat-outline"
                       size={12}
-                      color={colors.REMINDER}
+                      color={colors.PLACEHOLDER_SECOND}
                     />
                     <StyledText
                       style={{
                         fontSize: 10,
-                        color: colors.REMINDER,
+                        color: colors.PLACEHOLDER_SECOND,
                         fontWeight: "800",
                       }}
                     >
@@ -422,20 +424,22 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   style={[
                     styles.categoryBadge,
                     {
-                      backgroundColor: colors.REMINDER + (isDark ? "20" : "12"),
-                      borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                      backgroundColor:
+                        colors.PLACEHOLDER_SECOND + (isDark ? "20" : "12"),
+                      borderColor:
+                        colors.PLACEHOLDER_SECOND + (isDark ? "40" : "30"),
                     },
                   ]}
                 >
                   <Ionicons
                     name={getCategoryData(category).icon as any}
                     size={11}
-                    color={colors.REMINDER}
+                    color={colors.PLACEHOLDER_SECOND}
                   />
                   <StyledText
                     style={{
                       fontSize: 10,
-                      color: colors.REMINDER,
+                      color: colors.PLACEHOLDER_SECOND,
                       fontWeight: "700",
                     }}
                   >
@@ -448,8 +452,10 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   style={[
                     styles.categoryBadge,
                     {
-                      backgroundColor: colors.REMINDER + (isDark ? "20" : "12"),
-                      borderColor: colors.REMINDER + (isDark ? "40" : "30"),
+                      backgroundColor:
+                        colors.PLACEHOLDER_SECOND + (isDark ? "20" : "12"),
+                      borderColor:
+                        colors.PLACEHOLDER_SECOND + (isDark ? "40" : "30"),
                       paddingHorizontal: 6,
                       gap: 4,
                     },
@@ -458,12 +464,12 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   <Ionicons
                     name="repeat-outline"
                     size={12}
-                    color={colors.REMINDER}
+                    color={colors.PLACEHOLDER_SECOND}
                   />
                   <StyledText
                     style={{
                       fontSize: 10,
-                      color: colors.REMINDER,
+                      color: colors.PLACEHOLDER_SECOND,
                       fontWeight: "800",
                     }}
                   >
