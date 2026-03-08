@@ -242,8 +242,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 style={{
                   flexDirection: "row",
                   flexWrap: "wrap",
-                  gap: 6,
-                  marginTop: 6,
+                  gap: 5,
+                  marginTop: 5,
                   alignItems: "center",
                 }}
               >
@@ -266,8 +266,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
                     />
                     <StyledText
                       style={{
-                        fontSize: 10,
-                        color: colors.colors.PLACEHOLDER_SECOND,
+                        fontSize: 9,
+                        color: colors.PLACEHOLDER_SECOND,
                         fontWeight: "700",
                       }}
                     >
@@ -284,8 +284,6 @@ const TodoItem: React.FC<TodoItemProps> = ({
                           colors.PLACEHOLDER_SECOND + (isDark ? "20" : "12"),
                         borderColor:
                           colors.PLACEHOLDER_SECOND + (isDark ? "40" : "30"),
-                        paddingHorizontal: 6,
-                        gap: 4,
                       },
                     ]}
                   >
@@ -296,9 +294,9 @@ const TodoItem: React.FC<TodoItemProps> = ({
                     />
                     <StyledText
                       style={{
-                        fontSize: 10,
+                        fontSize: 9,
                         color: colors.PLACEHOLDER_SECOND,
-                        fontWeight: "800",
+                        fontWeight: "700",
                       }}
                     >
                       {isCompleted
@@ -400,7 +398,7 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   fontSize: 14,
                   fontWeight: "600",
                   lineHeight: 20,
-                  letterSpacing: 0.1,
+                  letterSpacing: 0.3,
                   opacity: isArchived ? 0.9 : 1,
                   textDecorationLine:
                     isCompleted && !isArchived ? "line-through" : "none",
@@ -414,8 +412,8 @@ const TodoItem: React.FC<TodoItemProps> = ({
               style={{
                 flexDirection: "row",
                 flexWrap: "wrap",
-                gap: 6,
-                marginTop: 4,
+                gap: 4,
+                marginTop: 5,
                 alignItems: "center",
               }}
             >
@@ -433,12 +431,12 @@ const TodoItem: React.FC<TodoItemProps> = ({
                 >
                   <Ionicons
                     name={getCategoryData(category).icon as any}
-                    size={11}
+                    size={12}
                     color={colors.PLACEHOLDER_SECOND}
                   />
                   <StyledText
                     style={{
-                      fontSize: 10,
+                      fontSize: 9,
                       color: colors.PLACEHOLDER_SECOND,
                       fontWeight: "700",
                     }}
@@ -456,8 +454,6 @@ const TodoItem: React.FC<TodoItemProps> = ({
                         colors.PLACEHOLDER_SECOND + (isDark ? "20" : "12"),
                       borderColor:
                         colors.PLACEHOLDER_SECOND + (isDark ? "40" : "30"),
-                      paddingHorizontal: 6,
-                      gap: 4,
                     },
                   ]}
                 >
@@ -468,9 +464,9 @@ const TodoItem: React.FC<TodoItemProps> = ({
                   />
                   <StyledText
                     style={{
-                      fontSize: 10,
+                      fontSize: 9,
                       color: colors.PLACEHOLDER_SECOND,
-                      fontWeight: "800",
+                      fontWeight: "700",
                     }}
                   >
                     {isCompleted

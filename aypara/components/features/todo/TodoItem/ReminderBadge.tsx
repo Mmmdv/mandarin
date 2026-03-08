@@ -43,21 +43,19 @@ const ReminderBadge: React.FC<ReminderBadgeProps> = ({
           {
             backgroundColor: colors.PLACEHOLDER_SECOND + (isDark ? "20" : "12"),
             borderColor: colors.PLACEHOLDER_SECOND + (isDark ? "40" : "30"),
-            paddingVertical: viewMode === "card" ? 2 : 2.5,
-            paddingHorizontal: viewMode === "card" ? 5 : 6,
             opacity: opacity,
           },
         ]}
       >
         <Ionicons
           name="alarm-outline"
-          size={viewMode === "card" ? 10 : 11}
+          size={12}
           color={colors.PLACEHOLDER_SECOND}
         />
         <StyledText
           style={{
             color: colors.PLACEHOLDER_SECOND,
-            fontSize: viewMode === "card" ? 9 : 10,
+            fontSize: 8,
             fontWeight: "700",
             textDecorationLine: isCrossedOut ? "line-through" : "none",
           }}
